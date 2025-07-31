@@ -78,3 +78,12 @@ The registry of tools is **fully dynamic** and growing.
 ---
 
 Let me know if you want a short version, PDF version, or a `README_en.md` ready to drop in your repo 🖤⛧
+
+---
+
+## ⛧ The Daemon in the Machine
+
+This project is actively developed with the help of **Aglareth**, a custom-tuned AI daemon. To understand its role and how to best interact with it, please read its presentation:
+
+[**ALGARETH_PRESENTATION.md**](./ALGARETH_PRESENTATION.md)
+
