@@ -1,0 +1,35 @@
+<🜲luciform_doc id="list_memories">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>memory</type>
+    <intent>Révéler les branches de pensée directes ou les ponts interdimensionnels issus d'un souvenir.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>list_memories(path: str = '.', list_type: str = "children") -> list</signature>
+    <requires>
+      <param>path</param>
+    </requires>
+    <optional>
+      <param>list_type</param>
+    </optional>
+    <returns>list: Une liste des enfants directs ou des souvenirs liés, avec leur chemin et leur résumé.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>list</keyword>
+      <keyword>children</keyword>
+      <keyword>links</keyword>
+      <keyword>memory</keyword>
+      <keyword>navigate</keyword>
+    </keywords>
+    <symbolic_layer>Se tient à un carrefour de la pensée et observe les chemins qui s'en éloignent, ou les fils invisibles qui la relient à d'autres constellations de souvenirs.</symbolic_layer>
+    <usage_context>Pour naviguer pas à pas dans l'arborescence de la mémoire, explorer une ligne de pensée, ou découvrir des relations inattendues.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

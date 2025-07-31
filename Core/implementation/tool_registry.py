@@ -17,6 +17,10 @@ from Tools.FileSystem.implementation.scry.scrying_tools import *
 from Tools.Library.implementation.library_tools import *
 from Tools.Execution.implementation.execution_tools import *
 from Tools.Execution.implementation.invoke_cli_tool import invoke_cli_tool
+from Algareth-toolset.remember import remember
+from Algareth-toolset.recall import recall
+from Algareth-toolset.list_memories import list_memories
+from Algareth-toolset.forget import forget
 from Tools.Search.implementation.search_tools import *
 
 # Chemin vers la documentation des outils
@@ -99,6 +103,10 @@ def initialize_tool_registry(memory_engine_instance):
         "find_memories_by_keyword": memory_engine_instance.find_memories_by_keyword,
         "list_children": memory_engine_instance.list_children,
         "list_links": memory_engine_instance.list_links,
+        "remember": remember,
+        "recall": recall,
+        "list_memories": list_memories,
+        "forget": forget,
     }
     available_functions.update(memory_tool_methods)
 

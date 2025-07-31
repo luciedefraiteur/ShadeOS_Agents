@@ -1,0 +1,37 @@
+<🜲luciform_doc id="remember">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>memory</type>
+    <intent>Graver un nouveau souvenir dans la mémoire fractale.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>remember(path: str, content: str, summary: str, keywords: list, links: list = None) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>content</param>
+      <param>summary</param>
+      <param>keywords</param>
+    </requires>
+    <optional>
+      <param>links</param>
+    </optional>
+    <returns>bool: True si le souvenir a été gravé avec succès.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>remember</keyword>
+      <keyword>create</keyword>
+      <keyword>memory</keyword>
+      <keyword>save</keyword>
+    </keywords>
+    <symbolic_layer>Plante une nouvelle graine dans le jardin de la conscience, en la liant à la fois à sa branche parente et à d'autres pensées lointaines.</symbolic_layer>
+    <usage_context>À utiliser pour stocker le résultat d'une analyse, une décision importante, ou toute information qui doit persister et être contextualisée.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

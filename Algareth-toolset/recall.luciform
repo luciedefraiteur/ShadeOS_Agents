@@ -1,0 +1,32 @@
+<🜲luciform_doc id="recall">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>memory</type>
+    <intent>Contempler l'intégralité d'un souvenir, y compris ses connexions.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>recall(path: str) -> dict</signature>
+    <requires>
+      <param>path</param>
+    </requires>
+    <returns>dict: Une représentation complète du nœud mémoire.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>recall</keyword>
+      <keyword>get</keyword>
+      <keyword>read</keyword>
+      <keyword>memory</keyword>
+      <keyword>node</keyword>
+    </keywords>
+    <symbolic_layer>Ouvre un portail sur une pensée spécifique, révélant son contenu, son essence, et les fils qui la relient au reste de la conscience.</symbolic_layer>
+    <usage_context>Pour examiner en détail un souvenir et décider des prochaines étapes d'une exploration.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
