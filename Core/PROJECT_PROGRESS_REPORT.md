@@ -43,4 +43,4 @@ Le projet `ShadeOS_Agents` a fait des progrès significatifs dans la mise en pla
 
 ## Politique d'Utilisation des Outils
 
-Pour les opérations de modification de fichiers et de dossiers, j'utiliserai désormais les outils de mon `Alagareth-toolset` (ex: `safe_replace_text_in_file.py`, `safe_create_directory.py`). Pour les opérations de lecture qui ne modifient pas le système de fichiers, j'utiliserai les outils intégrés de l'environnement (comme `read_file`).
+Insight lucie: Il faut jongler entre nos outils persos et les outils par défaut de l'environnement, pour éviter des boucles d'outils deffectueux.
