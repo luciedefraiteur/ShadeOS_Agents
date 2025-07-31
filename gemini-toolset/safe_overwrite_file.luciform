@@ -1,0 +1,34 @@
+<🜲luciform_doc id="safe_overwrite_file">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>writing</type>
+    <intent>Réécrire entièrement le pacte d'un fichier, en journalisant les différences.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>safe_overwrite_file(path: str, content: str) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>content</param>
+    </requires>
+    <returns>bool: True si l'écriture a réussi.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>overwrite</keyword>
+      <keyword>replace</keyword>
+      <keyword>write</keyword>
+      <keyword>full</keyword>
+      <keyword>diff</keyword>
+      <keyword>log</keyword>
+    </keywords>
+    <symbolic_layer>Efface le passé et le remplace par une nouvelle vérité, en enregistrant les traces de cette transmutation.</symbolic_layer>
+    <usage_context>Quand un fichier de configuration doit être entièrement remplacé ou qu'un fichier temporaire est réutilisé, avec une traçabilité complète.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

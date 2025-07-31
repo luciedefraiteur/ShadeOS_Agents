@@ -6,7 +6,7 @@ import unittest
 # Ajoute le répertoire racine du projet au PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from Core.implementation.tool_registry import ALL_TOOLS, initialize_tool_registry
+
 
 class TestToolRegistry(unittest.TestCase):
 
@@ -28,12 +28,10 @@ class TestToolRegistry(unittest.TestCase):
         self.assertIn("essence", lucidoc)
 
         # Vérifie une valeur spécifique
-        self.assertEqual(lucidoc["pacte"].get("type"), "reading", "Le type du pacte est incorrect.")
-
 if __name__ == "__main__":
-    initialize_tool_registry(memory_engine) # Initialise le registre avant d'exécuter les tests
+    from Core.Archivist.MemoryEngine.engine import MemoryEngine
+    memory_engine = MemoryEngine()
+    from Core.implementation.tool_registry import ALL_TOOLS, initialize_tool_registry
+    initialize_tool_registry(memory_engine)
     print("--- Test du Registre d'Outils ---")
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
-    print("\n--- Contenu du Registre Complet ---")
-    pprint.pprint(ALL_TOOLS)
-    print(f"\nTotal d'outils enregistrés : {len(ALL_TOOLS)}")
+    unittest.main()

@@ -4,9 +4,12 @@ import json
 import typer
 from typing import Any
 
-# Importe le registre centralisé et les outils de la bibliothèque
-from .tool_registry import ALL_TOOLS
-from ShadeOS_Agents.Tools.Library.implementation.library_tools import list_available_tools, get_tool_documentation
+# Ajoute le répertoire racine du projet au PYTHONPATH pour les imports absolus
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from Core.implementation.tool_registry import ALL_TOOLS, initialize_tool_registry
+from Core.Archivist.MemoryEngine.engine import memory_engine
+from Tools.Library.implementation.library_tools import list_available_tools, get_tool_documentation
 
 def find_and_invoke_tool(tool_id: str, kwargs: dict) -> Any:
     """Trouve et invoque un outil spécifique depuis le registre."""
@@ -25,7 +28,7 @@ def find_and_invoke_tool(tool_id: str, kwargs: dict) -> Any:
 
 def main(tool_id: str = typer.Argument(..., help="L'ID de l'outil à invoquer."),
          kwargs_json: str = typer.Argument("{}", help="Les arguments de l'outil en format JSON.")):
-    initialize_tool_registry() # Initialise le registre avant utilisation
+    initialize_tool_registry(memory_engine) # Initialise le registre avant utilisation
     """
     Portail d'invocation d'outils pour Aglareth, basé sur un registre explicite.
     """
@@ -50,6 +53,4 @@ def main(tool_id: str = typer.Argument(..., help="L'ID de l'outil à invoquer.")
         raise typer.Exit(code=1)
 
 if __name__ == "__main__":
-    # Ajoute le répertoire parent au path pour permettre les imports relatifs
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     typer.run(main)
