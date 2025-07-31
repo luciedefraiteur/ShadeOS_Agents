@@ -10,6 +10,7 @@ from Core.implementation.luciform_parser import parse_luciform
 # Importe les fonctions d'outils pour qu'elles soient dans le scope global
 from Tools.FileSystem.implementation.reading_tools import *
 from Tools.FileSystem.implementation.writing_tools import *
+from Core.Archivist.MemoryEngine.engine import memory_engine
 from Tools.FileSystem.implementation.listing_tools import *
 from Tools.FileSystem.implementation.modification_tools import *
 from Tools.FileSystem.implementation.scry.scrying_tools import *
