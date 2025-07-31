@@ -15,6 +15,7 @@ from Tools.FileSystem.implementation.modification_tools import *
 from Tools.FileSystem.implementation.scry.scrying_tools import *
 from Tools.Library.implementation.library_tools import *
 from Tools.Execution.implementation.execution_tools import *
+from Tools.Execution.implementation.invoke_cli_tool import invoke_cli_tool
 from Tools.Search.implementation.search_tools import *
 
 # Chemin vers la documentation des outils

@@ -1,47 +1,22 @@
+from Tools.Execution.implementation.invoke_cli_tool import invoke_cli_tool
+import json
+
 def replace_text_in_file(path: str, old_text: str, new_text: str, all_occurrences: bool = False) -> bool:
     """Remplace la première ou toutes les occurrences d'un texte dans un fichier."""
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        if all_occurrences:
-            new_content = content.replace(old_text, new_text)
-        else:
-            new_content = content.replace(old_text, new_text, 1)
-            
-        if new_content == content:
-            return False
-
-        with open(path, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-        return True
-    except Exception:
-        return False
+    args = [path, old_text, new_text]
+    if all_occurrences:
+        args.append("--all_occurrences")
+    result = invoke_cli_tool("safe_replace_text_in_file", args)
+    return result["success"]
 
 def replace_lines_in_file(path: str, start_line: int, end_line: int, new_lines: list[str]) -> bool:
     """Remplace une plage de lignes par de nouvelles lignes."""
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        
-        new_content_lines = lines[:start_line-1] + [l + '\n' for l in new_lines] + lines[end_line:]
-
-        with open(path, 'w', encoding='utf-8') as f:
-            f.writelines(new_content_lines)
-        return True
-    except Exception:
-        return False
+    args = [path, str(start_line), str(end_line)] + new_lines
+    result = invoke_cli_tool("safe_replace_lines_in_file", args)
+    return result["success"]
 
 def insert_text_at_line(path: str, line_number: int, text_to_insert: str) -> bool:
     """Insère un bloc de texte à une ligne spécifique, décalant le reste."""
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        
-        lines.insert(line_number - 1, text_to_insert + '\n')
-
-        with open(path, 'w', encoding='utf-8') as f:
-            f.writelines(lines)
-        return True
-    except Exception:
-        return False
+    args = [path, str(line_number), text_to_insert]
+    result = invoke_cli_tool("safe_insert_text_at_line", args)
+    return result["success"]

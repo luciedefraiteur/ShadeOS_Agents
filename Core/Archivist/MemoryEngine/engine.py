@@ -2,10 +2,9 @@ from .storage_backends import FileSystemBackend
 
 class MemoryEngine:
     """Point d'entrée principal et API publique du moteur de mémoire."""
-
-    def __init__(self, backend=None):
+    def __init__(self, base_path: str = '.', backend=None):
         # Permet d'injecter un backend différent pour les tests, sinon utilise FileSystemBackend par défaut.
-        self.backend = backend if backend else FileSystemBackend()
+        self.backend = backend if backend else FileSystemBackend(base_path=base_path)
 
     def create_memory(self, path: str, content: str, summary: str, keywords: list, links: list = None):
         """Crée un nouveau souvenir dans le système fractal."""
@@ -32,4 +31,4 @@ class MemoryEngine:
         return node.linked_memories
 
 # Instance globale pour un accès facile par les outils
-memory_engine = MemoryEngine()
+memory_engine = MemoryEngine(base_path='.')
