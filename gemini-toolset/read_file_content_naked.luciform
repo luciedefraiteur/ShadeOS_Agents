@@ -1,0 +1,32 @@
+<🜲luciform_doc id="read_file_content_naked">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>reading</type>
+    <intent>Invoquer le contenu brut d'un fichier, sans fioritures.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>read_file_content_naked(path: str) -> str</signature>
+    <requires>
+      <param>path</param>
+    </requires>
+    <returns>str: Le contenu brut du fichier.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>read</keyword>
+      <keyword>content</keyword>
+      <keyword>naked</keyword>
+      <keyword>raw</keyword>
+      <keyword>file</keyword>
+    </keywords>
+    <symbolic_layer>Dépouille le fichier de toute illusion pour en révéler la vérité nue.</symbolic_layer>
+    <usage_context>Pour les cas où seule la donnée brute est nécessaire, sans traitement ni interprétation.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

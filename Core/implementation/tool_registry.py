@@ -1,117 +1,127 @@
 import os
 import sys
-from .luciform_parser import parse_luciform
+import pprint
 
-# Importe les fonctions d'outils
-from ShadeOS_Agents.Tools.FileSystem.implementation.reading_tools import *
-from ShadeOS_Agents.Tools.FileSystem.implementation.writing_tools import *
-from ShadeOS_Agents.Tools.FileSystem.implementation.listing_tools import *
-from ShadeOS_Agents.Tools.FileSystem.implementation.modification_tools import *
-from ShadeOS_Agents.Tools.FileSystem.implementation.scry.scrying_tools import *
-from ShadeOS_Agents.Tools.Library.implementation.library_tools import *
-from ShadeOS_Agents.Tools.Execution.implementation.execution_tools import *
-from ShadeOS_Agents.Tools.Search.implementation.search_tools import *
+# Ajoute le répertoire racine du projet au PYTHONPATH pour les imports absolus
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from Core.implementation.luciform_parser import parse_luciform
+
+# Importe les fonctions d'outils pour qu'elles soient dans le scope global
+from Tools.FileSystem.implementation.reading_tools import *
+from Tools.FileSystem.implementation.writing_tools import *
+from Tools.FileSystem.implementation.listing_tools import *
+from Tools.FileSystem.implementation.modification_tools import *
+from Tools.FileSystem.implementation.scry.scrying_tools import *
+from Tools.Library.implementation.library_tools import *
+from Tools.Execution.implementation.execution_tools import *
+from Tools.Search.implementation.search_tools import *
 
 # Chemin vers la documentation des outils
 DOCS_BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../Tools/Library/documentation/luciforms'))
 
 ALL_TOOLS = {}
 
-def _reconstruct_doc_from_tree(parsed_tree):
-    """Reconstruit un dictionnaire plat depuis l'arbre parsé."""
-    print(f"[REGISTRY DEBUG] Reconstruire depuis l'arbre: {parsed_tree}", file=sys.stderr)
-    if not parsed_tree or not parsed_tree.get("attrs"):
-        print("[REGISTRY DEBUG] Arbre parsé invalide ou sans attributs.", file=sys.stderr)
+def _find_node_text(nodes, tag):
+    """Utilitaire pour trouver le contenu textuel d'un nœud spécifique."""
+    for node in nodes:
+        if node.get('tag') == tag:
+            for child in node.get('children', []):
+                if child.get('tag') == 'text':
+                    return child.get('content')
+    return None
+
+def _find_node_list(nodes, tag):
+    """Utilitaire pour trouver une liste de contenus textuels dans des sous-nœuds."""
+    for node in nodes:
+        if node.get('tag') == tag:
+            items = []
+            for child in node.get('children', []):
+                if child.get('tag') != 'comment':
+                    for sub_child in child.get('children', []):
+                        if sub_child.get('tag') == 'text':
+                            items.append(sub_child.get('content'))
+            return items
+    return []
+
+def _extract_semantic_doc(ast: dict) -> dict:
+    """Extrait un dictionnaire sémantique depuis l'arbre de syntaxe abstrait (AST)."""
+    if not ast or ast.get('tag') != '🜲luciform_doc':
         return None
-        
-    doc = {"id": parsed_tree["attrs"].get("id")}
-    if not doc["id"]:
-        print("[REGISTRY DEBUG] ID non trouvé dans l'arbre parsé.", file=sys.stderr)
-        return None
 
-    for section in parsed_tree.get("children", []):
-        print(f"[REGISTRY DEBUG] Traitement de la section: {section.get("tag")}", file=sys.stderr)
-        if section.get("type") == "comment": continue
-        
-        section_name = section.get("tag")
-        if not section_name:
-            print("[REGISTRY DEBUG] Nom de section non trouvé.", file=sys.stderr)
-            continue
+    doc = {'id': ast.get('attrs', {}).get('id')}
+    
+    children = ast.get('children', [])
+    
+    # Extraction du pacte
+    pacte_node = next((n for n in children if n.get('tag') == '🜄pacte'), None)
+    if pacte_node:
+        pacte_children = pacte_node.get('children', [])
+        doc['pacte'] = {
+            'type': _find_node_text(pacte_children, 'type'),
+            'intent': _find_node_text(pacte_children, 'intent'),
+            'level': _find_node_text(pacte_children, 'level'),
+        }
 
-        section_data = {}
-        comments = []
-        for item in section.get("children", []):
-            item_type = item.get("type")
-            item_tag = item.get("tag")
-            print(f"[REGISTRY DEBUG]   - Traitement de l'élément: {item_tag} (Type: {item_type})", file=sys.stderr)
+    # Extraction de l'invocation
+    invocation_node = next((n for n in children if n.get('tag') == '🜂invocation'), None)
+    if invocation_node:
+        inv_children = invocation_node.get('children', [])
+        doc['invocation'] = {
+            'signature': _find_node_text(inv_children, 'signature'),
+            'requires': _find_node_list(inv_children, 'requires'),
+            'optional': _find_node_list(inv_children, 'optional'),
+            'returns': _find_node_text(inv_children, 'returns'),
+        }
 
-            if item_type == "comment":
-                comments.append(item.get("content"))
-            elif item_type == "text":
-                continue
-            else: # C'est une balise
-                children = item.get("children", [])
-                if any(child.get("tag") == "param" for child in children):
-                    section_data[item_tag] = [child["children"][0]["content"] for child in children if child.get("tag") == "param" and child.get("children")]
-                elif children and children[0].get("type") == "text":
-                    section_data[item_tag] = children[0].get("content")
-                elif children and children[0].get("type") == "comment": # Gère les commentaires au niveau de l'élément
-                    if "comments" not in section_data: section_data["comments"] = []
-                    section_data["comments"].append(children[0].get("content"))
-                elif item_tag: # Gère les balises sans enfants texte direct (comme <keywords>)
-                    # Récupère les enfants de la balise (ex: <keyword>)
-                    nested_children_data = []
-                    for nested_child in children:
-                        if nested_child.get("type") == "text":
-                            nested_children_data.append(nested_child.get("content"))
-                        elif nested_child.get("tag") == "keyword" and nested_child.get("children") and nested_child["children"][0].get("type") == "text":
-                            nested_children_data.append(nested_child["children"][0].get("content"))
-                        # Ajout pour gérer les balises simples comme <type> et <intent>
-                        elif nested_child.get("tag") and nested_child.get("children") and nested_child["children"][0].get("type") == "text":
-                            section_data[nested_child.get("tag")] = nested_child["children"][0].get("content")
-                    if nested_children_data:
-                        section_data[item_tag] = nested_children_data
-                # Ajout pour gérer les balises simples comme <type> et <intent> qui sont directement dans la section
-                elif item_tag and children and children[0].get("type") == "text":
-                    section_data[item_tag] = children[0].get("content")
-        
-        if comments:
-            section_data["comments"] = comments
-        
-        doc[section_name] = section_data
-    print(f"[REGISTRY DEBUG] Document reconstruit: {doc}", file=sys.stderr)
+    # Extraction de l'essence
+    essence_node = next((n for n in children if n.get('tag') == '🜁essence'), None)
+    if essence_node:
+        ess_children = essence_node.get('children', [])
+        doc['essence'] = {
+            'keywords': _find_node_list(ess_children, 'keywords'),
+            'symbolic_layer': _find_node_text(ess_children, 'symbolic_layer'),
+            'usage_context': _find_node_text(ess_children, 'usage_context'),
+        }
+
     return doc
 
-def _build_dynamic_registry():
-    """Construit le registre dynamiquement en lisant les fichiers .luciform."""
-    print(f"[REGISTRY DEBUG] Construction du registre depuis : {DOCS_BASE_PATH}", file=sys.stderr)
+def initialize_tool_registry(memory_engine_instance):
+    """Construit le registre dynamiquement en lisant et parsant les fichiers .luciform."""
+    # Rassemble d'abord les fonctions globales
     available_functions = {**globals()}
-    print(f"[REGISTRY DEBUG] Fonctions disponibles (partiel): {list(available_functions.keys())[:5]}...", file=sys.stderr)
+    # Ajoute ensuite les méthodes du moteur de mémoire
+    memory_tool_methods = {
+        "create_memory": memory_engine_instance.create_memory,
+        "get_memory_node": memory_engine_instance.get_memory_node,
+        "find_memories_by_keyword": memory_engine_instance.find_memories_by_keyword,
+        "list_children": memory_engine_instance.list_children,
+        "list_links": memory_engine_instance.list_links,
+    }
+    available_functions.update(memory_tool_methods)
 
     for doc_file in os.listdir(DOCS_BASE_PATH):
         if doc_file.endswith(".luciform"):
-            print(f"[REGISTRY DEBUG] Fichier trouvé : {doc_file}", file=sys.stderr)
+            file_path = os.path.join(DOCS_BASE_PATH, doc_file)
             try:
-                parsed_tree = parse_luciform(os.path.join(DOCS_BASE_PATH, doc_file))
-                lucidoc = _reconstruct_doc_from_tree(parsed_tree)
-                if not lucidoc:
-                    print(f"[REGISTRY DEBUG]  - Luciform {doc_file} non reconstruit.", file=sys.stderr)
-                    continue
-                tool_id = lucidoc.get("id")
-                print(f"[REGISTRY DEBUG]  - ID extrait : {tool_id}", file=sys.stderr)
+                ast = parse_luciform(file_path)
+                lucidoc = _extract_semantic_doc(ast)
                 
-                if tool_id and tool_id in available_functions:
-                    print(f"[REGISTRY DEBUG]  - Succès : Outil '{tool_id}' trouvé et enregistré.", file=sys.stderr)
-                    ALL_TOOLS[tool_id] = {
-                        "function": available_functions[tool_id],
-                        "lucidoc": lucidoc
-                    }
+                if lucidoc and lucidoc.get("id"):
+                    tool_id = lucidoc["id"]
+                    if tool_id in available_functions:
+                        ALL_TOOLS[tool_id] = {
+                            "function": available_functions[tool_id],
+                            "lucidoc": lucidoc
+                        }
+                    else:
+                        sys.stderr.write(f"Avertissement : Outil '{tool_id}' défini dans {doc_file} mais non trouvé.\n")
                 else:
-                    print(f"[REGISTRY DEBUG]  - Échec : Outil '{tool_id}' non trouvé dans les fonctions disponibles ou ID manquant.", file=sys.stderr)
-            except (ValueError, KeyError, IndexError) as e:
-                print(f"[REGISTRY DEBUG]  - Erreur de reconstruction du luciform {doc_file}: {e}", file=sys.stderr)
+                    sys.stderr.write(f"Avertissement : Luciform dans {doc_file} est mal formé ou n'a pas d'ID.\n")
+            except Exception as e:
+                sys.stderr.write(f"Erreur lors du traitement du luciform {doc_file}: {e}\n")
                 continue
 
-    print(f"[REGISTRY DEBUG] Registre final : {list(ALL_TOOLS.keys())}", file=sys.stderr)
 
-_build_dynamic_registry()
+
+if __name__ == "__main__":    initialize_tool_registry() # Appelle l'initialisation si le module est exécuté directement    pprint.pprint(ALL_TOOLS)    print(f"\nTotal d'outils enregistrés : {len(ALL_TOOLS)}")

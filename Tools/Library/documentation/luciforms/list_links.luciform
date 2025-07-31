@@ -1,0 +1,28 @@
+<🜲luciform_doc id="list_links">
+
+  <🜄pacte>
+    <type>memory</type>
+    <intent>Suivre les ponts interdimensionnels vers d'autres souvenirs liés.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <🜂invocation>
+    <signature>list_links(path: str = '.') -> list[dict]</signature>
+    <optional>
+      <param>path</param>
+    </optional>
+    <returns>list[dict]: Une liste des souvenirs liés, avec leur chemin et leur résumé.</returns>
+  </🜂invocation>
+
+  <🜁essence>
+    <keywords>
+      <keyword>list</keyword>
+      <keyword>links</keyword>
+      <keyword>memory</keyword>
+      <keyword>connections</keyword>
+    </keywords>
+    <symbolic_layer>Traverse les portails de la pensée pour explorer des idées connectées mais non adjacentes.</symbolic_layer>
+    <usage_context>Pour découvrir des relations inattendues et naviguer dans le graphe sémantique de la mémoire.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

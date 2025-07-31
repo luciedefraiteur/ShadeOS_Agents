@@ -1,0 +1,33 @@
+<🜲luciform_doc id="read_file_lines">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>reading</type>
+    <intent>Extraire une séquence précise de lignes d'un fichier.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>read_file_lines(path: str, start_line: int, end_line: int) -> list[str]</signature>
+    <requires>
+      <param>path</param>
+      <param>start_line</param>
+      <param>end_line</param>
+    </requires>
+    <returns>list[str]: Les lignes demandées.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>read</keyword>
+      <keyword>lines</keyword>
+      <keyword>range</keyword>
+      <keyword>extract</keyword>
+    </keywords>
+    <symbolic_layer>Découpe un fragment du temps d'un fichier, ligne par ligne.</symbolic_layer>
+    <usage_context>Pour se concentrer sur une section spécifique d'un script ou d'un log.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

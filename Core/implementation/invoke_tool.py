@@ -25,6 +25,7 @@ def find_and_invoke_tool(tool_id: str, kwargs: dict) -> Any:
 
 def main(tool_id: str = typer.Argument(..., help="L'ID de l'outil à invoquer."),
          kwargs_json: str = typer.Argument("{}", help="Les arguments de l'outil en format JSON.")):
+    initialize_tool_registry() # Initialise le registre avant utilisation
     """
     Portail d'invocation d'outils pour Aglareth, basé sur un registre explicite.
     """

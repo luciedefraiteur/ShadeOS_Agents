@@ -1,0 +1,28 @@
+<🜲luciform_doc id="find_memories_by_keyword">
+
+  <🜄pacte>
+    <type>memory</type>
+    <intent>Sonder la mémoire à la recherche de souvenirs liés par un mot-clé.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <🜂invocation>
+    <signature>find_memories_by_keyword(keyword: str) -> list[str]</signature>
+    <requires>
+      <param>keyword</param>
+    </requires>
+    <returns>list[str]: Une liste des chemins vers les souvenirs correspondants.</returns>
+  </🜂invocation>
+
+  <🜁essence>
+    <keywords>
+      <keyword>find</keyword>
+      <keyword>search</keyword>
+      <keyword>memory</keyword>
+      <keyword>keyword</keyword>
+    </keywords>
+    <symbolic_layer>Murmure un mot à la conscience et écoute les échos qui en reviennent, cartographiant les pensées liées par ce concept.</symbolic_layer>
+    <usage_context>Pour retrouver des informations pertinentes lorsque l'on a une idée générale mais pas le chemin exact d'un souvenir.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

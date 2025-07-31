@@ -1,0 +1,28 @@
+<🜲luciform_doc id="list_children">
+
+  <🜄pacte>
+    <type>memory</type>
+    <intent>Révéler les branches de pensée directes issues d'un souvenir.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <🜂invocation>
+    <signature>list_children(path: str = '.') -> list[dict]</signature>
+    <optional>
+      <param>path</param>
+    </optional>
+    <returns>list[dict]: Une liste des enfants directs, avec leur chemin et leur résumé.</returns>
+  </🜂invocation>
+
+  <🜁essence>
+    <keywords>
+      <keyword>list</keyword>
+      <keyword>children</keyword>
+      <keyword>memory</keyword>
+      <keyword>navigate</keyword>
+    </keywords>
+    <symbolic_layer>Se tient à un carrefour de la pensée et observe les chemins qui s'en éloignent.</symbolic_layer>
+    <usage_context>Pour naviguer pas à pas dans l'arborescence de la mémoire et explorer une ligne de pensée.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
