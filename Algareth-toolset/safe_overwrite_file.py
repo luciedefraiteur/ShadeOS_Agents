@@ -3,7 +3,12 @@ import argparse
 import difflib
 import sys
 
-# Importe les outils gemini-toolset nécessaires
+# Assure que le répertoire de l'outil est dans sys.path pour les imports internes
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+if _current_dir not in sys.path:
+    sys.path.insert(0, _current_dir)
+
+# Importe les outils Alagareth-toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 
 def _overwrite_file_internal(path: str, content: str) -> bool:

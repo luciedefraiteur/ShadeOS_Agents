@@ -1,6 +1,12 @@
 import os
 import argparse
 import json
+import sys
+
+# Assure que le répertoire de l'outil est dans sys.path pour les imports internes
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+if _current_dir not in sys.path:
+    sys.path.insert(0, _current_dir)
 
 def scry_for_text(path: str, text_to_find: str, context_lines: int = 3) -> list[dict]:
     """Cherche un texte dans un fichier et retourne chaque occurrence avec un nombre défini de lignes de contexte avant et après."""
