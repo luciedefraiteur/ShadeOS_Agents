@@ -3,7 +3,7 @@ import sys
 import pprint
 
 # Ajoute le répertoire racine du projet au PYTHONPATH pour les imports absolus
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Core.implementation.luciform_parser import parse_luciform
 

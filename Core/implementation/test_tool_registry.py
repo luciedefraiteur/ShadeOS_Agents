@@ -31,7 +31,7 @@ class TestToolRegistry(unittest.TestCase):
         self.assertEqual(lucidoc["pacte"].get("type"), "reading", "Le type du pacte est incorrect.")
 
 if __name__ == "__main__":
-    initialize_tool_registry() # Initialise le registre avant d'exécuter les tests
+    initialize_tool_registry(memory_engine) # Initialise le registre avant d'exécuter les tests
     print("--- Test du Registre d'Outils ---")
     unittest.main(argv=['first-arg-is-ignored'], exit=False)
     print("\n--- Contenu du Registre Complet ---")
