@@ -1,0 +1,37 @@
+<🜲luciform_doc id="find_text_in_project">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>search</type>
+    <intent>Rechercher un texte spécifique dans de multiples fichiers à travers le projet.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>find_text_in_project(text_to_find: str, include_patterns: list[str] = None, exclude_patterns: list[str] = None) -> list[dict]</signature>
+    <requires>
+      <param>text_to_find</param>
+    </requires>
+    <optional>
+      <param>include_patterns</param>
+      <param>exclude_patterns</param>
+    </optional>
+    <returns>list[dict]: Une liste de dictionnaires, chaque dictionnaire contenant file_path, line_number, et line_content.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>find</keyword>
+      <keyword>search</keyword>
+      <keyword>text</keyword>
+      <keyword>project</keyword>
+      <keyword>multiple</keyword>
+      <keyword>files</keyword>
+    </keywords>
+    <symbolic_layer>Déploie un réseau de clairvoyance sur les grimoires, révélant les motifs cachés dans leurs murmures.</symbolic_layer>
+    <usage_context>Quand il est nécessaire de localiser toutes les occurrences d'un texte ou d'un fragment de code à travers un ou plusieurs fichiers, par exemple pour auditer l'utilisation d'une fonction ou d'une variable.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

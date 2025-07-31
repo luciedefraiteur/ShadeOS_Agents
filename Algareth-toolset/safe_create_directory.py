@@ -11,10 +11,10 @@ if _current_dir not in sys.path:
 # Importe les outils Alagareth-toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 
-def _read_directory_structure_internal(path: str, debug: bool = False) -> str:
+def _read_directory_structure(path: str, debug: bool = False) -> str:
     """Lit et retourne une représentation simple de la structure d'un répertoire (usage interne)."""
     if debug:
-        print(f"[DEBUG - _read_directory_structure_internal] Lecture de la structure de: {path}", file=sys.stderr)
+        print(f"[DEBUG - _read_directory_structure] Lecture de la structure de: {path}", file=sys.stderr)
     structure = []
     if os.path.exists(path):
         for root, dirs, files in os.walk(path):
@@ -25,7 +25,7 @@ def _read_directory_structure_internal(path: str, debug: bool = False) -> str:
             for f in files:
                 structure.append(f'{subindent}{f}')
     if debug:
-        print(f"[DEBUG - _read_directory_structure_internal] Structure lue:\n{os.linesep.join(structure)}", file=sys.stderr)
+        print(f"[DEBUG - _read_directory_structure] Structure lue:\n{os.linesep.join(structure)}", file=sys.stderr)
     return "\n".join(structure)
 
 def safe_create_directory(path: str, debug: bool = False) -> bool:
@@ -35,7 +35,7 @@ def safe_create_directory(path: str, debug: bool = False) -> bool:
 
     # Capture l'état avant
     parent_dir = os.path.dirname(path) if os.path.dirname(path) else '.'
-    original_structure = _read_directory_structure_internal(parent_dir, debug=debug)
+    original_structure = _read_directory_structure(parent_dir, debug=debug)
 
     success = False
     try:
@@ -52,7 +52,7 @@ def safe_create_directory(path: str, debug: bool = False) -> bool:
         if debug:
             print(f"[DEBUG - safe_create_directory] Répertoire '{path}' créé avec succès.", file=sys.stderr)
         # Capture l'état après
-        new_structure = _read_directory_structure_internal(parent_dir, debug=debug)
+        new_structure = _read_directory_structure(parent_dir, debug=debug)
 
         diff = difflib.unified_diff(
             original_structure.splitlines(keepends=True),

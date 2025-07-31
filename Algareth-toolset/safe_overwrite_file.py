@@ -11,7 +11,7 @@ if _current_dir not in sys.path:
 # Importe les outils Alagareth-toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 
-def _overwrite_file_internal(path: str, content: str) -> bool:
+def _overwrite_file(path: str, content: str) -> bool:
     """Écrit ou écrase un fichier avec le nouveau contenu (usage interne)."""
     try:
         with open(path, 'w', encoding='utf-8') as f:
@@ -34,7 +34,7 @@ def safe_overwrite_file(path: str, content: str, debug: bool = False) -> bool:
             print(f"[DEBUG - safe_overwrite_file] Fichier original non trouvé ou erreur de lecture: {original_content}. Procède à l'écriture.", file=sys.stderr)
         original_content = "" # Traite comme un fichier vide pour le diff
 
-    success = _overwrite_file_internal(path, content)
+    success = _overwrite_file(path, content)
 
     if success:
         new_content = safe_read_file_content(path, debug=debug)
