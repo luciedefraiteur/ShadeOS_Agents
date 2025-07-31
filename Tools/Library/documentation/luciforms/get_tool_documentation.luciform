@@ -3,7 +3,7 @@
   <!-- Le Pacte : Ce que fait l'outil -->
   <🜄pacte>
     <type>library</type>
-    <intent>Révéler l'intégralité du __lucidoc__ pour un outil spécifique, exposant son pacte complet.</intent>
+    <intent>Révéler l'intégralité du luciform_doc pour un outil spécifique, exposant son pacte complet.</intent>
     <level>fondamental</level>
   </🜄pacte>
 
@@ -14,7 +14,7 @@
       <param>all_tools</param>
       <param>tool_id</param>
     </requires>
-    <returns>dict: Le dictionnaire __lucidoc__ complet de l'outil.</returns>
+    <returns>dict: Le dictionnaire luciform_doc complet de l'outil.</returns>
   </🜂invocation>
 
   <!-- L'Essence : Le sens profond de l'outil -->

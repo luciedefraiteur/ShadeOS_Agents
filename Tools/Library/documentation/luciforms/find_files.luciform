@@ -1,0 +1,34 @@
+<🜲luciform_doc id="find_files">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>search</type>
+    <intent>Révèle les chemins des fichiers correspondant à un pattern mystique (glob).</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>find_files(pattern: str, base_path: str = ".") -> list[str]</signature>
+    <requires>
+      <param>pattern</param>
+    </requires>
+    <optional>
+      <param>base_path</param>
+    </optional>
+    <returns>list[str]: Une liste des chemins de fichiers correspondants.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>find</keyword>
+      <keyword>files</keyword>
+      <keyword>glob</keyword>
+      <keyword>search</keyword>
+    </keywords>
+    <symbolic_layer>Sonde les profondeurs de l'arborescence pour débusquer les grimoires cachés par leur nom ou leur forme.</symbolic_layer>
+    <usage_context>Quand il est nécessaire de localiser des fichiers spécifiques dans le projet, par exemple pour trouver tous les fichiers de configuration ou tous les scripts Python.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

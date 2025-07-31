@@ -9,31 +9,33 @@ from ShadeOS_Agents.Tools.FileSystem.implementation.listing_tools import *
 from ShadeOS_Agents.Tools.FileSystem.implementation.modification_tools import *
 from ShadeOS_Agents.Tools.FileSystem.implementation.scry.scrying_tools import *
 from ShadeOS_Agents.Tools.Library.implementation.library_tools import *
+from ShadeOS_Agents.Tools.Execution.implementation.execution_tools import *
+from ShadeOS_Agents.Tools.Search.implementation.search_tools import *
 
 # Chemin vers la documentation des outils
-DOCS_BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../documentation/luciforms'))
+DOCS_BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../Tools/Library/documentation/luciforms'))
 
 ALL_TOOLS = {}
 
 def _reconstruct_doc_from_tree(parsed_tree):
     """Reconstruit un dictionnaire plat depuis l'arbre parsé."""
-    print(f"[DEBUG] Reconstruire depuis l'arbre: {parsed_tree}", file=sys.stderr)
+    print(f"[REGISTRY DEBUG] Reconstruire depuis l'arbre: {parsed_tree}", file=sys.stderr)
     if not parsed_tree or not parsed_tree.get("attrs"):
-        print("[DEBUG] Arbre parsé invalide ou sans attributs.", file=sys.stderr)
+        print("[REGISTRY DEBUG] Arbre parsé invalide ou sans attributs.", file=sys.stderr)
         return None
         
     doc = {"id": parsed_tree["attrs"].get("id")}
     if not doc["id"]:
-        print("[DEBUG] ID non trouvé dans l'arbre parsé.", file=sys.stderr)
+        print("[REGISTRY DEBUG] ID non trouvé dans l'arbre parsé.", file=sys.stderr)
         return None
 
     for section in parsed_tree.get("children", []):
-        print(f"[DEBUG] Traitement de la section: {section.get("tag")}", file=sys.stderr)
+        print(f"[REGISTRY DEBUG] Traitement de la section: {section.get("tag")}", file=sys.stderr)
         if section.get("type") == "comment": continue
         
         section_name = section.get("tag")
         if not section_name:
-            print("[DEBUG] Nom de section non trouvé.", file=sys.stderr)
+            print("[REGISTRY DEBUG] Nom de section non trouvé.", file=sys.stderr)
             continue
 
         section_data = {}
@@ -41,7 +43,7 @@ def _reconstruct_doc_from_tree(parsed_tree):
         for item in section.get("children", []):
             item_type = item.get("type")
             item_tag = item.get("tag")
-            print(f"[DEBUG]   - Traitement de l'élément: {item_tag} (Type: {item_type})", file=sys.stderr)
+            print(f"[REGISTRY DEBUG]   - Traitement de l'élément: {item_tag} (Type: {item_type})", file=sys.stderr)
 
             if item_type == "comment":
                 comments.append(item.get("content"))
@@ -72,43 +74,44 @@ def _reconstruct_doc_from_tree(parsed_tree):
                 # Ajout pour gérer les balises simples comme <type> et <intent> qui sont directement dans la section
                 elif item_tag and children and children[0].get("type") == "text":
                     section_data[item_tag] = children[0].get("content")
-                # Ajout pour gérer les balises simples comme <type> et <intent> qui sont directement dans la section
-                elif item_tag and children and children[0].get("type") == "text":
-                    section_data[item_tag] = children[0].get("content")
-                # Ajout pour gérer les balises simples comme <type> et <intent> qui sont directement dans la section
-                elif item_tag and children and children[0].get("type") == "text":
-                    section_data[item_tag] = children[0].get("content")
-                # Ajout pour gérer les balises simples comme <type> et <intent> qui sont directement dans la section
-                elif item_tag and children and children[0].get("type") == "text":
-                    section_data[item_tag] = children[0].get("content")
         
         if comments:
             section_data["comments"] = comments
         
         doc[section_name] = section_data
-    print(f"[DEBUG] Document reconstruit: {doc}", file=sys.stderr)
+    print(f"[REGISTRY DEBUG] Document reconstruit: {doc}", file=sys.stderr)
     return doc
 
 def _build_dynamic_registry():
     """Construit le registre dynamiquement en lisant les fichiers .luciform."""
+    print(f"[REGISTRY DEBUG] Construction du registre depuis : {DOCS_BASE_PATH}", file=sys.stderr)
     available_functions = {**globals()}
+    print(f"[REGISTRY DEBUG] Fonctions disponibles (partiel): {list(available_functions.keys())[:5]}...", file=sys.stderr)
 
     for doc_file in os.listdir(DOCS_BASE_PATH):
         if doc_file.endswith(".luciform"):
+            print(f"[REGISTRY DEBUG] Fichier trouvé : {doc_file}", file=sys.stderr)
             try:
                 parsed_tree = parse_luciform(os.path.join(DOCS_BASE_PATH, doc_file))
                 lucidoc = _reconstruct_doc_from_tree(parsed_tree)
                 if not lucidoc:
+                    print(f"[REGISTRY DEBUG]  - Luciform {doc_file} non reconstruit.", file=sys.stderr)
                     continue
                 tool_id = lucidoc.get("id")
+                print(f"[REGISTRY DEBUG]  - ID extrait : {tool_id}", file=sys.stderr)
                 
                 if tool_id and tool_id in available_functions:
+                    print(f"[REGISTRY DEBUG]  - Succès : Outil '{tool_id}' trouvé et enregistré.", file=sys.stderr)
                     ALL_TOOLS[tool_id] = {
                         "function": available_functions[tool_id],
                         "lucidoc": lucidoc
                     }
+                else:
+                    print(f"[REGISTRY DEBUG]  - Échec : Outil '{tool_id}' non trouvé dans les fonctions disponibles ou ID manquant.", file=sys.stderr)
             except (ValueError, KeyError, IndexError) as e:
-                print(f"[DEBUG] Erreur de reconstruction du luciform {doc_file}: {e}", file=sys.stderr)
+                print(f"[REGISTRY DEBUG]  - Erreur de reconstruction du luciform {doc_file}: {e}", file=sys.stderr)
                 continue
+
+    print(f"[REGISTRY DEBUG] Registre final : {list(ALL_TOOLS.keys())}", file=sys.stderr)
 
 _build_dynamic_registry()
