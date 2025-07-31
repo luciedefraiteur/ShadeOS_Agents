@@ -1,0 +1,35 @@
+<🜲luciform_doc id="list_available_tools">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>library</type>
+    <intent>Invoquer la liste de tous les sceaux d'outils connus, révélant leur identité et leur intention première.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>list_available_tools(all_tools: dict, type_filter: str = None, keyword_filter: str = None) -> list[dict]</signature>
+    <requires>
+      <param>all_tools</param>
+    </requires>
+    <optional>
+      <param>type_filter</param>
+      <param>keyword_filter</param>
+    </optional>
+    <returns>list[dict]: Une liste de dictionnaires __lucidoc__ partiels.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>list</keyword>
+      <keyword>tools</keyword>
+      <keyword>library</keyword>
+      <keyword>available</keyword>
+    </keywords>
+    <symbolic_layer>Prend conscience de son propre arsenal.</symbolic_layer>
+    <usage_context>Pour qu'un agent puisse savoir quels outils il peut utiliser.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

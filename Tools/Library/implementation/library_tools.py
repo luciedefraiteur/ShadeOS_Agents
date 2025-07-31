@@ -1,72 +1,39 @@
 import os
-import importlib.util
-from openai import tool
 
-# Le chemin vers la racine des outils, à adapter si nécessaire
-TOOLS_BASE_PATH = "/home/luciedefraiteur/ShadeOS_Agents/Tools/"
-
-def _find_tool_files():
-    """Helper pour trouver tous les fichiers d'implémentation d'outils."""
-    tool_files = []
-    for root, _, files in os.walk(TOOLS_BASE_PATH):
-        for file in files:
-            if file.endswith("_tools.py"):
-                tool_files.append(os.path.join(root, file))
-    return tool_files
-
-def _extract_lucidoc_from_file(path):
-    """Helper pour extraire tous les __lucidoc__ d'un fichier."""
-    docs = []
-    try:
-        spec = importlib.util.spec_from_file_location("module.name", path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        
-        for attr_name in dir(module):
-            attr = getattr(module, attr_name)
-            if hasattr(attr, "__lucidoc__"):
-                docs.append(getattr(attr, "__lucidoc__"))
-    except Exception:
-        # Ignorer les fichiers qui ne peuvent être importés
-        pass
-    return docs
-
-@tool
-def list_available_tools(type_filter: str = None, keyword_filter: str = None) -> list[dict]:
-    """
-    Liste tous les outils disponibles, avec une option de filtrage.
-    Retourne une liste de dictionnaires contenant l'id, le type et l'intention de chaque outil.
-    """
-    all_docs = []
-    tool_files = _find_tool_files()
-    for file_path in tool_files:
-        all_docs.extend(_extract_lucidoc_from_file(file_path))
+def list_available_tools(all_tools: dict, type_filter: str = None, keyword_filter: str = None) -> list[dict]:
+    """Liste tous les outils disponibles, avec une option de filtrage."""
+    all_docs = [info["lucidoc"] for info in all_tools.values()]
 
     filtered_docs = all_docs
 
     if type_filter:
-        filtered_docs = [doc for doc in filtered_docs if doc.get("type") == type_filter]
+        filtered_docs = [doc for doc in filtered_docs if doc.get("pacte", {}).get("type") == type_filter]
     
     if keyword_filter:
-        filtered_docs = [doc for doc in filtered_docs if keyword_filter in doc.get("ritual_keywords", [])]
+        filtered_docs = [doc for doc in filtered_docs if keyword_filter in doc.get("essence", {}).get("keywords", [])]
 
-    # Ne retourne que les champs publics pour la liste
     public_docs = [
-        {"id": doc.get("id"), "type": doc.get("type"), "intent": doc.get("intent")}
+        {"id": doc.get("id"), "type": doc.get("pacte", {}).get("type"), "intent": doc.get("pacte", {}).get("intent")}
         for doc in filtered_docs
     ]
     
     return public_docs
 
-@tool
-def get_tool_documentation(tool_id: str) -> dict:
-    """
-    Retourne la documentation complète (`__lucidoc__`) pour un outil donné.
-    """
-    tool_files = _find_tool_files()
-    for file_path in tool_files:
-        docs = _extract_lucidoc_from_file(file_path)
-        for doc in docs:
-            if doc.get("id") == tool_id:
-                return doc
-    return {"error": f"Outil avec l'id '{tool_id}' non trouvé."}
+def get_tool_documentation(all_tools: dict, tool_id: str) -> dict:
+    """Retourne la documentation complète (`lucidoc`) pour un outil donné."""
+    if tool_id in all_tools:
+        return all_tools[tool_id]["lucidoc"]
+    else:
+        return {"error": f"Outil avec l'id '{tool_id}' non trouvé."}
+
+def get_luciform_grimoire(tool_id: str) -> str:
+    """Retrouve et présente le contenu brut et intégral d'un fichier .luciform de documentation."""
+    # Chemin vers la documentation des outils
+    DOCS_BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../documentation/luciforms'))
+    file_path = os.path.join(DOCS_BASE_PATH, f"{tool_id}.luciform")
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return f"Erreur : Le grimoire pour l'outil '{tool_id}' est introuvable."

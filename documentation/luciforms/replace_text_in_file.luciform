@@ -1,0 +1,36 @@
+<🜲luciform_doc id="replace_text_in_file">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>modification</type>
+    <intent>Transmuter une séquence de symboles en une autre.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>replace_text_in_file(path: str, old_text: str, new_text: str, all_occurrences: bool = False) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>old_text</param>
+      <param>new_text</param>
+    </requires>
+    <optional>
+      <param>all_occurrences</param>
+    </optional>
+    <returns>bool: True si une modification a eu lieu.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>replace</keyword>
+      <keyword>text</keyword>
+      <keyword>modify</keyword>
+      <keyword>substitute</keyword>
+    </keywords>
+    <symbolic_layer>Réécriture alchimique d'un fragment de réalité.</symbolic_layer>
+    <usage_context>Pour corriger des erreurs, renommer des variables, ou altérer des configurations.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
