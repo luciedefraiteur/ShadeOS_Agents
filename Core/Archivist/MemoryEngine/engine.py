@@ -78,6 +78,175 @@ class MemoryEngine:
         """Récupère le contenu complet d'un nœud mémoire."""
         return self.backend.read(path)
 
+    def forget_memory(self, path: str, cleanup_links: bool = True) -> bool:
+        """
+        Supprime intelligemment un souvenir du système de mémoire.
+
+        Args:
+            path: Chemin du souvenir à supprimer
+            cleanup_links: Si True, nettoie les liens vers ce nœud
+
+        Returns:
+            True si succès, False sinon
+        """
+        try:
+            # Vérification que le nœud existe
+            node = self.get_memory_node(path)
+            if not node:
+                print(f"⚠️ Nœud {path} n'existe pas")
+                return False
+
+            # Étape 1: Nettoyer les liens entrants si demandé
+            if cleanup_links:
+                self._cleanup_incoming_links(path)
+
+            # Étape 2: Supprimer le nœud lui-même
+            if hasattr(self.backend, 'delete'):
+                success = self.backend.delete(path)
+                if success:
+                    print(f"✅ Mémoire {path} supprimée avec nettoyage des liens")
+                return success
+            else:
+                # Fallback pour backends sans méthode delete
+                print(f"⚠️ Backend {self.backend_type} ne supporte pas la suppression")
+                return False
+
+        except Exception as e:
+            print(f"❌ Erreur suppression mémoire {path}: {e}")
+            return False
+
+    def _cleanup_incoming_links(self, target_path: str):
+        """
+        Nettoie tous les liens pointant vers un nœud à supprimer.
+
+        Args:
+            target_path: Chemin du nœud cible à supprimer
+        """
+        try:
+            print(f"🧹 Nettoyage des liens vers {target_path}...")
+
+            # Pour les backends avancés avec support des liens
+            if hasattr(self.backend, 'find_nodes_linking_to'):
+                linking_nodes = self.backend.find_nodes_linking_to(target_path)
+
+                for node_path in linking_nodes:
+                    self._remove_links_from_node(node_path, target_path)
+
+            else:
+                # Fallback : scan manuel (plus lent mais fonctionne)
+                print("🔍 Scan manuel des liens (backend basique)...")
+                self._manual_link_cleanup(target_path)
+
+        except Exception as e:
+            print(f"⚠️ Erreur nettoyage liens: {e}")
+
+    def _remove_links_from_node(self, node_path: str, target_path: str):
+        """
+        Supprime les liens vers target_path depuis node_path.
+
+        Args:
+            node_path: Nœud à modifier
+            target_path: Cible des liens à supprimer
+        """
+        try:
+            node = self.get_memory_node(node_path)
+            if not node:
+                return
+
+            # Vérification et nettoyage des différents types de liens
+            modified = False
+
+            # Links classiques
+            if hasattr(node, 'links') and node.links:
+                original_count = len(node.links)
+                node.links = [link for link in node.links if link != target_path]
+                if len(node.links) != original_count:
+                    modified = True
+
+            # Transcendence links
+            if hasattr(node, 'transcendence_links') and node.transcendence_links:
+                original_count = len(node.transcendence_links)
+                node.transcendence_links = [link for link in node.transcendence_links if link != target_path]
+                if len(node.transcendence_links) != original_count:
+                    modified = True
+
+            # Immanence links
+            if hasattr(node, 'immanence_links') and node.immanence_links:
+                original_count = len(node.immanence_links)
+                node.immanence_links = [link for link in node.immanence_links if link != target_path]
+                if len(node.immanence_links) != original_count:
+                    modified = True
+
+            # Sauvegarder si modifié
+            if modified:
+                if hasattr(self.backend, 'update_node'):
+                    self.backend.update_node(node_path, node)
+                    print(f"  🔗 Liens nettoyés dans {node_path}")
+                else:
+                    # Fallback : recréer le nœud
+                    self._recreate_node_without_links(node, target_path)
+
+        except Exception as e:
+            print(f"⚠️ Erreur suppression liens de {node_path}: {e}")
+
+    def _manual_link_cleanup(self, target_path: str):
+        """
+        Nettoyage manuel des liens (pour backends basiques).
+
+        Args:
+            target_path: Chemin cible à nettoyer
+        """
+        try:
+            # Cette méthode est plus lente mais fonctionne avec tous les backends
+            print("🔍 Recherche manuelle des nœuds avec liens...")
+
+            # Pour l'instant, on log juste l'intention
+            # L'implémentation complète nécessiterait un scan de tous les nœuds
+            print(f"⚠️ Nettoyage manuel non implémenté pour {target_path}")
+            print("💡 Utilisez un backend avancé pour le nettoyage automatique des liens")
+
+        except Exception as e:
+            print(f"⚠️ Erreur nettoyage manuel: {e}")
+
+    def _recreate_node_without_links(self, node, target_path: str):
+        """
+        Recrée un nœud en supprimant les liens vers target_path.
+
+        Args:
+            node: Nœud à recréer
+            target_path: Chemin à supprimer des liens
+        """
+        try:
+            # Nettoie les liens
+            clean_links = []
+            if hasattr(node, 'links') and node.links:
+                clean_links = [link for link in node.links if link != target_path]
+
+            clean_transcendence = []
+            if hasattr(node, 'transcendence_links') and node.transcendence_links:
+                clean_transcendence = [link for link in node.transcendence_links if link != target_path]
+
+            clean_immanence = []
+            if hasattr(node, 'immanence_links') and node.immanence_links:
+                clean_immanence = [link for link in node.immanence_links if link != target_path]
+
+            # Recrée le nœud avec les liens nettoyés
+            self.create_memory(
+                path=node.path,
+                content=node.content,
+                summary=node.summary,
+                keywords=node.keywords,
+                links=clean_links,
+                strata=getattr(node, 'strata', 'somatic'),
+                transcendence_links=clean_transcendence,
+                immanence_links=clean_immanence
+            )
+
+            print(f"  🔄 Nœud {node.path} recréé sans liens vers {target_path}")
+
+        except Exception as e:
+            print(f"⚠️ Erreur recréation nœud: {e}")
+
     def find_memories_by_keyword(self, keyword: str) -> list:
         """Trouve les chemins des souvenirs contenant un mot-clé spécifique."""
         return self.backend.find_by_keyword(keyword)

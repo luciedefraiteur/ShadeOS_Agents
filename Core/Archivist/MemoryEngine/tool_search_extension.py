@@ -456,6 +456,42 @@ class ToolSearchExtension:
 
         return types_info
 
+    def unregister_tool(self, tool_id: str) -> bool:
+        """
+        Désenregistre un outil du MemoryEngine.
+
+        Args:
+            tool_id: Identifiant de l'outil à supprimer
+
+        Returns:
+            True si succès, False sinon
+        """
+        try:
+            # Recherche du chemin de l'outil
+            tool_paths = self.memory_engine.find_memories_by_keyword(tool_id)
+
+            for path in tool_paths:
+                if path.startswith(self.tools_namespace) and path.endswith(f"/{tool_id}"):
+                    # Suppression du MemoryEngine
+                    success = self.memory_engine.forget_memory(path)
+
+                    if success:
+                        # Suppression du cache local
+                        if tool_id in self._tool_cache:
+                            del self._tool_cache[tool_id]
+                        print(f"✅ Outil {tool_id} désenregistré")
+                        return True
+                    else:
+                        print(f"❌ Échec suppression {tool_id} du MemoryEngine")
+                        return False
+
+            print(f"⚠️ Outil {tool_id} non trouvé")
+            return False
+
+        except Exception as e:
+            print(f"❌ Erreur désenregistrement {tool_id}: {e}")
+            return False
+
     def format_tool_types_help(self) -> str:
         """
         Formate l'aide sur les types d'outils pour affichage.
