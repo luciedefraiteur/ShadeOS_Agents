@@ -134,4 +134,23 @@ def initialize_tool_registry(memory_engine_instance):
 
 
 
-if __name__ == "__main__":    initialize_tool_registry() # Appelle l'initialisation si le module est exécuté directement    pprint.pprint(ALL_TOOLS)    print(f"\nTotal d'outils enregistrés : {len(ALL_TOOLS)}")
+if __name__ == "__main__":
+    # Appelle l'initialisation si le module est exécuté directement
+    from Core.Archivist.MemoryEngine.engine import MemoryEngine
+    memory_engine = MemoryEngine()
+    initialize_tool_registry(memory_engine)
+
+    print("⛧ Registre d'Outils - Diagnostic Complet")
+    print("⛧" + "─" * 50)
+    pprint.pprint(ALL_TOOLS)
+    print(f"\n⛧ Total d'outils enregistrés : {len(ALL_TOOLS)}")
+
+    # Affichage des outils sans documentation
+    tools_without_docs = [tool_id for tool_id, tool_info in ALL_TOOLS.items()
+                         if not tool_info.get("lucidoc")]
+    if tools_without_docs:
+        print(f"\n⛧ Outils sans documentation luciform ({len(tools_without_docs)}) :")
+        for tool_id in tools_without_docs:
+            print(f"  - {tool_id}")
+    else:
+        print("\n⛧ Tous les outils ont une documentation luciform !")
