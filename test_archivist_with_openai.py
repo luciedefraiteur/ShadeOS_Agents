@@ -70,6 +70,16 @@ class DaemonSimulator:
         print(f"  ✓ Found {len(context_response.relevant_memories)} relevant memories")
         print(f"  ✓ Confidence score: {context_response.confidence_score:.2f}")
         print(f"  ✓ Reasoning: {context_response.reasoning}")
+
+        # Afficher la réponse luciforme si disponible
+        if context_response.luciform_response:
+            print(f"⛧ Réponse Luciforme :")
+            print(context_response.luciform_response[:200] + "..." if len(context_response.luciform_response) > 200 else context_response.luciform_response)
+
+        # Afficher le contexte cosmique si disponible
+        if context_response.cosmic_context:
+            print(f"🌟 Contexte Cosmique :")
+            print(context_response.cosmic_context[:200] + "..." if len(context_response.cosmic_context) > 200 else context_response.cosmic_context)
         
         # Step 2: Process with daemon's specialized perspective
         daemon_response = await self._process_with_daemon_logic(user_query, context_response, use_openai)
