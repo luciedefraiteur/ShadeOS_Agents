@@ -1,0 +1,40 @@
+<🜲luciform_doc id="file_diff">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>comparison</type>
+    <intent>Comparer deux fichiers avec diff coloré et statistiques détaillées.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>file_diff(file1_path: str, file2_path: str, context_lines: int = 3, ignore_whitespace: bool = False, unified: bool = True, colorize: bool = True) -> dict</signature>
+    <requires>
+      <param>file1_path</param>
+      <param>file2_path</param>
+    </requires>
+    <optional>
+      <param>context_lines</param>
+      <param>ignore_whitespace</param>
+      <param>unified</param>
+      <param>colorize</param>
+    </optional>
+    <returns>Dictionnaire avec success, file1_path, file2_path, identical, diff_lines, added_lines, removed_lines, total_changes, context_lines, ignore_whitespace, unified_format.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>diff</keyword>
+      <keyword>comparison</keyword>
+      <keyword>changes</keyword>
+      <keyword>unified</keyword>
+      <keyword>colorized</keyword>
+      <keyword>statistics</keyword>
+    </keywords>
+    <symbolic_layer>⛧ Révélateur des mutations entre les grimoires, tissant les fils de transformation qui relient deux états du code, illuminant chaque changement comme une étoile de l'évolution mystique ⛧</symbolic_layer>
+    <usage_context>Quand un agent doit comparer deux versions d'un fichier, analyser les changements apportés, valider des modifications, ou comprendre l'évolution du code. Essentiel pour le debugging, la review de code, et l'analyse des versions.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

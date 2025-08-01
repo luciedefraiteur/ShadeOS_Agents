@@ -1,0 +1,40 @@
+<🜲luciform_doc id="file_stats">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>analysis</type>
+    <intent>Analyser les statistiques détaillées d'un fichier : lignes, mots, caractères, patterns.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>analyze_file_stats(file_path: str, include_words: bool = True, include_chars: bool = True, include_patterns: bool = True, top_words: int = 10) -> dict</signature>
+    <requires>
+      <param>file_path</param>
+    </requires>
+    <optional>
+      <param>include_words</param>
+      <param>include_chars</param>
+      <param>include_patterns</param>
+      <param>top_words</param>
+    </optional>
+    <returns>Dictionnaire avec success, file_path, file_size_bytes, total_lines, non_empty_lines, total_characters, total_words, character_analysis, word_analysis, pattern_analysis, line_type_analysis.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>statistics</keyword>
+      <keyword>analysis</keyword>
+      <keyword>metrics</keyword>
+      <keyword>words</keyword>
+      <keyword>characters</keyword>
+      <keyword>patterns</keyword>
+      <keyword>lines</keyword>
+    </keywords>
+    <symbolic_layer>⛧ Scrutateur des essences cachées dans les grimoires, révélant les métriques secrètes qui composent l'âme du code, comptant chaque symbole comme une perle de sagesse dans le collier de la connaissance ⛧</symbolic_layer>
+    <usage_context>Quand un agent doit analyser la complexité d'un fichier, comprendre sa structure, évaluer sa qualité, ou extraire des métriques pour l'optimisation. Idéal pour l'analyse de code, la documentation automatique, et l'évaluation de la lisibilité.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

@@ -1,0 +1,43 @@
+<🜲luciform_doc id="regex_search_file">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>search</type>
+    <intent>Rechercher des patterns regex dans un fichier unique avec contexte et coloration.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>regex_search_file(file_path: str, pattern: str, context_before: int = 2, context_after: int = 2, case_sensitive: bool = True, multiline: bool = False, show_line_numbers: bool = True, highlight_matches: bool = True, max_matches: int = None) -> dict</signature>
+    <requires>
+      <param>file_path</param>
+      <param>pattern</param>
+    </requires>
+    <optional>
+      <param>context_before</param>
+      <param>context_after</param>
+      <param>case_sensitive</param>
+      <param>multiline</param>
+      <param>show_line_numbers</param>
+      <param>highlight_matches</param>
+      <param>max_matches</param>
+    </optional>
+    <returns>Dictionnaire avec success, file_path, pattern, total_matches, matches (array avec line_number, match_text, context, groups), case_sensitive, multiline.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>regex</keyword>
+      <keyword>pattern</keyword>
+      <keyword>search</keyword>
+      <keyword>context</keyword>
+      <keyword>highlight</keyword>
+      <keyword>single_file</keyword>
+    </keywords>
+    <symbolic_layer>⛧ Révélateur des patterns cachés dans les grimoires de code, tissant des toiles de découverte ligne par ligne, illuminant chaque correspondance comme une étoile mystique dans l'obscurité du texte ⛧</symbolic_layer>
+    <usage_context>Quand un agent doit analyser un fichier spécifique avec des patterns complexes, extraire des informations structurées, ou déboguer du code en cherchant des motifs précis. Idéal pour l'analyse de logs, la recherche de fonctions, ou l'extraction de données formatées.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
