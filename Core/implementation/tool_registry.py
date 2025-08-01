@@ -59,32 +59,32 @@ def _extract_semantic_doc(ast: dict) -> dict:
     
     children = ast.get('children', [])
     
-    # Extraction du pacte
+    # Extraction du pacte (garde les symboles dans les clés)
     pacte_node = next((n for n in children if n.get('tag') == '🜄pacte'), None)
     if pacte_node:
         pacte_children = pacte_node.get('children', [])
-        doc['pacte'] = {
+        doc['🜄pacte'] = {
             'type': _find_node_text(pacte_children, 'type'),
             'intent': _find_node_text(pacte_children, 'intent'),
             'level': _find_node_text(pacte_children, 'level'),
         }
 
-    # Extraction de l'invocation
+    # Extraction de l'invocation (garde les symboles dans les clés)
     invocation_node = next((n for n in children if n.get('tag') == '🜂invocation'), None)
     if invocation_node:
         inv_children = invocation_node.get('children', [])
-        doc['invocation'] = {
+        doc['🜂invocation'] = {
             'signature': _find_node_text(inv_children, 'signature'),
             'requires': _find_node_list(inv_children, 'requires'),
             'optional': _find_node_list(inv_children, 'optional'),
             'returns': _find_node_text(inv_children, 'returns'),
         }
 
-    # Extraction de l'essence
+    # Extraction de l'essence (garde les symboles dans les clés)
     essence_node = next((n for n in children if n.get('tag') == '🜁essence'), None)
     if essence_node:
         ess_children = essence_node.get('children', [])
-        doc['essence'] = {
+        doc['🜁essence'] = {
             'keywords': _find_node_list(ess_children, 'keywords'),
             'symbolic_layer': _find_node_text(ess_children, 'symbolic_layer'),
             'usage_context': _find_node_text(ess_children, 'usage_context'),

@@ -22,10 +22,10 @@ class TestToolRegistry(unittest.TestCase):
         lucidoc = ALL_TOOLS[tool_id].get("lucidoc")
         self.assertIsNotNone(lucidoc, f"La documentation pour '{tool_id}' ne devrait pas être nulle.")
         
-        # Vérifie la présence des sections clés
-        self.assertIn("pacte", lucidoc)
-        self.assertIn("invocation", lucidoc)
-        self.assertIn("essence", lucidoc)
+        # Vérifie la présence des sections clés (avec symboles mystiques)
+        self.assertIn("🜄pacte", lucidoc)
+        self.assertIn("🜂invocation", lucidoc)
+        self.assertIn("🜁essence", lucidoc)
 
         # Vérifie une valeur spécifique
 if __name__ == "__main__":

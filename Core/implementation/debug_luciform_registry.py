@@ -21,10 +21,10 @@ for tool_id, tool_info in ALL_TOOLS.items():
     print(f"[DIAGNOSTIC]   - Fonction: {tool_info["function"].__name__}", file=sys.stderr)
     if "lucidoc" in tool_info:
         lucidoc = tool_info["lucidoc"]
-        # Les clés sont normalisées (sans symboles) dans la structure extraite
-        pacte = lucidoc.get('pacte', {})
-        essence = lucidoc.get('essence', {})
-        invocation = lucidoc.get('invocation', {})
+        # Les clés gardent leurs symboles mystiques dans la structure extraite
+        pacte = lucidoc.get('🜄pacte', {})
+        essence = lucidoc.get('🜁essence', {})
+        invocation = lucidoc.get('🜂invocation', {})
 
         print(f"[DIAGNOSTIC]   - Luciform Type: {pacte.get('type')}", file=sys.stderr)
         print(f"[DIAGNOSTIC]   - Luciform Intent: {pacte.get('intent')}", file=sys.stderr)
@@ -44,9 +44,9 @@ for tool_id, tool_info in ALL_TOOLS.items():
     item = {"id": tool_id}
     if "lucidoc" in tool_info:
         lucidoc = tool_info["lucidoc"]
-        pacte = lucidoc.get('pacte', {})
-        essence = lucidoc.get('essence', {})
-        invocation = lucidoc.get('invocation', {})
+        pacte = lucidoc.get('🜄pacte', {})
+        essence = lucidoc.get('🜁essence', {})
+        invocation = lucidoc.get('🜂invocation', {})
 
         item["type"] = pacte.get("type")
         item["intent"] = pacte.get("intent")
