@@ -17,10 +17,10 @@ from Tools.FileSystem.implementation.scry.scrying_tools import *
 from Tools.Library.implementation.library_tools import *
 from Tools.Execution.implementation.execution_tools import *
 from Tools.Execution.implementation.invoke_cli_tool import invoke_cli_tool
-from Algareth-toolset.remember import remember
-from Algareth-toolset.recall import recall
-from Algareth-toolset.list_memories import list_memories
-from Algareth-toolset.forget import forget
+from Alagareth_toolset.remember import remember
+from Alagareth_toolset.recall import recall
+from Alagareth_toolset.list_memories import list_memories
+from Alagareth_toolset.forget import forget
 from Tools.Search.implementation.search_tools import *
 
 # Chemin vers la documentation des outils

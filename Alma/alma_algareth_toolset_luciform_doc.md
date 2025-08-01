@@ -1,10 +1,10 @@
-### Alma's Algareth-toolset Luciform Documentation
+### Alma's Alagareth_toolset Luciform Documentation
 
-This document highlights the importance and conceptual structure of `luciform` documentation for the tools within the `Algareth-toolset`. This documentation is crucial for Alma and other high-level daemons to understand, invoke, and integrate these tools effectively.
+This document highlights the importance and conceptual structure of `luciform` documentation for the tools within the `Alagareth_toolset`. This documentation is crucial for Alma and other high-level daemons to understand, invoke, and integrate these tools effectively.
 
-#### 1. Purpose of Luciform Documentation for Algareth-toolset
+#### 1. Purpose of Luciform Documentation for Alagareth_toolset
 
-While `invoke_cli_tool.py` provides a programmatic interface to execute `Algareth-toolset` tools, `luciform` documentation offers a deeper, semantic understanding of each tool's capabilities, intent, and operational nuances. It transforms a simple CLI command into a defined "capability" within the ShadeOS ecosystem.
+While `invoke_cli_tool.py` provides a programmatic interface to execute `Alagareth_toolset` tools, `luciform` documentation offers a deeper, semantic understanding of each tool's capabilities, intent, and operational nuances. It transforms a simple CLI command into a defined "capability" within the ShadeOS ecosystem.
 
 Key purposes include:
 *   **Semantic Understanding:** Allows Alma to understand *what* a tool does, *why* it exists, and *how* it fits into broader workflows, beyond just its command-line arguments.
@@ -13,7 +13,7 @@ Key purposes include:
 *   **Discovery:** Facilitates the discovery of available tools and their functionalities by other daemons or by Alma herself.
 *   **Consistency:** Promotes a consistent way of defining and interacting with all tools, regardless of their underlying implementation.
 
-#### 2. Existing Luciforms in Algareth-toolset
+#### 2. Existing Luciforms in Alagareth_toolset
 
 Upon inspection of the `ShadeOS_Agents/Alagareth_toolset` directory, it is clear that a comprehensive set of `luciform` files already exists, describing a wide range of fundamental capabilities. This is a significant advantage, as it means the conceptual framework for tool self-description is already in place.
 
@@ -46,6 +46,6 @@ This existing collection of `luciforms` provides a robust foundation. My previou
 
 #### 3. Integration and Discovery
 
-These `luciform` files reside alongside their respective tools within the `Algareth-toolset` directory structure. Alma, or a dedicated "Tool Indexer" daemon, can scan these directories to build a comprehensive understanding of all available capabilities.
+These `luciform` files reside alongside their respective tools within the `Alagareth_toolset` directory structure. Alma, or a dedicated "Tool Indexer" daemon, can scan these directories to build a comprehensive understanding of all available capabilities.
 
-This approach elevates the `Algareth-toolset` from a mere collection of scripts to a formally defined set of capabilities, making them first-class citizens in the ShadeOS daemon ecosystem.
+This approach elevates the `Alagareth_toolset` from a mere collection of scripts to a formally defined set of capabilities, making them first-class citizens in the ShadeOS daemon ecosystem.

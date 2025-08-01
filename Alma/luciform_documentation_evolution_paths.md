@@ -1,6 +1,6 @@
 ### Alma's Luciform Documentation Evolution Paths
 
-This document captures potential enhancements and evolutionary paths for the `luciform` documentation, drawing from conceptual ideas that emerged during the initial analysis of the `Algareth-toolset`'s existing `luciforms`. While the current `luciform` structure is robust, these ideas could further enrich the semantic understanding and automated utilization of tools and daemons.
+This document captures potential enhancements and evolutionary paths for the `luciform` documentation, drawing from conceptual ideas that emerged during the initial analysis of the `Alagareth_toolset`'s existing `luciforms`. While the current `luciform` structure is robust, these ideas could further enrich the semantic understanding and automated utilization of tools and daemons.
 
 #### 1. Enhanced `interface_definition` Block
 
