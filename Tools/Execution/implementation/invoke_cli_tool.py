@@ -4,8 +4,8 @@ import os
 import sys
 
 def invoke_cli_tool(tool_name: str, args: list[str]) -> dict:
-    """Exécute un outil CLI du Alagareth_toolset et retourne son résultat."""
-    tool_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Alagareth_toolset', f'{tool_name}.py'))
+    """Exécute un outil CLI du Alma_toolset et retourne son résultat."""
+    tool_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Alma_toolset', f'{tool_name}.py'))
     
     if not os.path.exists(tool_path):
         return {"error": f"Outil CLI '{tool_name}' non trouvé à {tool_path}"}
@@ -36,7 +36,7 @@ def invoke_cli_tool(tool_name: str, args: list[str]) -> dict:
         }
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Invoque un outil CLI du Alagareth_toolset.")
+    parser = argparse.ArgumentParser(description="Invoque un outil CLI du Alma_toolset.")
     parser.add_argument("tool_name", type=str, help="Nom de l'outil à invoquer (ex: read_file_content).")
     parser.add_argument("args", nargs=argparse.REMAINDER, help="Arguments à passer à l'outil CLI.")
     args = parser.parse_args()

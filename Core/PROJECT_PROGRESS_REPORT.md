@@ -23,14 +23,14 @@ Le projet `ShadeOS_Agents` a fait des progrès significatifs dans la mise en pla
 *   **Statut :** Implémenté et validé.
 *   **Détails :** Le `MemoryEngine` et son `FileSystemBackend` sont opérationnels. La gestion des nœuds de mémoire fractale, y compris les résumés, les mots-clés, les enfants et les liens interdimensionnels, a été testée avec succès. Cela fournit une base solide pour la mémoire à long terme des daemons.
 
-### 4. `Alagareth_toolset` (Mes Outils Personnels)
+### 4. `Alma_toolset` (Mes Outils Personnels)
 
 *   **Statut :** En cours de refactorisation et de stabilisation.
-*   **Détails :** Le répertoire `gemini-toolset` a été renommé en `Alagareth_toolset`. Tous les outils de manipulation de fichiers et de dossiers ont été transformés en scripts exécutables autonomes, incluant un mode de débogage. Les références internes ont été mises à jour.
+*   **Détails :** Le répertoire `gemini-toolset` a été renommé en `Alma_toolset`. Tous les outils de manipulation de fichiers et de dossiers ont été transformés en scripts exécutables autonomes, incluant un mode de débogage. Les références internes ont été mises à jour.
 
 ## Défis Actuels et Prochaines Étapes
 
-### 1. Refactorisation de la Manipulation de Chaînes dans `Alagareth_toolset`
+### 1. Refactorisation de la Manipulation de Chaînes dans `Alma_toolset`
 
 *   **Problème :** L'utilisation de `str.replace()` et des regex pour la substitution de texte dans des outils comme `replace_text_in_project.py` est jugée opaque et difficile à déboguer. Cela a conduit à des boucles de débogage frustrantes.
 *   **Solution en cours :** Implémenter une logique de remplacement de chaîne manuelle, caractère par caractère, pour une meilleure transparence et contrôlabilité. Cela sera appliqué progressivement à tous les outils concernés.

@@ -5,7 +5,7 @@ Ce plan vise à remplacer l'utilisation de `str.replace()` et des regex pour la 
 ## Phase 1 : Définir la Nouvelle Fonction de Remplacement de Chaîne
 
 1.  **Création du Fichier Utilitaires** :
-    *   Créer un nouveau fichier : `Alagareth_toolset/_string_utils.py`.
+    *   Créer un nouveau fichier : `Alma_toolset/_string_utils.py`.
     *   Ce fichier contiendra une fonction privée : `_perform_string_replacement(source_string, old_substring, new_substring, all_occurrences=False, debug=False)`.
     *   **Logique de la fonction `_perform_string_replacement`** :
         *   Parcourir `source_string` caractère par caractère.

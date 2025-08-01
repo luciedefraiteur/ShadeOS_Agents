@@ -9,7 +9,7 @@
 
 ## 🔮 Execution (2 outils)
 
-- **`invoke_cli_tool`** [fondamental] : Exécuter un outil CLI du Alagareth_toolset et retourner son résultat.
+- **`invoke_cli_tool`** [fondamental] : Exécuter un outil CLI du Alma_toolset et retourner son résultat.
 - **`run_shell_command`** [fondamental] : Exécute une commande shell et retourne son résultat.
 
 ## 🔮 Library (3 outils)

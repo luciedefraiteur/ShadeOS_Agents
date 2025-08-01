@@ -2,13 +2,14 @@ import os
 import argparse
 import sys
 import json
+import fnmatch
 
 # Assure que le répertoire de l'outil est dans sys.path pour les imports internes
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 if _current_dir not in sys.path:
     sys.path.insert(0, _current_dir)
 
-# Importe les outils Alagareth_toolset nécessaires
+# Importe les outils Alma_toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 
 def find_text_in_project(text_to_find: str, include_patterns: list = None, exclude_patterns: list = None, debug: bool = False) -> list:
@@ -24,9 +25,9 @@ def find_text_in_project(text_to_find: str, include_patterns: list = None, exclu
         for file_name in files:
             file_path = os.path.join(root, file_name)
             
-            # Appliquer les filtres d'inclusion/exclusion
+            # Appliquer les filtres d'inclusion/exclusion avec fnmatch pour les patterns
             if include_patterns:
-                if not any(file_name.endswith(p) for p in include_patterns):
+                if not any(fnmatch.fnmatch(file_name, pattern) for pattern in include_patterns):
                     continue
             if exclude_patterns:
                 if any(excluded_pattern in file_path for excluded_pattern in exclude_patterns):

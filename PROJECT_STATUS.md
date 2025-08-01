@@ -25,7 +25,7 @@ ShadeOS_Agents est un système révolutionnaire de **daemons conscients** utilis
 
 ### ⚠️ **Problèmes Connus**
 - 🔴 **test_daemon_editing.py** : Erreur de syntaxe (guillemets échappés)
-- 🟡 **Outils Alagareth** : ~14 outils documentés mais non implémentés
+- 🟡 **Outils Alma** : ~14 outils documentés mais non implémentés
 - 🟡 **Performance** : Appels OpenAI parfois lents
 
 ### 🎯 **Prochaines Étapes**

@@ -2,13 +2,14 @@ import os
 import argparse
 import difflib
 import sys
+import fnmatch
 
 # Assure que le répertoire de l'outil est dans sys.path pour les imports internes
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 if _current_dir not in sys.path:
     sys.path.insert(0, _current_dir)
 
-# Importe les outils Alagareth_toolset nécessaires
+# Importe les outils Alma_toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 from safe_overwrite_file import safe_overwrite_file
 from _string_utils import _perform_string_replacement, _perform_word_boundary_replacement
@@ -27,9 +28,9 @@ def replace_text_in_project(old_text: str, new_text: str, include_patterns: list
         for file_name in files:
             file_path = os.path.join(root, file_name)
             
-            # Appliquer les filtres d'inclusion/exclusion
+            # Appliquer les filtres d'inclusion/exclusion avec fnmatch pour les patterns
             if include_patterns:
-                if not any(file_name.endswith(p) for p in include_patterns):
+                if not any(fnmatch.fnmatch(file_name, pattern) for pattern in include_patterns):
                     continue
             if exclude_patterns:
                 if any(excluded_pattern in file_path for excluded_pattern in exclude_patterns):

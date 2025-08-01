@@ -38,7 +38,7 @@ corrected_calculator = '''#!/usr/bin/env python3
 
 ## 🟡 **Problèmes Modérés**
 
-### **2. Outils Alagareth Manquants**
+### **2. Outils Alma Manquants**
 **Statut :** 🟡 **NON-BLOQUANT**
 
 **Description :**

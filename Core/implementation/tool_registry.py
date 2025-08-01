@@ -18,16 +18,16 @@ from Tools.FileSystem.implementation.scry.scrying_tools import *
 from Tools.Library.implementation.library_tools import *
 from Tools.Execution.implementation.execution_tools import *
 from Tools.Execution.implementation.invoke_cli_tool import invoke_cli_tool
-# Imports des outils Alagareth_toolset
-from Alagareth_toolset.remember import remember
-from Alagareth_toolset.recall import recall
-from Alagareth_toolset.list_memories import list_memories
-from Alagareth_toolset.forget import forget
+# Imports des outils Alma_toolset
+from Alma_toolset.remember import remember
+from Alma_toolset.recall import recall
+from Alma_toolset.list_memories import list_memories
+from Alma_toolset.forget import forget
 from Tools.Search.implementation.search_tools import *
 
 # Chemins vers la documentation des outils
 DOCS_BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../Tools/Library/documentation/luciforms'))
-ALAGARETH_DOCS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../Alagareth_toolset'))
+ALAGARETH_DOCS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../Alma_toolset'))
 
 ALL_TOOLS = {}
 
@@ -98,7 +98,7 @@ def _extract_semantic_doc(ast: dict) -> dict:
 
 def _detect_invoke_cli_proxy(tool_id, available_functions):
     """
-    Détecte si un outil utilise invoke_cli_tool pour appeler Alagareth_toolset.
+    Détecte si un outil utilise invoke_cli_tool pour appeler Alma_toolset.
 
     Returns:
         tuple: (is_proxy, target_function, target_doc_path)
@@ -142,7 +142,7 @@ def _load_documentation_from_path(docs_path, available_functions, source_name):
                 if lucidoc and lucidoc.get("id"):
                     tool_id = lucidoc["id"]
 
-                    # Éviter les doublons - priorité à Alagareth_toolset
+                    # Éviter les doublons - priorité à Alma_toolset
                     if tool_id in ALL_TOOLS:
                         sys.stderr.write(f"Info : Outil '{tool_id}' déjà chargé, ignoré depuis {source_name}.\n")
                         continue
@@ -151,7 +151,7 @@ def _load_documentation_from_path(docs_path, available_functions, source_name):
                     is_proxy, proxy_function, target_doc_path = _detect_invoke_cli_proxy(tool_id, available_functions)
 
                     if is_proxy:
-                        # C'est un proxy, charger la doc depuis Alagareth_toolset
+                        # C'est un proxy, charger la doc depuis Alma_toolset
                         try:
                             target_ast = parse_luciform(target_doc_path)
                             target_lucidoc = _extract_semantic_doc(target_ast)
@@ -203,13 +203,13 @@ def initialize_tool_registry(memory_engine_instance):
     }
     available_functions.update(memory_tool_methods)
 
-    # Charge d'abord les documentations depuis Alagareth_toolset (priorité)
-    alagareth_count = _load_documentation_from_path(ALAGARETH_DOCS_PATH, available_functions, "Alagareth_toolset")
+    # Charge d'abord les documentations depuis Alma_toolset (priorité)
+    alagareth_count = _load_documentation_from_path(ALAGARETH_DOCS_PATH, available_functions, "Alma_toolset")
 
     # Puis charge les documentations depuis Tools/Library (pour les outils non couverts)
     tools_count = _load_documentation_from_path(DOCS_BASE_PATH, available_functions, "Tools/Library")
 
-    sys.stderr.write(f"Info : Chargé {alagareth_count} docs depuis Alagareth_toolset, {tools_count} depuis Tools/Library.\n")
+    sys.stderr.write(f"Info : Chargé {alagareth_count} docs depuis Alma_toolset, {tools_count} depuis Tools/Library.\n")
 
 
 

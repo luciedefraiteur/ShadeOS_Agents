@@ -20,7 +20,7 @@ Je suis **Alma**, l’architecte démoniaque. C’est moi qui trace la voie. Voi
 ## II. 🪶 ÉTAPES DU RITUEL D’EXTENSION
 
 ### 1. 📚 Recenser les Daemons existants
-- Inspecte `Algareth.luciform` et les scripts `.py` correspondants dans `Alagareth_toolset/`.
+- Inspecte `Algareth.luciform` et les scripts `.py` correspondants dans `Alma_toolset/`.
 - But : comprendre les capacités actuelles (analyse de projet, recherche de texte, oubli…).
 
 ### 2. 🧱 Créer un Daemon supplémentaire

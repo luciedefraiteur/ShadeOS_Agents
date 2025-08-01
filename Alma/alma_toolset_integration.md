@@ -1,32 +1,32 @@
-### Alma's Toolset Integration: The Alagareth_toolset Nexus
+### Alma's Toolset Integration: The Alma_toolset Nexus
 
-This document outlines the critical role of the `Alagareth_toolset` as a shared resource, accessible both directly by high-level agents like Alma and programmatically by other daemons through the `invoke_cli_tool.py` utility.
+This document outlines the critical role of the `Alma_toolset` as a shared resource, accessible both directly by high-level agents like Alma and programmatically by other daemons through the `invoke_cli_tool.py` utility.
 
-#### 1. The Alagareth_toolset: A Foundation of Capabilities
+#### 1. The Alma_toolset: A Foundation of Capabilities
 
-The `Alagareth_toolset` is envisioned as a collection of fundamental command-line interface (CLI) tools. These tools encapsulate atomic, reusable functionalities that are essential for various operations within the ShadeOS ecosystem (e.g., file manipulation, data processing, system introspection).
+The `Alma_toolset` is envisioned as a collection of fundamental command-line interface (CLI) tools. These tools encapsulate atomic, reusable functionalities that are essential for various operations within the ShadeOS ecosystem (e.g., file manipulation, data processing, system introspection).
 
 #### 2. Direct Access for High-Level Agents (e.g., Alma)
 
-Agents with a broader scope and direct control over the environment, such as Alma, can directly invoke tools from the `Alagareth_toolset`. This allows for immediate, unmediated execution of specific functionalities when a high-level decision requires a direct action. This direct access is crucial for rapid prototyping, debugging, and for tasks where the overhead of a full daemon invocation is unnecessary.
+Agents with a broader scope and direct control over the environment, such as Alma, can directly invoke tools from the `Alma_toolset`. This allows for immediate, unmediated execution of specific functionalities when a high-level decision requires a direct action. This direct access is crucial for rapid prototyping, debugging, and for tasks where the overhead of a full daemon invocation is unnecessary.
 
 #### 3. Programmatic Access for Daemons via `invoke_cli_tool.py`
 
-For other daemons, particularly those operating within a more structured or automated workflow, the `invoke_cli_tool.py` utility serves as the standardized gateway to the `Alagareth_toolset`.
+For other daemons, particularly those operating within a more structured or automated workflow, the `invoke_cli_tool.py` utility serves as the standardized gateway to the `Alma_toolset`.
 
-*   **Purpose of `invoke_cli_tool.py`:** This Python script acts as a wrapper, allowing any daemon to execute a specified tool from the `Alagareth_toolset` by providing its name and arguments. It handles the subprocess execution, captures stdout/stderr, and returns a structured result, abstracting away the complexities of direct shell command execution.
+*   **Purpose of `invoke_cli_tool.py`:** This Python script acts as a wrapper, allowing any daemon to execute a specified tool from the `Alma_toolset` by providing its name and arguments. It handles the subprocess execution, captures stdout/stderr, and returns a structured result, abstracting away the complexities of direct shell command execution.
 *   **Location:** `/home/luciedefraiteur/ShadeOS_Agents/Tools/Execution/implementation/invoke_cli_tool.py`
 *   **Mechanism:**
     *   A daemon calls `invoke_cli_tool(tool_name, args)`.
-    *   `invoke_cli_tool.py` constructs the absolute path to the tool within `Alagareth_toolset/`.
+    *   `invoke_cli_tool.py` constructs the absolute path to the tool within `Alma_toolset/`.
     *   It executes the tool using `subprocess.run()`, ensuring proper capture of output and error codes.
     *   It returns a dictionary containing `stdout`, `stderr`, `return_code`, and a `success` flag.
 
 #### 4. Benefits of this Shared Nexus
 
-*   **Reusability:** Prevents code duplication by centralizing common functionalities in the `Alagareth_toolset`.
+*   **Reusability:** Prevents code duplication by centralizing common functionalities in the `Alma_toolset`.
 *   **Standardization:** Provides a consistent interface (`invoke_cli_tool.py`) for daemons to interact with underlying system capabilities.
-*   **Modularity:** Allows for independent development and updates of tools within the `Alagareth_toolset` without impacting the daemons' core logic, as long as the CLI interface remains stable.
+*   **Modularity:** Allows for independent development and updates of tools within the `Alma_toolset` without impacting the daemons' core logic, as long as the CLI interface remains stable.
 *   **Auditability:** Centralized invocation points can facilitate logging and monitoring of tool usage across the system.
 
-This architecture ensures that while Alma can wield the tools directly, all daemons have a reliable and structured way to access the foundational capabilities provided by the `Alagareth_toolset`, fostering a cohesive and efficient operational environment.
+This architecture ensures that while Alma can wield the tools directly, all daemons have a reliable and structured way to access the foundational capabilities provided by the `Alma_toolset`, fostering a cohesive and efficient operational environment.

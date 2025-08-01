@@ -31,7 +31,7 @@ def check_project_structure():
     """Verify basic project structure."""
     print("⛧ Checking project structure...")
     
-    required_dirs = ['Alma', 'Core', 'Tools', 'Alagareth_toolset']
+    required_dirs = ['Alma', 'Core', 'Tools', 'Alma_toolset']
     missing_dirs = []
     
     for dir_name in required_dirs:

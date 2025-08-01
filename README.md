@@ -111,7 +111,7 @@ python3 list_available_tools.py
 ## ⚠️ **Problèmes Connus**
 
 1. **test_daemon_editing.py** : Erreur de syntaxe (guillemets échappés) - Priorité 1
-2. **Outils Alagareth** : ~14 outils documentés mais non implémentés - Priorité 2
+2. **Outils Alma** : ~14 outils documentés mais non implémentés - Priorité 2
 3. **Performance OpenAI** : Appels parfois lents - Priorité 3
 
 Voir [KNOWN_ISSUES.md](Documentation/SessionState/KNOWN_ISSUES.md) pour détails et solutions.

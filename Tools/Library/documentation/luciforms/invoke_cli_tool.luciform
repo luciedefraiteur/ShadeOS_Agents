@@ -3,7 +3,7 @@
   <!-- Le Pacte : Ce que fait l'outil -->
   <🜄pacte>
     <type>execution</type>
-    <intent>Exécuter un outil CLI du Alagareth_toolset et retourner son résultat.</intent>
+    <intent>Exécuter un outil CLI du Alma_toolset et retourner son résultat.</intent>
     <level>fondamental</level>
   </🜄pacte>
 
@@ -24,9 +24,9 @@
       <keyword>cli</keyword>
       <keyword>tool</keyword>
       <keyword>execute</keyword>
-      <keyword>Alagareth_toolset</keyword>
+      <keyword>Alma_toolset</keyword>
     </keywords>
-    <symbolic_layer>Projette une commande dans le néant du shell, invoquant un esprit mineur du Alagareth_toolset pour accomplir une tâche spécifique, et en capture l'écho.</symbolic_layer>
+    <symbolic_layer>Projette une commande dans le néant du shell, invoquant un esprit mineur du Alma_toolset pour accomplir une tâche spécifique, et en capture l'écho.</symbolic_layer>
     <usage_context>Utilisé par les outils proxy du projet pour déléguer l'exécution à des outils spécialisés et autonomes.</usage_context>
   </🜁essence>
 

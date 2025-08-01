@@ -65,7 +65,7 @@ Core/Archivist/
 ```
 Tools/                           # Arsenal mystique (29 outils)
 Core/implementation/tool_registry.py  # Registre dynamique d'outils
-Alagareth_toolset/              # Outils CLI spécialisés
+Alma_toolset/              # Outils CLI spécialisés
 ```
 
 ### **Tests et Validation :**
@@ -139,7 +139,7 @@ PYTHONPATH=/home/luciedefraiteur/ShadeOS_Agents python3 Core/implementation/tool
 ## ⚠️ **Problèmes Connus**
 
 1. **test_daemon_editing.py** : Guillemets échappés dans les chaînes Python cassent la syntaxe
-2. **Quelques outils Alagareth** : Certains outils ont des documentations mais pas d'implémentation
+2. **Quelques outils Alma** : Certains outils ont des documentations mais pas d'implémentation
 3. **Performance** : Les appels OpenAI peuvent être lents pour de gros projets
 
 ## 🔮 **Vision Future**
