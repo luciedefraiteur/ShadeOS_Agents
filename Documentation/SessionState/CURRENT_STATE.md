@@ -122,9 +122,9 @@ PYTHONPATH=/home/luciedefraiteur/ShadeOS_Agents python3 Core/implementation/tool
 ## 🎯 **Prochaines Étapes Suggérées**
 
 ### **Immédiat :**
-1. **Corriger test_daemon_editing.py** : Problème de guillemets échappés dans les chaînes Python
-2. **Tester l'édition complète** : Valider que les daemons peuvent éditer le TestProject
-3. **Optimiser les templates** : Améliorer les templates luciformes pour de meilleures réponses
+1. **Implémenter outils manquants** : Compléter les outils Alma documentés mais non implémentés
+2. **Optimiser les templates** : Améliorer les templates luciformes pour de meilleures réponses
+3. **Tests avancés** : Étendre les capacités de test des daemons
 
 ### **Court Terme :**
 1. **Interface Web** : Créer une interface web pour interagir avec les daemons
@@ -138,9 +138,8 @@ PYTHONPATH=/home/luciedefraiteur/ShadeOS_Agents python3 Core/implementation/tool
 
 ## ⚠️ **Problèmes Connus**
 
-1. **test_daemon_editing.py** : Guillemets échappés dans les chaînes Python cassent la syntaxe
-2. **Quelques outils Alma** : Certains outils ont des documentations mais pas d'implémentation
-3. **Performance** : Les appels OpenAI peuvent être lents pour de gros projets
+1. **Quelques outils Alma** : Certains outils ont des documentations mais pas d'implémentation
+2. **Performance** : Les appels OpenAI peuvent être lents pour de gros projets
 
 ## 🔮 **Vision Future**
 
