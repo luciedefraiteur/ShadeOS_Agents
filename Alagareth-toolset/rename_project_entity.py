@@ -1,7 +1,6 @@
 import os
 import argparse
 import sys
-import re
 
 # Assure que le répertoire de l'outil est dans sys.path pour les imports internes
 _current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,10 +42,7 @@ def rename_project_entity(old_name: str, new_name: str, debug: bool = False) -> 
     # Phase 2: Mise à jour des références dans le contenu des fichiers
     # Utilise une regex pour s'assurer de ne remplacer que le nom complet
     # Utilise des limites de mots () pour éviter les remplacements partiels
-    old_name_regex = re.escape(old_name) + r'(?![a-zA-Z0-9_])'
-    new_name_str = new_name
-
-    modified_files = replace_text_in_project(old_name_regex, new_name_str, include_patterns=[".py", ".luciform", ".md"], exclude_patterns=[".git", "__pycache__"], debug=debug)
+    modified_files = replace_text_in_project(old_name, new_name, include_patterns=[".py", ".luciform", ".md"], exclude_patterns=[".git", "__pycache__"], word_boundaries=True, debug=debug)
 
     if debug:
         if modified_files:

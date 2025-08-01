@@ -11,12 +11,14 @@ if _current_dir not in sys.path:
 # Importe les outils Alagareth-toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 from safe_overwrite_file import safe_overwrite_file
+from _string_utils import _perform_string_replacement, _perform_word_boundary_replacement
 
-def replace_text_in_project(old_text: str, new_text: str, include_patterns: list = None, exclude_patterns: list = None, debug: bool = False) -> list:
+def replace_text_in_project(old_text: str, new_text: str, include_patterns: list = None, exclude_patterns: list = None, word_boundaries: bool = False, debug: bool = False) -> list:
     """Recherche et remplace du texte dans plusieurs fichiers, en logant les différences."""
     if debug:
         print(f"[DEBUG - replace_text_in_project] Recherche de '{old_text}' pour remplacer par '{new_text}'", file=sys.stderr)
         print(f"[DEBUG - replace_text_in_project] Inclure: {include_patterns}, Exclure: {exclude_patterns}", file=sys.stderr)
+        print(f"[DEBUG - replace_text_in_project] Limites de mots: {word_boundaries}", file=sys.stderr)
 
     modified_files = []
     
@@ -43,7 +45,12 @@ def replace_text_in_project(old_text: str, new_text: str, include_patterns: list
                 continue
 
             if old_text in original_content:
-                new_content = original_content.replace(old_text, new_text)
+                # Choisir la méthode de remplacement selon le paramètre word_boundaries
+                if word_boundaries:
+                    new_content = _perform_word_boundary_replacement(original_content, old_text, new_text, all_occurrences=True, debug=debug)
+                else:
+                    new_content = _perform_string_replacement(original_content, old_text, new_text, all_occurrences=True, debug=debug)
+
                 if new_content != original_content:
                     if safe_overwrite_file(file_path, new_content, debug=debug):
                         modified_files.append(file_path)
@@ -64,10 +71,11 @@ if __name__ == "__main__":
     parser.add_argument("new_text", type=str, help="Texte de remplacement.")
     parser.add_argument("--include", nargs='*', help="Patterns de fichiers à inclure (ex: *.py, *.md).")
     parser.add_argument("--exclude", nargs='*', help="Patterns de chemins à exclure (ex: .git, __pycache__).")
+    parser.add_argument("--word-boundaries", action="store_true", help="Utilise les limites de mots pour le remplacement (évite les remplacements partiels).")
     parser.add_argument("--debug", action="store_true", help="Active le mode débogage.")
     args = parser.parse_args()
 
-    modified_files = replace_text_in_project(args.old_text, args.new_text, args.include, args.exclude, debug=args.debug)
+    modified_files = replace_text_in_project(args.old_text, args.new_text, args.include, args.exclude, word_boundaries=args.word_boundaries, debug=args.debug)
     if modified_files:
         print("\nFichiers modifiés:")
         for f in modified_files:

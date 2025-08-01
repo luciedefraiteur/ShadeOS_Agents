@@ -1,4 +1,12 @@
-import re
+import os
+import sys
+
+# Ajouter le chemin vers Alagareth-toolset pour importer _string_utils
+_alagareth_toolset_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "Alagareth-toolset")
+if _alagareth_toolset_path not in sys.path:
+    sys.path.insert(0, _alagareth_toolset_path)
+
+from _string_utils import _simple_xml_tokenizer
 
 def parse_luciform(file_path: str) -> dict:
     """
@@ -8,33 +16,30 @@ def parse_luciform(file_path: str) -> dict:
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Tokenizer pour séparer les commentaires, les balises, et le texte.
-    tokenizer = re.compile(r'(<!--.*?-->)|(<([^>\s/]+)[^>]*>)|(</[^>]+>)|([^<]+)', re.DOTALL)
-    
-    stack = [{"tag": "root", "attrs": {}, "children": []}] # Pile pour gérer la hiérarchie
-    
-    for match in tokenizer.finditer(content):
-        comment, tag_open, tag_name, tag_close, text = match.groups()
+    # Tokenizer simple pour séparer les commentaires, les balises, et le texte (sans regex)
+    tokens = _simple_xml_tokenizer(content)
 
-        if comment:
+    stack = [{"tag": "root", "attrs": {}, "children": []}] # Pile pour gérer la hiérarchie
+
+    for token in tokens:
+        if token['type'] == 'comment':
             # Ajoute un nœud de commentaire
-            stack[-1]["children"].append({"tag": "comment", "content": comment.strip('<!- ->').strip()})
-        
-        elif tag_open:
+            stack[-1]["children"].append({"tag": "comment", "content": token['content']})
+
+        elif token['type'] == 'tag_open':
             # Balise ouvrante : crée un nouveau nœud et le pousse sur la pile
-            attrs = dict(re.findall(r'([a-zA-Z0-9_\-:]+)="([^"]+)"', tag_open))
-            new_node = {"tag": tag_name, "attrs": attrs, "children": []}
+            new_node = {"tag": token['tag_name'], "attrs": token['attrs'], "children": []}
             stack.append(new_node)
 
-        elif tag_close:
+        elif token['type'] == 'tag_close':
             # Balise fermante : finalise le nœud et le lie à son parent
             if len(stack) > 1:
                 closed_node = stack.pop()
                 stack[-1]["children"].append(closed_node)
 
-        elif text and text.strip():
+        elif token['type'] == 'text':
             # Ajoute un nœud de texte
-            stack[-1]["children"].append({"tag": "text", "content": text.strip()})
+            stack[-1]["children"].append({"tag": "text", "content": token['content']})
             
     # Le résultat final est le premier (et unique) enfant du nœud racine
     if len(stack) == 1 and len(stack[0]["children"]) == 1:
