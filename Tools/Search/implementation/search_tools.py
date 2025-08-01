@@ -2,8 +2,8 @@ import glob
 import os
 import sys
 
-# Ajouter le chemin vers Alagareth-toolset pour importer _string_utils
-_alagareth_toolset_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "Alagareth-toolset")
+# Ajouter le chemin vers Alagareth_toolset pour importer _string_utils
+_alagareth_toolset_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "Alagareth_toolset")
 if _alagareth_toolset_path not in sys.path:
     sys.path.insert(0, _alagareth_toolset_path)
 

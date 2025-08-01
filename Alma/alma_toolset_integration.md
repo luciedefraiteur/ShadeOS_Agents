@@ -18,7 +18,7 @@ For other daemons, particularly those operating within a more structured or auto
 *   **Location:** `/home/luciedefraiteur/ShadeOS_Agents/Tools/Execution/implementation/invoke_cli_tool.py`
 *   **Mechanism:**
     *   A daemon calls `invoke_cli_tool(tool_name, args)`.
-    *   `invoke_cli_tool.py` constructs the absolute path to the tool within `Alagareth-toolset/`.
+    *   `invoke_cli_tool.py` constructs the absolute path to the tool within `Alagareth_toolset/`.
     *   It executes the tool using `subprocess.run()`, ensuring proper capture of output and error codes.
     *   It returns a dictionary containing `stdout`, `stderr`, `return_code`, and a `success` flag.
 

@@ -8,7 +8,7 @@ _current_dir = os.path.dirname(os.path.abspath(__file__))
 if _current_dir not in sys.path:
     sys.path.insert(0, _current_dir)
 
-# Importe les outils Alagareth-toolset nécessaires
+# Importe les outils Alagareth_toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 from safe_overwrite_file import safe_overwrite_file
 from _string_utils import _perform_string_replacement, _perform_word_boundary_replacement

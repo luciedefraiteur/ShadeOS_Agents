@@ -15,7 +15,7 @@ Key purposes include:
 
 #### 2. Existing Luciforms in Algareth-toolset
 
-Upon inspection of the `ShadeOS_Agents/Alagareth-toolset` directory, it is clear that a comprehensive set of `luciform` files already exists, describing a wide range of fundamental capabilities. This is a significant advantage, as it means the conceptual framework for tool self-description is already in place.
+Upon inspection of the `ShadeOS_Agents/Alagareth_toolset` directory, it is clear that a comprehensive set of `luciform` files already exists, describing a wide range of fundamental capabilities. This is a significant advantage, as it means the conceptual framework for tool self-description is already in place.
 
 Examples of existing `luciform` categories include:
 

@@ -8,7 +8,7 @@ _current_dir = os.path.dirname(os.path.abspath(__file__))
 if _current_dir not in sys.path:
     sys.path.insert(0, _current_dir)
 
-# Importe les outils Alagareth-toolset nécessaires
+# Importe les outils Alagareth_toolset nécessaires
 from safe_read_file_content import safe_read_file_content
 
 def find_text_in_project(text_to_find: str, include_patterns: list = None, exclude_patterns: list = None, debug: bool = False) -> list:
