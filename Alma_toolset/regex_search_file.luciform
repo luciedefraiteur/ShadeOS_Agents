@@ -2,8 +2,8 @@
 
   <!-- Le Pacte : Ce que fait l'outil -->
   <🜄pacte>
-    <type>search</type>
-    <intent>Rechercher des patterns regex dans un fichier unique avec contexte et coloration.</intent>
+    <type>divination</type>
+    <intent>Révéler les patterns cachés dans un grimoire unique par la magie des expressions régulières.</intent>
     <level>avancé</level>
   </🜄pacte>
 

@@ -2,8 +2,8 @@
 
   <!-- Le Pacte : Ce que fait l'outil -->
   <🜄pacte>
-    <type>writing</type>
-    <intent>Réécrire entièrement le pacte d'un fichier, en journalisant les différences.</intent>
+    <type>inscription</type>
+    <intent>Réinscrire entièrement le pacte d'un grimoire, gravant les mutations dans les annales mystiques.</intent>
     <level>intermédiaire</level>
   </🜄pacte>
 

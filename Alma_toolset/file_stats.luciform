@@ -2,8 +2,8 @@
 
   <!-- Le Pacte : Ce que fait l'outil -->
   <🜄pacte>
-    <type>analysis</type>
-    <intent>Analyser les statistiques détaillées d'un fichier : lignes, mots, caractères, patterns.</intent>
+    <type>augury</type>
+    <intent>Lire les présages cachés dans un grimoire : compter les signes, révéler les patterns mystiques.</intent>
     <level>intermédiaire</level>
   </🜄pacte>
 

@@ -2,8 +2,8 @@
 
   <!-- Le Pacte : Ce que fait l'outil -->
   <🜄pacte>
-    <type>search</type>
-    <intent>Rechercher un texte spécifique dans de multiples fichiers à travers le projet.</intent>
+    <type>divination</type>
+    <intent>Diviner les occurrences d'un texte mystique à travers les multiples grimoires du projet.</intent>
     <level>intermédiaire</level>
   </🜄pacte>
 
