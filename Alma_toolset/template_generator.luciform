@@ -1,0 +1,38 @@
+<🜲luciform_doc id="template_generator">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>generation</type>
+    <intent>Générer des fichiers à partir de templates avec variables, conditions et boucles.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>generate_from_template(template_path: str, output_path: str, variables: dict = None, overwrite: bool = False) -> dict</signature>
+    <requires>
+      <param>template_path</param>
+      <param>output_path</param>
+    </requires>
+    <optional>
+      <param>variables</param>
+      <param>overwrite</param>
+    </optional>
+    <returns>Dictionnaire avec success, template_path, output_path, template_size, output_size, variables_used, variables.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>template</keyword>
+      <keyword>generation</keyword>
+      <keyword>variables</keyword>
+      <keyword>conditions</keyword>
+      <keyword>boucles</keyword>
+      <keyword>automation</keyword>
+    </keywords>
+    <symbolic_layer>⛧ Tisserand mystique des structures de code, transformant les patterns abstraits en réalités tangibles, insufflant la vie dans les squelettes de templates par la magie des variables cosmiques ⛧</symbolic_layer>
+    <usage_context>Quand un agent doit créer des fichiers structurés rapidement, générer du code boilerplate, créer des configurations personnalisées, ou automatiser la création de projets. Essentiel pour la productivité, la cohérence du code, et l'évitement de la répétition.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
