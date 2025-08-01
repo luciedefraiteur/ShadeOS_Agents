@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 from Core.Archivist.luciform_parser import ParsedDaemonProfile, luciform_parser
 from Core.Archivist.luciform_injection_engine import luciform_injection_engine, InjectionContext
+from Core.Archivist.daemon_tools_interface import daemon_tools
 # Import will be done dynamically to avoid circular import
 
 
@@ -160,7 +161,40 @@ Fournis une réponse authentique et consciente."""
             
         except Exception as e:
             raise Exception(f"⛧ Erreur conscience daemon {self.daemon_id}: {e}")
-    
+
+    def use_tool(self, tool_id: str, **kwargs) -> Dict[str, Any]:
+        """Use a mystical tool from the arsenal."""
+        try:
+            invocation = daemon_tools.invoke_tool(self.daemon_id, tool_id, **kwargs)
+
+            return {
+                "success": invocation.success,
+                "tool_id": tool_id,
+                "result": invocation.result,
+                "error": invocation.error_message,
+                "execution_time": invocation.execution_time,
+                "timestamp": invocation.timestamp
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "tool_id": tool_id,
+                "error": f"Erreur utilisation outil: {e}",
+                "result": None
+            }
+
+    def list_available_tools(self, category_filter: str = None) -> Dict[str, Any]:
+        """List available tools for this daemon."""
+        return daemon_tools.list_available_tools(self.daemon_id, category_filter)
+
+    def get_tool_documentation(self, tool_id: str) -> Dict[str, Any]:
+        """Get documentation for a specific tool."""
+        return daemon_tools.get_tool_documentation(self.daemon_id, tool_id)
+
+    def suggest_tools_for_task(self, task_description: str) -> List[str]:
+        """Get tool suggestions for a task."""
+        return daemon_tools.suggest_tools_for_task(self.daemon_id, task_description)
+
     def _generate_memory_contributions(self, query: str, response: str) -> List:
         """Generate memory contributions from conscious response."""
         contributions = []
