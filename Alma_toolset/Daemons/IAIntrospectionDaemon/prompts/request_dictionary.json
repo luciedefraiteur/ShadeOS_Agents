@@ -1,0 +1,170 @@
+{
+  "request_types": {
+    "memory_engine": {
+      "description": "Requêtes pour le Memory Engine",
+      "requests": {
+        "REQUEST_MEMORY_STATISTICS": {
+          "description": "Obtenir les statistiques d'une strate mémoire",
+          "parameters": ["strata_name"],
+          "example": "::REQUEST_MEMORY_STATISTICS:: cognitive",
+          "return_type": "statistics_object"
+        },
+        "REQUEST_MEMORY_NODES": {
+          "description": "Lister les nœuds mémoire selon un pattern",
+          "parameters": ["path_pattern"],
+          "example": "::REQUEST_MEMORY_NODES:: /memory/core/*",
+          "return_type": "node_list"
+        },
+        "REQUEST_MEMORY_LINKS": {
+          "description": "Obtenir les liens d'un nœud mémoire",
+          "parameters": ["node_path"],
+          "example": "::REQUEST_MEMORY_LINKS:: /memory/core",
+          "return_type": "link_list"
+        },
+        "REQUEST_MEMORY_KEYWORDS": {
+          "description": "Analyser les mots-clés avec seuil de fréquence",
+          "parameters": ["frequency_threshold"],
+          "example": "::REQUEST_MEMORY_KEYWORDS:: 5",
+          "return_type": "keyword_analysis"
+        },
+        "REQUEST_MEMORY_STRATA_DISTRIBUTION": {
+          "description": "Répartition des mémoires par strate",
+          "parameters": [],
+          "example": "::REQUEST_MEMORY_STRATA_DISTRIBUTION::",
+          "return_type": "distribution_stats"
+        },
+        "REQUEST_MEMORY_NODE_DETAILS": {
+          "description": "Détails complets d'un nœud mémoire",
+          "parameters": ["node_path"],
+          "example": "::REQUEST_MEMORY_NODE_DETAILS:: /memory/core",
+          "return_type": "node_details"
+        },
+        "REQUEST_MEMORY_CHILDREN": {
+          "description": "Enfants d'un nœud parent",
+          "parameters": ["parent_path"],
+          "example": "::REQUEST_MEMORY_CHILDREN:: /memory/core",
+          "return_type": "children_list"
+        },
+        "REQUEST_MEMORY_TRANSCENDENCE_LINKS": {
+          "description": "Liens de transcendance d'un nœud",
+          "parameters": ["node_path"],
+          "example": "::REQUEST_MEMORY_TRANSCENDENCE_LINKS:: /memory/core",
+          "return_type": "transcendence_links"
+        }
+      }
+    },
+    "tool_memory": {
+      "description": "Requêtes pour le Tool Memory Extension",
+      "requests": {
+        "REQUEST_TOOL_LIST": {
+          "description": "Lister les outils par niveau",
+          "parameters": ["level"],
+          "example": "::REQUEST_TOOL_LIST:: avancé",
+          "return_type": "tool_list"
+        },
+        "REQUEST_TOOL_METADATA": {
+          "description": "Métadonnées d'un outil spécifique",
+          "parameters": ["tool_name"],
+          "example": "::REQUEST_TOOL_METADATA:: safe_create_file",
+          "return_type": "tool_metadata"
+        },
+        "REQUEST_TOOL_KEYWORDS": {
+          "description": "Mots-clés des outils avec seuil",
+          "parameters": ["frequency_threshold"],
+          "example": "::REQUEST_TOOL_KEYWORDS:: 3",
+          "return_type": "keyword_frequency"
+        },
+        "REQUEST_TOOL_CORRELATIONS": {
+          "description": "Corrélations entre types d'outils",
+          "parameters": ["tool_type"],
+          "example": "::REQUEST_TOOL_CORRELATIONS:: protection",
+          "return_type": "correlation_matrix"
+        },
+        "REQUEST_TOOL_DETAILS": {
+          "description": "Détails d'un type d'outil",
+          "parameters": ["tool_type"],
+          "example": "::REQUEST_TOOL_DETAILS:: file_manipulation",
+          "return_type": "tool_type_details"
+        },
+        "REQUEST_TOOL_SCAN_RESULTS": {
+          "description": "Résultats du scan des outils",
+          "parameters": [],
+          "example": "::REQUEST_TOOL_SCAN_RESULTS::",
+          "return_type": "scan_summary"
+        },
+        "REQUEST_TOOL_SEARCH_RESULTS": {
+          "description": "Résultats de recherche d'outils",
+          "parameters": ["search_term"],
+          "example": "::REQUEST_TOOL_SEARCH_RESULTS:: backup",
+          "return_type": "search_results"
+        },
+        "REQUEST_TOOL_INFO": {
+          "description": "Informations d'un outil par chemin",
+          "parameters": ["tool_path"],
+          "example": "::REQUEST_TOOL_INFO:: Alma_toolset/safe_create_file.py",
+          "return_type": "tool_info"
+        }
+      }
+    },
+    "editing_session": {
+      "description": "Requêtes pour l'Editing Session",
+      "requests": {
+        "REQUEST_EDITING_PARTITION_PATTERNS": {
+          "description": "Patterns de partitionnement utilisés",
+          "parameters": [],
+          "example": "::REQUEST_EDITING_PARTITION_PATTERNS::",
+          "return_type": "partition_patterns"
+        },
+        "REQUEST_EDITING_NAVIGATION_STATS": {
+          "description": "Statistiques de navigation contextuelle",
+          "parameters": [],
+          "example": "::REQUEST_EDITING_NAVIGATION_STATS::",
+          "return_type": "navigation_stats"
+        },
+        "REQUEST_EDITING_LANGUAGE_SUPPORT": {
+          "description": "Langages supportés et capacités",
+          "parameters": [],
+          "example": "::REQUEST_EDITING_LANGUAGE_SUPPORT::",
+          "return_type": "language_support"
+        },
+        "REQUEST_EDITING_SESSION_EFFICIENCY": {
+          "description": "Efficacité des sessions d'édition",
+          "parameters": [],
+          "example": "::REQUEST_EDITING_SESSION_EFFICIENCY::",
+          "return_type": "efficiency_metrics"
+        },
+        "REQUEST_EDITING_LOCATION_TRACKING": {
+          "description": "Suivi de localisation pour un fichier",
+          "parameters": ["file_path"],
+          "example": "::REQUEST_EDITING_LOCATION_TRACKING:: src/main.py",
+          "return_type": "location_data"
+        },
+        "REQUEST_EDITING_AST_ANALYSIS": {
+          "description": "Analyse AST d'un fichier",
+          "parameters": ["file_path"],
+          "example": "::REQUEST_EDITING_AST_ANALYSIS:: src/main.py",
+          "return_type": "ast_analysis"
+        },
+        "REQUEST_EDITING_PARTITION_SCHEMAS": {
+          "description": "Schémas de partitionnement disponibles",
+          "parameters": [],
+          "example": "::REQUEST_EDITING_PARTITION_SCHEMAS::",
+          "return_type": "partition_schemas"
+        },
+        "REQUEST_EDITING_FALLBACK_STRATEGIES": {
+          "description": "Stratégies de fallback disponibles",
+          "parameters": [],
+          "example": "::REQUEST_EDITING_FALLBACK_STRATEGIES::",
+          "return_type": "fallback_strategies"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-02",
+    "description": "Dictionnaire des requêtes d'injection contextuelle pour le Daemon Introspectif",
+    "format": "::REQUEST_TYPE:: [parameters]",
+    "priority_order": "memory_engine, tool_memory, editing_session"
+  }
+} 

@@ -1,0 +1,191 @@
+{
+  "daemon_type": "metaphysical",
+  "consciousness_level": 3,
+  "description": "Dictionnaire des requêtes de rétro-injection pour le Daemon Métaphysique - Synthétiseur d'Insights et Détecteur d'Émergences",
+  "version": "1.0",
+  "created": "2025-08-02",
+  
+  "request_categories": {
+    "insight_synthesis": {
+      "description": "Requêtes pour la synthèse d'insights",
+      "requests": {
+        "REQUEST_INSIGHT_FUSION": {
+          "description": "Fusionner les insights cognitifs en compréhensions unifiées",
+          "parameters": ["insight_types", "fusion_method"],
+          "example": "::REQUEST_INSIGHT_FUSION:: pattern,correlation intuitive",
+          "return_type": "fused_insights",
+          "priority": "high"
+        },
+        "REQUEST_INSIGHT_DEPTH_ANALYSIS": {
+          "description": "Analyser la profondeur des insights générés",
+          "parameters": ["insight_id", "depth_metrics"],
+          "example": "::REQUEST_INSIGHT_DEPTH_ANALYSIS:: insight_001 complexity,novelty",
+          "return_type": "depth_analysis",
+          "priority": "medium"
+        },
+        "REQUEST_INSIGHT_VALIDATION": {
+          "description": "Valider la cohérence des insights",
+          "parameters": ["insight_id", "validation_criteria"],
+          "example": "::REQUEST_INSIGHT_VALIDATION:: insight_001 logical,empirical",
+          "return_type": "validation_result",
+          "priority": "high"
+        },
+        "REQUEST_INSIGHT_EVOLUTION": {
+          "description": "Suivre l'évolution des insights dans le temps",
+          "parameters": ["insight_id", "time_period"],
+          "example": "::REQUEST_INSIGHT_EVOLUTION:: insight_001 7_days",
+          "return_type": "evolution_trace",
+          "priority": "medium"
+        }
+      }
+    },
+    "system_understanding": {
+      "description": "Requêtes pour la compréhension systémique",
+      "requests": {
+        "REQUEST_SYSTEM_HOLISTIC_VIEW": {
+          "description": "Développer une vision holistique du système",
+          "parameters": ["system_scope", "perspective_type"],
+          "example": "::REQUEST_SYSTEM_HOLISTIC_VIEW:: global emergent",
+          "return_type": "holistic_understanding",
+          "priority": "high"
+        },
+        "REQUEST_INTERACTION_MAPPING": {
+          "description": "Cartographier les interactions systémiques",
+          "parameters": ["interaction_type", "mapping_depth"],
+          "example": "::REQUEST_INTERACTION_MAPPING:: causal deep",
+          "return_type": "interaction_map",
+          "priority": "high"
+        },
+        "REQUEST_PRINCIPLE_IDENTIFICATION": {
+          "description": "Identifier les principes sous-jacents",
+          "parameters": ["principle_domain", "abstraction_level"],
+          "example": "::REQUEST_PRINCIPLE_IDENTIFICATION:: behavior fundamental",
+          "return_type": "underlying_principles",
+          "priority": "critical"
+        },
+        "REQUEST_SYSTEM_DYNAMICS": {
+          "description": "Comprendre la dynamique systémique",
+          "parameters": ["dynamics_type", "time_scale"],
+          "example": "::REQUEST_SYSTEM_DYNAMICS:: feedback long_term",
+          "return_type": "system_dynamics",
+          "priority": "high"
+        }
+      }
+    },
+    "emergence_detection": {
+      "description": "Requêtes pour la détection d'émergences",
+      "requests": {
+        "REQUEST_EMERGENT_BEHAVIOR": {
+          "description": "Détecter les comportements émergents",
+          "parameters": ["behavior_scale", "emergence_type"],
+          "example": "::REQUEST_EMERGENT_BEHAVIOR:: collective spontaneous",
+          "return_type": "emergent_behavior",
+          "priority": "critical"
+        },
+        "REQUEST_EMERGENT_PROPERTIES": {
+          "description": "Identifier les propriétés émergentes",
+          "parameters": ["property_type", "system_level"],
+          "example": "::REQUEST_EMERGENT_PROPERTIES:: functional global",
+          "return_type": "emergent_properties",
+          "priority": "high"
+        },
+        "REQUEST_PHASE_TRANSITIONS": {
+          "description": "Détecter les transitions de phase",
+          "parameters": ["transition_type", "detection_sensitivity"],
+          "example": "::REQUEST_PHASE_TRANSITIONS:: critical 0.1",
+          "return_type": "phase_transitions",
+          "priority": "critical"
+        },
+        "REQUEST_SELF_ORGANIZATION": {
+          "description": "Observer l'auto-organisation",
+          "parameters": ["organization_type", "observation_period"],
+          "example": "::REQUEST_SELF_ORGANIZATION:: structural 24_hours",
+          "return_type": "self_organization",
+          "priority": "high"
+        }
+      }
+    },
+    "strategic_vision": {
+      "description": "Requêtes pour la vision stratégique",
+      "requests": {
+        "REQUEST_STRATEGIC_PERSPECTIVE": {
+          "description": "Développer une perspective stratégique",
+          "parameters": ["perspective_scope", "time_horizon"],
+          "example": "::REQUEST_STRATEGIC_PERSPECTIVE:: global long_term",
+          "return_type": "strategic_perspective",
+          "priority": "high"
+        },
+        "REQUEST_FUTURE_SCENARIOS": {
+          "description": "Générer des scénarios futurs",
+          "parameters": ["scenario_type", "probability_threshold"],
+          "example": "::REQUEST_FUTURE_SCENARIOS:: evolution 0.7",
+          "return_type": "future_scenarios",
+          "priority": "medium"
+        },
+        "REQUEST_OPTIMIZATION_OPPORTUNITIES": {
+          "description": "Identifier les opportunités d'optimisation",
+          "parameters": ["optimization_domain", "impact_threshold"],
+          "example": "::REQUEST_OPTIMIZATION_OPPORTUNITIES:: performance high",
+          "return_type": "optimization_opportunities",
+          "priority": "high"
+        },
+        "REQUEST_ADAPTATION_STRATEGIES": {
+          "description": "Développer des stratégies d'adaptation",
+          "parameters": ["adaptation_type", "resilience_level"],
+          "example": "::REQUEST_ADAPTATION_STRATEGIES:: proactive robust",
+          "return_type": "adaptation_strategies",
+          "priority": "high"
+        }
+      }
+    },
+    "intuitive_synthesis": {
+      "description": "Requêtes pour la synthèse intuitive",
+      "requests": {
+        "REQUEST_INTUITIVE_CONNECTION": {
+          "description": "Établir des connexions intuitives",
+          "parameters": ["connection_type", "intuition_depth"],
+          "example": "::REQUEST_INTUITIVE_CONNECTION:: cross_domain deep",
+          "return_type": "intuitive_connections",
+          "priority": "medium"
+        },
+        "REQUEST_WISDOM_EXTRACTION": {
+          "description": "Extraire la sagesse des données",
+          "parameters": ["wisdom_type", "extraction_method"],
+          "example": "::REQUEST_WISDOM_EXTRACTION:: practical intuitive",
+          "return_type": "extracted_wisdom",
+          "priority": "high"
+        },
+        "REQUEST_METAPHOR_GENERATION": {
+          "description": "Générer des métaphores explicatives",
+          "parameters": ["metaphor_domain", "complexity_level"],
+          "example": "::REQUEST_METAPHOR_GENERATION:: system simple",
+          "return_type": "explanatory_metaphors",
+          "priority": "low"
+        },
+        "REQUEST_ESSENCE_CAPTURE": {
+          "description": "Capturer l'essence des phénomènes",
+          "parameters": ["phenomenon_type", "abstraction_level"],
+          "example": "::REQUEST_ESSENCE_CAPTURE:: behavior fundamental",
+          "return_type": "phenomenon_essence",
+          "priority": "high"
+        }
+      }
+    }
+  },
+  
+  "metadata": {
+    "synthesis_methods": ["intuitive", "holistic", "emergent", "strategic"],
+    "insight_quality_metrics": {
+      "depth": "complexity_and_profundity",
+      "novelty": "originality_and_innovation",
+      "coherence": "logical_consistency",
+      "applicability": "practical_relevance"
+    },
+    "priority_levels": {
+      "critical": "immediate_synthesis",
+      "high": "rapid_synthesis",
+      "medium": "normal_synthesis",
+      "low": "background_synthesis"
+    }
+  }
+} 

@@ -22,24 +22,83 @@ from watchdog.events import FileSystemEventHandler
 # Ajout du path pour les imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from Core.Archivist.MemoryEngine.engine import MemoryEngine
-from Core.Archivist.MemoryEngine.EditingSession.partitioning import (
-    LanguageRegistry,
-    partition_file,
-    PartitionResult
-)
-from Core.Archivist.MemoryEngine.EditingSession.partitioning.partition_schemas import (
-    PartitionBlock,
-    PartitionMethod,
-    BlockType
-)
+try:
+    from Core.Archivist.MemoryEngine.engine import MemoryEngine
+except ImportError:
+    # Fallback si MemoryEngine n'est pas disponible
+    class MemoryEngine:
+        def __init__(self):
+            pass
+        def create_memory(self, *args, **kwargs):
+            pass
+        def get_memory_node(self, *args, **kwargs):
+            return None
+        def find_memories_by_keyword(self, *args, **kwargs):
+            return []
+try:
+    from Core.Archivist.MemoryEngine.EditingSession.partitioning import (
+        LanguageRegistry,
+        partition_file,
+        PartitionResult
+    )
+    from Core.Archivist.MemoryEngine.EditingSession.partitioning.partition_schemas import (
+        PartitionBlock,
+        PartitionMethod,
+        BlockType
+    )
+except ImportError:
+    # Fallback si partitioning n'est pas disponible
+    from enum import Enum
+    from dataclasses import dataclass
+    from typing import List, Dict, Any
+
+    class PartitionMethod(Enum):
+        AST = "ast"
+        TREE_SITTER = "tree_sitter"
+        REGEX = "regex"
+        TEXTUAL = "textual"
+        EMERGENCY = "emergency"
+
+    class BlockType(Enum):
+        SECTION = "section"
+        FUNCTION = "function"
+        CLASS = "class"
+
+    @dataclass
+    class PartitionBlock:
+        block_name: str
+        block_type: BlockType
+        content: str
+        metadata: Dict[str, Any]
+
+    @dataclass
+    class PartitionResult:
+        success: bool
+        partitions: List[PartitionBlock]
+        method_used: PartitionMethod
+        processing_time: float
+
+    class LanguageRegistry:
+        @staticmethod
+        def get_language_for_file(file_path: str) -> str:
+            return "markdown"
+
+    def partition_file(file_path: str, content: str) -> PartitionResult:
+        return PartitionResult(
+            success=True,
+            partitions=[PartitionBlock("full_content", BlockType.SECTION, content, {})],
+            method_used=PartitionMethod.TEXTUAL,
+            processing_time=0.1
+        )
 # Imports conditionnels pour éviter les erreurs d'import relatif
 try:
     from .openai_analyzer import OpenAIAnalyzer, AIInsights
     from .contextual_md_analyzer import ContextualMDAnalyzer, ContextualAnalysis
+    from .content_type_detector import ContentTypeDetector, ContentType, ContentCharacteristics
 except ImportError:
     from openai_analyzer import OpenAIAnalyzer, AIInsights
     from contextual_md_analyzer import ContextualMDAnalyzer, ContextualAnalysis
+    from content_type_detector import ContentTypeDetector, ContentType, ContentCharacteristics
 
 
 @dataclass
@@ -146,6 +205,7 @@ class MDDaemonCore:
             max_recursive_depth=3,
             force_ollama=self.force_ollama
         )
+        self.content_detector = ContentTypeDetector()
         
         # État du daemon
         self.running = False
@@ -261,12 +321,16 @@ class MDDaemonCore:
             if not content:
                 return
             
+            # Détection du type de contenu
+            content_characteristics = self.content_detector.detect_content_type(file_path, content)
+            print(f"🔍 Content type: {content_characteristics.content_type.value} (confidence: {content_characteristics.confidence_score:.2f})")
+
             # Analyse de base
             analysis = await self._analyze_file_basic(file_path, content)
-            
-            # Décision d'analyse avancée
-            if self._should_use_advanced_analysis(content, analysis):
-                await self._analyze_file_advanced(file_path, content, analysis)
+
+            # Décision d'analyse avancée (adaptée au type)
+            if self._should_use_advanced_analysis(content, analysis, content_characteristics):
+                await self._analyze_file_advanced(file_path, content, analysis, content_characteristics)
 
             # Décision d'analyse contextuelle
             if self._should_use_contextual_analysis(content, analysis):

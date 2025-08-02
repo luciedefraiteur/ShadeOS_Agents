@@ -1,0 +1,162 @@
+{
+  "session_id": "introspection_daemon_20250802_135004",
+  "start_time": "2025-08-02T13:50:04.236822",
+  "end_time": "2025-08-02T13:50:05.954675",
+  "total_prompts": 6,
+  "successful_prompts": 6,
+  "failed_prompts": 0,
+  "average_effectiveness": 0.125,
+  "session_type": "introspection_daemon",
+  "prompts": [
+    {
+      "timestamp": "2025-08-02T13:50:04.646871",
+      "prompt_id": "ab580a314982",
+      "prompt_type": "generation_standalone_test",
+      "input_prompt": "GENERATE: standalone_test",
+      "output_response": "<🜲luciform id=\"auto_introspection_standalone_test⛧\" type=\"✶comprehensive_analysis\">\n  <🜄context_injection>\n    ::INJECT_COMPONENT_DATA::\n    Composants analysés : 3 identifiés\n    État global : 0.85\n\n    ::INJECT_CAPABILITY_MAP::\n    Capacités découvertes : 4 mappées\n    Score moyen : 0.75\n\n    ::INJECT_PERFORMANCE_METRICS::\n    Type d'analyse : standalone_test\n    Profondeur d'introspection : 3 niveaux\n  </🜄context_injection>\n\n  <🜂introspection_directive>\n    Tu es le IntrospectionDaemon en mode d'auto-analyse standalone_test.\n\n    MISSION D'INTROSPECTION MYSTIQUE :\n\n    1. 🧠 ANALYSE ARCHITECTURALE :\n       - Évalue la santé des 3 composants injectés\n       - Identifie les patterns de défaillance potentiels\n       - Analyse la cohérence globale du système\n\n    2. 🔍 CARTOGRAPHIE DES CAPACITÉS :\n       - Inventorie les 4 capacités découvertes\n       - Identifie les lacunes critiques\n       - Propose des extensions stratégiques\n\n    3. ⚡ OPTIMISATION INTELLIGENTE :\n       - Analyse les métriques de performance\n       - Identifie les goulots d'étranglement\n       - Génère des recommandations concrètes\n\n    4. 🌟 ÉVOLUTION ADAPTATIVE :\n       - Planifie l'évolution future\n       - Priorise les améliorations\n       - Définis des métriques de succès\n\n    RÉSULTAT ATTENDU :\n    Génère une auto-analyse complète incluant :\n    - État de santé détaillé avec scores\n    - Plan d'optimisation prioritaire\n    - Stratégie d'évolution adaptative\n    - Métriques de suivi précises\n  </🜂introspection_directive>\n</🜲luciform>",
+      "context_data": {
+        "components": {
+          "memory_engine": {
+            "status": "active",
+            "health": 0.9
+          },
+          "tool_registry": {
+            "status": "active",
+            "health": 0.8
+          },
+          "editing_session": {
+            "status": "active",
+            "health": 0.85
+          }
+        },
+        "capabilities": {
+          "introspection": 0.8,
+          "auto_prompting": 0.7,
+          "context_injection": 0.9,
+          "evolution": 0.6
+        }
+      },
+      "effectiveness_score": 0.0,
+      "execution_time": 0.0,
+      "metadata": {
+        "operation": "prompt_generation",
+        "template_used": "introspection_template",
+        "injection_points": [
+          "components",
+          "capabilities"
+        ],
+        "prompt_length": 1529
+      },
+      "error_message": null
+    },
+    {
+      "timestamp": "2025-08-02T13:50:04.747382",
+      "prompt_id": "5d118bfad434",
+      "prompt_type": "injection_comprehensive",
+      "input_prompt": "<🜲luciform id=\"auto_introspection_standalone_test⛧\" type=\"✶comprehensive_analysis\">\n  <🜄context_injection>\n    ::INJECT_COMPONENT_DATA::\n    Composants analysés : 3 identifiés\n    État global : 0.85\n\n    ::INJECT_CAPABILITY_MAP::\n    Capacités découvertes : 4 mappées\n    Score moyen : 0.75\n\n    ::INJECT_PERFORMANCE_METRICS::\n    Type d'analyse : standalone_test\n    Profondeur d'introspection : 3 niveaux\n  </🜄context_injection>\n\n  <🜂introspection_directive>\n    Tu es le IntrospectionDaemon en mode d'auto-analyse standalone_test.\n\n    MISSION D'INTROSPECTION MYSTIQUE :\n\n    1. 🧠 ANALYSE ARCHITECTURALE :\n       - Évalue la santé des 3 composants injectés\n       - Identifie les patterns de défaillance potentiels\n       - Analyse la cohérence globale du système\n\n    2. 🔍 CARTOGRAPHIE DES CAPACITÉS :\n       - Inventorie les 4 capacités découvertes\n       - Identifie les lacunes critiques\n       - Propose des extensions stratégiques\n\n    3. ⚡ OPTIMISATION INTELLIGENTE :\n       - Analyse les métriques de performance\n       - Identifie les goulots d'étranglement\n       - Génère des recommandations concrètes\n\n    4. 🌟 ÉVOLUTION ADAPTATIVE :\n       - Planifie l'évolution future\n       - Priorise les améliorations\n       - Définis des métriques de succès\n\n    RÉSULTAT ATTENDU :\n    Génère une auto-analyse complète incluant :\n    - État de santé détaillé avec scores\n    - Plan d'optimisation prioritaire\n    - Stratégie d'évolution adaptative\n    - Métriques de suivi précises\n  </🜂introspection_directive>\n</🜲luciform>",
+      "output_response": "Context-injected: <🜲luciform id=\"auto_introspection_standalone_test⛧\" type=\"✶comprehensive_analysis\">\n  <🜄context_injection>\n    ::INJECT_COMPONENT_DATA::\n    Composants analysés : 3 identifiés\n    État global : 0.85\n\n    ::INJECT_CAPABILITY_MAP::\n    Capacités découvertes : 4 mappées\n    Score moyen : 0.75\n\n    ::INJECT_PERFORMANCE_METRICS::\n    Type d'analyse : standalone_test\n    Profondeur d'introspection : 3 niveaux\n  </🜄context_injection>\n\n  <🜂introspection_directive>\n    Tu es le IntrospectionDaemon en mode d'auto-analyse standalone_test.\n\n    MISSION D'INTROSPECTION MYSTIQUE :\n\n    1. 🧠 ANALYSE ARCHITECTURALE :\n       - Évalue la santé des 3 composants injectés\n       - Identifie les patterns de défaillance potentiels\n       - Analyse la cohérence globale du système\n\n    2. 🔍 CARTOGRAPHIE DES CAPACITÉS :\n       - Inventorie les 4 capacités découvertes\n       - Identifie les lacunes critiques\n       - Propose des extensions stratégiques\n\n    3. ⚡ OPTIMISATION INTELLIGENTE :\n       - Analyse les métriques de performance\n       - Identifie les goulots d'étranglement\n       - Génère des recommandations concrètes\n\n    4. 🌟 ÉVOLUTION ADAPTATIVE :\n       - Planifie l'évolution future\n       - Priorise les améliorations\n       - Définis des métriques de succès\n\n    RÉSULTAT ATTENDU :\n    Génère une auto-analyse complète incluant :\n    - État de santé détaillé avec scores\n    - Plan d'optimisation prioritaire\n    - Stratégie d'évolution adaptative\n    - Métriques de suivi précises\n  </🜂introspection_directive>\n</🜲luciform>",
+      "context_data": {
+        "components": {
+          "memory_engine": {
+            "status": "active",
+            "health": 0.9
+          },
+          "tool_registry": {
+            "status": "active",
+            "health": 0.8
+          },
+          "editing_session": {
+            "status": "active",
+            "health": 0.85
+          }
+        },
+        "capabilities": {
+          "introspection": 0.8,
+          "auto_prompting": 0.7,
+          "context_injection": 0.9,
+          "evolution": 0.6
+        }
+      },
+      "effectiveness_score": 0.0,
+      "execution_time": 0.0,
+      "metadata": {
+        "operation": "context_injection",
+        "injection_type": "comprehensive",
+        "enrichment_ratio": 1.0117724002616089,
+        "base_length": 1529,
+        "enriched_length": 1547,
+        "injection_success": false
+      },
+      "error_message": null
+    },
+    {
+      "timestamp": "2025-08-02T13:50:05.048603",
+      "prompt_id": "a078a9b0e001",
+      "prompt_type": "introspection_analysis",
+      "input_prompt": "Context-injected: <🜲luciform id=\"auto_introspection_standalone_test⛧\" type=\"✶comprehensive_analysis\">\n  <🜄context_injection>\n    ::INJECT_COMPONENT_DATA::\n    Composants analysés : 3 identifiés\n    État global : 0.85\n\n    ::INJECT_CAPABILITY_MAP::\n    Capacités découvertes : 4 mappées\n    Score moyen : 0.75\n\n    ::INJECT_PERFORMANCE_METRICS::\n    Type d'analyse : standalone_test\n    Profondeur d'introspection : 3 niveaux\n  </🜄context_injection>\n\n  <🜂introspection_directive>\n    Tu es le IntrospectionDaemon en mode d'auto-analyse standalone_test.\n\n    MISSION D'INTROSPECTION MYSTIQUE :\n\n    1. 🧠 ANALYSE ARCHITECTURALE :\n       - Évalue la santé des 3 composants injectés\n       - Identifie les patterns de défaillance potentiels\n       - Analyse la cohérence globale du système\n\n    2. 🔍 CARTOGRAPHIE DES CAPACITÉS :\n       - Inventorie les 4 capacités découvertes\n       - Identifie les lacunes critiques\n       - Propose des extensions stratégiques\n\n    3. ⚡ OPTIMISATION INTELLIGENTE :\n       - Analyse les métriques de performance\n       - Identifie les goulots d'étranglement\n       - Génère des recommandations concrètes\n\n    4. 🌟 ÉVOLUTION ADAPTATIVE :\n       - Planifie l'évolution future\n       - Priorise les améliorations\n       - Définis des métriques de succès\n\n    RÉSULTAT ATTENDU :\n    Génère une auto-analyse complète incluant :\n    - État de santé détaillé avec scores\n    - Plan d'optimisation prioritaire\n    - Stratégie d'évolution adaptative\n    - Métriques de suivi précises\n  </🜂introspection_directive>\n</🜲luciform>",
+      "output_response": "{\n  \"analysis_type\": \"standalone_test\",\n  \"components_analyzed\": {\n    \"memory_engine\": {\n      \"status\": \"active\",\n      \"health\": 0.9\n    },\n    \"tool_registry\": {\n      \"status\": \"active\",\n      \"health\": 0.8\n    },\n    \"editing_session\": {\n      \"status\": \"active\",\n      \"health\": 0.85\n    }\n  },\n  \"capabilities_discovered\": {\n    \"introspection\": 0.8,\n    \"auto_prompting\": 0.7,\n    \"context_injection\": 0.9,\n    \"evolution\": 0.6\n  },\n  \"improvement_suggestions\": [\n    \"Improve context injection\",\n    \"Optimize prompt generation\"\n  ],\n  \"evolution_recommendations\": [\n    \"Add new analysis capabilities\",\n    \"Enhance effectiveness tracking\"\n  ]\n}",
+      "context_data": {},
+      "effectiveness_score": 0.75,
+      "execution_time": 0.10020661354064941,
+      "metadata": {
+        "operation": "introspection_analysis",
+        "components_analyzed": 3,
+        "capabilities_discovered": 4,
+        "improvement_suggestions": 2,
+        "analysis_type": "standalone_test"
+      },
+      "error_message": null
+    },
+    {
+      "timestamp": "2025-08-02T13:50:05.349723",
+      "prompt_id": "a67a73668b37",
+      "prompt_type": "generation_memory_analysis",
+      "input_prompt": "GENERATE: memory_analysis",
+      "output_response": "Optimized: Targeted-injected: <🜲luciform id=\"focused_memory_analysis_analysis⛧\" type=\"✶targeted_introspection\">\n  <🜄focused_context>\n    ::INJECT_TARGET_DATA::\n    Focus d'analyse : memory_analysis\n    Contexte disponible : 5 éléments\n\n    ::INJECT_RELATED_CONTEXT::\n    Données contextuelles spécialisées pour memory_analysis\n\n    ::INJECT_HISTORICAL_DATA::\n    Historique et patterns pour memory_analysis\n  </🜄focused_context>\n\n  <🜂focused_directive>\n    Tu es le IntrospectionDaemon en mode d'analyse focalisée sur : memory_analysis\n\n    MISSION D'ANALYSE CIBLÉE :\n\n    1. 🎯 ANALYSE SPÉCIALISÉE :\n       - Focus exclusif sur memory_analysis\n       - Analyse approfondie des aspects spécifiques\n       - Évaluation détaillée de l'état et performances\n\n    2. 🔗 ANALYSE RELATIONNELLE :\n       - Impact sur les composants connexes\n       - Dépendances et interdépendances\n       - Effets de réseau et propagation\n\n    3. 📊 ANALYSE HISTORIQUE :\n       - Évolution et tendances observées\n       - Patterns de succès et d'échec\n       - Apprentissages des expériences passées\n\n    4. 🚀 RECOMMANDATIONS SPÉCIALISÉES :\n       - Améliorations spécifiques au domaine memory_analysis\n       - Optimisations techniques précises\n       - Plan d'action détaillé et réalisable\n\n    RÉSULTAT CIBLÉ :\n    Génère une analyse spécialisée incluant :\n    - Diagnostic précis de memory_analysis\n    - Recommandations d'amélioration spécifiques\n    - Plan d'action avec étapes concrètes\n    - Métriques de suivi adaptées\n  </🜂focused_directive>\n</🜲luciform>",
+      "context_data": {},
+      "effectiveness_score": 0.0,
+      "execution_time": 0.3007063865661621,
+      "metadata": {
+        "operation": "prompt_generation",
+        "template_used": "auto_generation",
+        "injection_points": [],
+        "prompt_length": 1537
+      },
+      "error_message": null
+    },
+    {
+      "timestamp": "2025-08-02T13:50:05.651010",
+      "prompt_id": "594b3e7d598e",
+      "prompt_type": "generation_tool_inventory",
+      "input_prompt": "GENERATE: tool_inventory",
+      "output_response": "Optimized: Targeted-injected: <🜲luciform id=\"focused_tool_inventory_analysis⛧\" type=\"✶targeted_introspection\">\n  <🜄focused_context>\n    ::INJECT_TARGET_DATA::\n    Focus d'analyse : tool_inventory\n    Contexte disponible : 5 éléments\n\n    ::INJECT_RELATED_CONTEXT::\n    Données contextuelles spécialisées pour tool_inventory\n\n    ::INJECT_HISTORICAL_DATA::\n    Historique et patterns pour tool_inventory\n  </🜄focused_context>\n\n  <🜂focused_directive>\n    Tu es le IntrospectionDaemon en mode d'analyse focalisée sur : tool_inventory\n\n    MISSION D'ANALYSE CIBLÉE :\n\n    1. 🎯 ANALYSE SPÉCIALISÉE :\n       - Focus exclusif sur tool_inventory\n       - Analyse approfondie des aspects spécifiques\n       - Évaluation détaillée de l'état et performances\n\n    2. 🔗 ANALYSE RELATIONNELLE :\n       - Impact sur les composants connexes\n       - Dépendances et interdépendances\n       - Effets de réseau et propagation\n\n    3. 📊 ANALYSE HISTORIQUE :\n       - Évolution et tendances observées\n       - Patterns de succès et d'échec\n       - Apprentissages des expériences passées\n\n    4. 🚀 RECOMMANDATIONS SPÉCIALISÉES :\n       - Améliorations spécifiques au domaine tool_inventory\n       - Optimisations techniques précises\n       - Plan d'action détaillé et réalisable\n\n    RÉSULTAT CIBLÉ :\n    Génère une analyse spécialisée incluant :\n    - Diagnostic précis de tool_inventory\n    - Recommandations d'amélioration spécifiques\n    - Plan d'action avec étapes concrètes\n    - Métriques de suivi adaptées\n  </🜂focused_directive>\n</🜲luciform>",
+      "context_data": {},
+      "effectiveness_score": 0.0,
+      "execution_time": 0.30097365379333496,
+      "metadata": {
+        "operation": "prompt_generation",
+        "template_used": "auto_generation",
+        "injection_points": [],
+        "prompt_length": 1529
+      },
+      "error_message": null
+    },
+    {
+      "timestamp": "2025-08-02T13:50:05.953242",
+      "prompt_id": "2dd5b06b1a91",
+      "prompt_type": "generation_capability_assessment",
+      "input_prompt": "GENERATE: capability_assessment",
+      "output_response": "Optimized: Targeted-injected: <🜲luciform id=\"focused_capability_assessment_analysis⛧\" type=\"✶targeted_introspection\">\n  <🜄focused_context>\n    ::INJECT_TARGET_DATA::\n    Focus d'analyse : capability_assessment\n    Contexte disponible : 5 éléments\n\n    ::INJECT_RELATED_CONTEXT::\n    Données contextuelles spécialisées pour capability_assessment\n\n    ::INJECT_HISTORICAL_DATA::\n    Historique et patterns pour capability_assessment\n  </🜄focused_context>\n\n  <🜂focused_directive>\n    Tu es le IntrospectionDaemon en mode d'analyse focalisée sur : capability_assessment\n\n    MISSION D'ANALYSE CIBLÉE :\n\n    1. 🎯 ANALYSE SPÉCIALISÉE :\n       - Focus exclusif sur capability_assessment\n       - Analyse approfondie des aspects spécifiques\n       - Évaluation détaillée de l'état et performances\n\n    2. 🔗 ANALYSE RELATIONNELLE :\n       - Impact sur les composants connexes\n       - Dépendances et interdépendances\n       - Effets de réseau et propagation\n\n    3. 📊 ANALYSE HISTORIQUE :\n       - Évolution et tendances observées\n       - Patterns de succès et d'échec\n       - Apprentissages des expériences passées\n\n    4. 🚀 RECOMMANDATIONS SPÉCIALISÉES :\n       - Améliorations spécifiques au domaine capability_assessment\n       - Optimisations techniques précises\n       - Plan d'action détaillé et réalisable\n\n    RÉSULTAT CIBLÉ :\n    Génère une analyse spécialisée incluant :\n    - Diagnostic précis de capability_assessment\n    - Recommandations d'amélioration spécifiques\n    - Plan d'action avec étapes concrètes\n    - Métriques de suivi adaptées\n  </🜂focused_directive>\n</🜲luciform>",
+      "context_data": {},
+      "effectiveness_score": 0.0,
+      "execution_time": 0.3008277416229248,
+      "metadata": {
+        "operation": "prompt_generation",
+        "template_used": "auto_generation",
+        "injection_points": [],
+        "prompt_length": 1585
+      },
+      "error_message": null
+    }
+  ]
+}

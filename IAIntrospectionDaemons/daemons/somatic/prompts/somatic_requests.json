@@ -1,0 +1,157 @@
+{
+  "daemon_type": "somatic",
+  "consciousness_level": 1,
+  "description": "Dictionnaire des requêtes de rétro-injection pour le Daemon Somatique - Collecteur de Signaux Bruts",
+  "version": "1.0",
+  "created": "2025-08-02",
+  
+  "request_categories": {
+    "system_monitoring": {
+      "description": "Requêtes pour le monitoring système",
+      "requests": {
+        "REQUEST_SYSTEM_METRICS": {
+          "description": "Obtenir les métriques système actuelles",
+          "parameters": ["metric_type"],
+          "example": "::REQUEST_SYSTEM_METRICS:: cpu_usage",
+          "return_type": "system_metrics",
+          "priority": "medium"
+        },
+        "REQUEST_PROCESS_INFO": {
+          "description": "Informations sur les processus actifs",
+          "parameters": ["process_name"],
+          "example": "::REQUEST_PROCESS_INFO:: python",
+          "return_type": "process_info",
+          "priority": "medium"
+        },
+        "REQUEST_FILE_CHANGES": {
+          "description": "Détecter les changements de fichiers récents",
+          "parameters": ["directory_path", "time_window"],
+          "example": "::REQUEST_FILE_CHANGES:: /home/user/project 3600",
+          "return_type": "file_changes",
+          "priority": "high"
+        },
+        "REQUEST_MEMORY_USAGE": {
+          "description": "Utilisation mémoire détaillée",
+          "parameters": [],
+          "example": "::REQUEST_MEMORY_USAGE::",
+          "return_type": "memory_usage",
+          "priority": "high"
+        },
+        "REQUEST_DISK_SPACE": {
+          "description": "Espace disque disponible",
+          "parameters": ["path"],
+          "example": "::REQUEST_DISK_SPACE:: /home",
+          "return_type": "disk_space",
+          "priority": "medium"
+        }
+      }
+    },
+    "memory_engine_monitoring": {
+      "description": "Requêtes pour la surveillance du Memory Engine",
+      "requests": {
+        "REQUEST_MEMORY_ACCESS": {
+          "description": "Détecter les accès au Memory Engine",
+          "parameters": ["time_window"],
+          "example": "::REQUEST_MEMORY_ACCESS:: 300",
+          "return_type": "memory_access_log",
+          "priority": "high"
+        },
+        "REQUEST_MEMORY_NODE_CHANGES": {
+          "description": "Changements dans les nœuds mémoire",
+          "parameters": ["node_path"],
+          "example": "::REQUEST_MEMORY_NODE_CHANGES:: /memory/core",
+          "return_type": "node_changes",
+          "priority": "high"
+        },
+        "REQUEST_MEMORY_LINK_UPDATES": {
+          "description": "Mises à jour des liens mémoire",
+          "parameters": ["link_type"],
+          "example": "::REQUEST_MEMORY_LINK_UPDATES:: transcendance",
+          "return_type": "link_updates",
+          "priority": "medium"
+        },
+        "REQUEST_MEMORY_STRATA_ACTIVITY": {
+          "description": "Activité par strate mémoire",
+          "parameters": ["strata_name"],
+          "example": "::REQUEST_MEMORY_STRATA_ACTIVITY:: cognitive",
+          "return_type": "strata_activity",
+          "priority": "medium"
+        }
+      }
+    },
+    "tool_monitoring": {
+      "description": "Requêtes pour la surveillance des outils",
+      "requests": {
+        "REQUEST_TOOL_USAGE": {
+          "description": "Utilisation des outils récente",
+          "parameters": ["tool_name", "time_window"],
+          "example": "::REQUEST_TOOL_USAGE:: safe_create_file 1800",
+          "return_type": "tool_usage",
+          "priority": "high"
+        },
+        "REQUEST_TOOL_ERRORS": {
+          "description": "Erreurs d'outils détectées",
+          "parameters": ["tool_name"],
+          "example": "::REQUEST_TOOL_ERRORS:: find_text_in_project",
+          "return_type": "tool_errors",
+          "priority": "critical"
+        },
+        "REQUEST_TOOL_PERFORMANCE": {
+          "description": "Performance des outils",
+          "parameters": ["tool_name"],
+          "example": "::REQUEST_TOOL_PERFORMANCE:: template_generator",
+          "return_type": "tool_performance",
+          "priority": "medium"
+        },
+        "REQUEST_NEW_TOOLS_DETECTED": {
+          "description": "Nouveaux outils détectés",
+          "parameters": ["directory_path"],
+          "example": "::REQUEST_NEW_TOOLS_DETECTED:: Alma_toolset",
+          "return_type": "new_tools",
+          "priority": "high"
+        }
+      }
+    },
+    "anomaly_detection": {
+      "description": "Requêtes pour la détection d'anomalies",
+      "requests": {
+        "REQUEST_ANOMALY_PATTERNS": {
+          "description": "Patterns d'anomalies détectés",
+          "parameters": ["anomaly_type"],
+          "example": "::REQUEST_ANOMALY_PATTERNS:: memory_spike",
+          "return_type": "anomaly_patterns",
+          "priority": "critical"
+        },
+        "REQUEST_THRESHOLD_VIOLATIONS": {
+          "description": "Violations de seuils",
+          "parameters": ["metric_name"],
+          "example": "::REQUEST_THRESHOLD_VIOLATIONS:: cpu_usage",
+          "return_type": "threshold_violations",
+          "priority": "high"
+        },
+        "REQUEST_UNUSUAL_ACTIVITY": {
+          "description": "Activité inhabituelle détectée",
+          "parameters": ["activity_type"],
+          "example": "::REQUEST_UNUSUAL_ACTIVITY:: file_access",
+          "return_type": "unusual_activity",
+          "priority": "high"
+        }
+      }
+    }
+  },
+  
+  "metadata": {
+    "monitoring_frequency": "continuous",
+    "alert_thresholds": {
+      "cpu_usage": 80,
+      "memory_usage": 85,
+      "disk_usage": 90
+    },
+    "priority_levels": {
+      "critical": "immediate_response",
+      "high": "rapid_response",
+      "medium": "normal_response",
+      "low": "deferred_response"
+    }
+  }
+} 

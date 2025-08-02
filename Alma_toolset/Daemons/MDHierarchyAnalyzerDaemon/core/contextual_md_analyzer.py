@@ -21,7 +21,19 @@ from pathlib import Path
 # Ajout du path pour les imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from Core.Archivist.MemoryEngine.engine import MemoryEngine
+try:
+    from Core.Archivist.MemoryEngine.engine import MemoryEngine
+except ImportError:
+    # Fallback si MemoryEngine n'est pas disponible
+    class MemoryEngine:
+        def __init__(self):
+            pass
+        def create_memory(self, *args, **kwargs):
+            pass
+        def get_memory_node(self, *args, **kwargs):
+            return None
+        def find_memories_by_keyword(self, *args, **kwargs):
+            return []
 
 # Import conditionnel pour éviter les erreurs d'import relatif
 try:

@@ -1,0 +1,75 @@
+{
+  "test_session": {
+    "session_id": "introspection_daemon_20250802_135004",
+    "session_type": "introspection_daemon",
+    "duration": 1.720582,
+    "total_prompts": 6,
+    "successful_prompts": 6,
+    "failed_prompts": 0,
+    "success_rate": 1.0,
+    "average_effectiveness": 0.125
+  },
+  "prompt_history": [
+    {
+      "prompt_id": "ab580a314982",
+      "timestamp": "2025-08-02T13:50:04.646871",
+      "prompt_type": "generation_standalone_test",
+      "effectiveness_score": 0.0,
+      "execution_time": 0.0,
+      "has_error": false,
+      "prompt_preview": "GENERATE: standalone_test"
+    },
+    {
+      "prompt_id": "5d118bfad434",
+      "timestamp": "2025-08-02T13:50:04.747382",
+      "prompt_type": "injection_comprehensive",
+      "effectiveness_score": 0.0,
+      "execution_time": 0.0,
+      "has_error": false,
+      "prompt_preview": "<🜲luciform id=\"auto_introspection_standalone_test⛧\" type=\"✶comprehensive_analysis\">\n  <🜄context_inje..."
+    },
+    {
+      "prompt_id": "a078a9b0e001",
+      "timestamp": "2025-08-02T13:50:05.048603",
+      "prompt_type": "introspection_analysis",
+      "effectiveness_score": 0.75,
+      "execution_time": 0.10020661354064941,
+      "has_error": false,
+      "prompt_preview": "Context-injected: <🜲luciform id=\"auto_introspection_standalone_test⛧\" type=\"✶comprehensive_analysis\"..."
+    },
+    {
+      "prompt_id": "a67a73668b37",
+      "timestamp": "2025-08-02T13:50:05.349723",
+      "prompt_type": "generation_memory_analysis",
+      "effectiveness_score": 0.0,
+      "execution_time": 0.3007063865661621,
+      "has_error": false,
+      "prompt_preview": "GENERATE: memory_analysis"
+    },
+    {
+      "prompt_id": "594b3e7d598e",
+      "timestamp": "2025-08-02T13:50:05.651010",
+      "prompt_type": "generation_tool_inventory",
+      "effectiveness_score": 0.0,
+      "execution_time": 0.30097365379333496,
+      "has_error": false,
+      "prompt_preview": "GENERATE: tool_inventory"
+    },
+    {
+      "prompt_id": "2dd5b06b1a91",
+      "timestamp": "2025-08-02T13:50:05.953242",
+      "prompt_type": "generation_capability_assessment",
+      "effectiveness_score": 0.0,
+      "execution_time": 0.3008277416229248,
+      "has_error": false,
+      "prompt_preview": "GENERATE: capability_assessment"
+    }
+  ],
+  "test_metrics": {
+    "total_tests": 7,
+    "successful_tests": 6,
+    "failed_tests": 1,
+    "average_effectiveness": 0.7583333333333333
+  },
+  "generated_at": "2025-08-02T13:50:05.957500"
+}

@@ -22,7 +22,25 @@ from pathlib import Path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import de la logique de chargement .env d'Alma
-from load_env import EnvLoader
+try:
+    from ....load_env import EnvLoader
+except ImportError:
+    try:
+        from load_env import EnvLoader
+    except ImportError:
+        # Fallback si load_env n'est pas disponible
+        class EnvLoader:
+            @staticmethod
+            def load_env():
+                import os
+                from pathlib import Path
+                env_file = Path.home() / '.env'
+                if env_file.exists():
+                    with open(env_file) as f:
+                        for line in f:
+                            if '=' in line and not line.startswith('#'):
+                                key, value = line.strip().split('=', 1)
+                                os.environ[key] = value
 
 
 @dataclass
@@ -61,7 +79,7 @@ class OpenAIAnalyzer:
     """Analyseur intelligent utilisant OpenAI avec fallback Ollama."""
 
     def __init__(self, budget_per_hour: float = 2.0, budget_per_day: float = 20.0,
-                 use_ollama_fallback: bool = True, ollama_model: str = "mistral",
+                 use_ollama_fallback: bool = True, ollama_model: str = "qwen2.5:7b-instruct",
                  force_ollama: bool = False):
         self.budget_per_hour = budget_per_hour
         self.budget_per_day = budget_per_day

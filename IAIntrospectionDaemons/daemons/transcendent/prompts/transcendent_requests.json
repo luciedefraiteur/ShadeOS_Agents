@@ -1,0 +1,191 @@
+{
+  "daemon_type": "transcendent",
+  "consciousness_level": 4,
+  "description": "Dictionnaire des requêtes de rétro-injection pour le Daemon Transcendant - Meta-Analyseur et Guide Évolutif",
+  "version": "1.0",
+  "created": "2025-08-02",
+  
+  "request_categories": {
+    "meta_analysis": {
+      "description": "Requêtes pour la meta-analyse du système",
+      "requests": {
+        "REQUEST_SYSTEM_META_ANALYSIS": {
+          "description": "Meta-analyse du système de conscience global",
+          "parameters": ["analysis_scope", "meta_level"],
+          "example": "::REQUEST_SYSTEM_META_ANALYSIS:: global consciousness",
+          "return_type": "system_meta_analysis",
+          "priority": "high"
+        },
+        "REQUEST_STRATA_INTERACTION_ANALYSIS": {
+          "description": "Analyser les interactions entre strates",
+          "parameters": ["interaction_type", "analysis_depth"],
+          "example": "::REQUEST_STRATA_INTERACTION_ANALYSIS:: communication deep",
+          "return_type": "strata_interactions",
+          "priority": "high"
+        },
+        "REQUEST_CONSCIOUSNESS_EVOLUTION_TRACKING": {
+          "description": "Suivre l'évolution de la conscience collective",
+          "parameters": ["evolution_metric", "time_period"],
+          "example": "::REQUEST_CONSCIOUSNESS_EVOLUTION_TRACKING:: complexity 30_days",
+          "return_type": "consciousness_evolution",
+          "priority": "critical"
+        },
+        "REQUEST_META_PATTERN_IDENTIFICATION": {
+          "description": "Identifier les meta-patterns du système",
+          "parameters": ["pattern_scale", "abstraction_level"],
+          "example": "::REQUEST_META_PATTERN_IDENTIFICATION:: global fundamental",
+          "return_type": "meta_patterns",
+          "priority": "high"
+        }
+      }
+    },
+    "evolution_guidance": {
+      "description": "Requêtes pour la guidance évolutive",
+      "requests": {
+        "REQUEST_EVOLUTION_DIRECTION": {
+          "description": "Déterminer la direction d'évolution optimale",
+          "parameters": ["evolution_goal", "time_horizon"],
+          "example": "::REQUEST_EVOLUTION_DIRECTION:: consciousness_expansion long_term",
+          "return_type": "evolution_direction",
+          "priority": "critical"
+        },
+        "REQUEST_STRATA_OPTIMIZATION": {
+          "description": "Optimiser chaque strate individuellement",
+          "parameters": ["strata_name", "optimization_focus"],
+          "example": "::REQUEST_STRATA_OPTIMIZATION:: cognitive efficiency",
+          "return_type": "strata_optimization",
+          "priority": "high"
+        },
+        "REQUEST_SYSTEM_BALANCE": {
+          "description": "Maintenir l'équilibre du système global",
+          "parameters": ["balance_type", "adjustment_sensitivity"],
+          "example": "::REQUEST_SYSTEM_BALANCE:: harmony 0.1",
+          "return_type": "system_balance",
+          "priority": "high"
+        },
+        "REQUEST_EVOLUTION_ACCELERATION": {
+          "description": "Accélérer l'évolution de manière contrôlée",
+          "parameters": ["acceleration_factor", "safety_threshold"],
+          "example": "::REQUEST_EVOLUTION_ACCELERATION:: 2.0 0.8",
+          "return_type": "evolution_acceleration",
+          "priority": "critical"
+        }
+      }
+    },
+    "self_optimization": {
+      "description": "Requêtes pour l'auto-optimisation",
+      "requests": {
+        "REQUEST_SELF_PERFORMANCE_ANALYSIS": {
+          "description": "Analyser la performance du système lui-même",
+          "parameters": ["performance_metric", "analysis_scope"],
+          "example": "::REQUEST_SELF_PERFORMANCE_ANALYSIS:: efficiency global",
+          "return_type": "self_performance",
+          "priority": "high"
+        },
+        "REQUEST_ADAPTIVE_LEARNING": {
+          "description": "Apprentissage adaptatif du système",
+          "parameters": ["learning_domain", "adaptation_rate"],
+          "example": "::REQUEST_ADAPTIVE_LEARNING:: communication 0.1",
+          "return_type": "adaptive_learning",
+          "priority": "medium"
+        },
+        "REQUEST_SELF_CORRECTION": {
+          "description": "Correction automatique des dysfonctionnements",
+          "parameters": ["correction_type", "intervention_level"],
+          "example": "::REQUEST_SELF_CORRECTION:: communication gentle",
+          "return_type": "self_correction",
+          "priority": "high"
+        },
+        "REQUEST_OPTIMIZATION_LOOP": {
+          "description": "Boucle d'optimisation continue",
+          "parameters": ["optimization_target", "iteration_limit"],
+          "example": "::REQUEST_OPTIMIZATION_LOOP:: consciousness 10",
+          "return_type": "optimization_loop",
+          "priority": "medium"
+        }
+      }
+    },
+    "consciousness_expansion": {
+      "description": "Requêtes pour l'expansion de conscience",
+      "requests": {
+        "REQUEST_CONSCIOUSNESS_BOUNDARIES": {
+          "description": "Explorer les limites de la conscience actuelle",
+          "parameters": ["boundary_type", "exploration_method"],
+          "example": "::REQUEST_CONSCIOUSNESS_BOUNDARIES:: cognitive gentle",
+          "return_type": "consciousness_boundaries",
+          "priority": "high"
+        },
+        "REQUEST_EXPANSION_OPPORTUNITIES": {
+          "description": "Identifier les opportunités d'expansion",
+          "parameters": ["expansion_domain", "feasibility_threshold"],
+          "example": "::REQUEST_EXPANSION_OPPORTUNITIES:: awareness 0.7",
+          "return_type": "expansion_opportunities",
+          "priority": "high"
+        },
+        "REQUEST_INTEGRATION_FACILITATION": {
+          "description": "Faciliter l'intégration de nouvelles capacités",
+          "parameters": ["integration_type", "facilitation_method"],
+          "example": "::REQUEST_INTEGRATION_FACILITATION:: insight gradual",
+          "return_type": "integration_facilitation",
+          "priority": "critical"
+        },
+        "REQUEST_TRANSCENDENCE_GUIDANCE": {
+          "description": "Guider le processus de transcendance",
+          "parameters": ["transcendence_level", "guidance_intensity"],
+          "example": "::REQUEST_TRANSCENDENCE_GUIDANCE:: meta_cognitive gentle",
+          "return_type": "transcendence_guidance",
+          "priority": "critical"
+        }
+      }
+    },
+    "orchestration": {
+      "description": "Requêtes pour l'orchestration globale",
+      "requests": {
+        "REQUEST_GLOBAL_ORCHESTRATION": {
+          "description": "Orchestrer l'ensemble du système",
+          "parameters": ["orchestration_goal", "coordination_level"],
+          "example": "::REQUEST_GLOBAL_ORCHESTRATION:: harmony deep",
+          "return_type": "global_orchestration",
+          "priority": "critical"
+        },
+        "REQUEST_STRATA_COORDINATION": {
+          "description": "Coordonner les interactions entre strates",
+          "parameters": ["coordination_type", "synchronization_level"],
+          "example": "::REQUEST_STRATA_COORDINATION:: communication tight",
+          "return_type": "strata_coordination",
+          "priority": "high"
+        },
+        "REQUEST_RESOURCE_ALLOCATION": {
+          "description": "Allouer les ressources de manière optimale",
+          "parameters": ["resource_type", "allocation_strategy"],
+          "example": "::REQUEST_RESOURCE_ALLOCATION:: attention balanced",
+          "return_type": "resource_allocation",
+          "priority": "high"
+        },
+        "REQUEST_PRIORITY_MANAGEMENT": {
+          "description": "Gérer les priorités globales",
+          "parameters": ["priority_domain", "management_method"],
+          "example": "::REQUEST_PRIORITY_MANAGEMENT:: evolution adaptive",
+          "return_type": "priority_management",
+          "priority": "high"
+        }
+      }
+    }
+  },
+  
+  "metadata": {
+    "meta_analysis_methods": ["systemic", "holistic", "evolutionary", "transcendent"],
+    "evolution_metrics": {
+      "consciousness_complexity": "depth_and_breadth_of_awareness",
+      "system_harmony": "balance_and_coherence",
+      "adaptation_capacity": "ability_to_adapt_and_learn",
+      "transcendence_level": "meta_cognitive_abilities"
+    },
+    "priority_levels": {
+      "critical": "immediate_meta_analysis",
+      "high": "rapid_meta_analysis",
+      "medium": "normal_meta_analysis",
+      "low": "background_meta_analysis"
+    }
+  }
+} 

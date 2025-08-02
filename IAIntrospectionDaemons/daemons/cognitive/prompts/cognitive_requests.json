@@ -1,0 +1,190 @@
+{
+  "daemon_type": "cognitive",
+  "consciousness_level": 2,
+  "description": "Dictionnaire des requêtes de rétro-injection pour le Daemon Cognitif - Analyseur de Patterns et Corrélations",
+  "version": "1.0",
+  "created": "2025-08-02",
+  
+  "request_categories": {
+    "pattern_analysis": {
+      "description": "Requêtes pour l'analyse de patterns",
+      "requests": {
+        "REQUEST_TEMPORAL_PATTERNS": {
+          "description": "Analyser les patterns temporels dans les données somatiques",
+          "parameters": ["data_source", "time_window"],
+          "example": "::REQUEST_TEMPORAL_PATTERNS:: memory_usage 86400",
+          "return_type": "temporal_patterns",
+          "priority": "high"
+        },
+        "REQUEST_FREQUENCY_PATTERNS": {
+          "description": "Identifier les patterns de fréquence",
+          "parameters": ["event_type", "min_frequency"],
+          "example": "::REQUEST_FREQUENCY_PATTERNS:: file_access 10",
+          "return_type": "frequency_patterns",
+          "priority": "medium"
+        },
+        "REQUEST_SEQUENCE_PATTERNS": {
+          "description": "Détecter les patterns de séquence",
+          "parameters": ["sequence_length", "confidence_threshold"],
+          "example": "::REQUEST_SEQUENCE_PATTERNS:: 5 0.8",
+          "return_type": "sequence_patterns",
+          "priority": "high"
+        },
+        "REQUEST_CYCLIC_PATTERNS": {
+          "description": "Identifier les patterns cycliques",
+          "parameters": ["cycle_type"],
+          "example": "::REQUEST_CYCLIC_PATTERNS:: daily",
+          "return_type": "cyclic_patterns",
+          "priority": "medium"
+        }
+      }
+    },
+    "correlation_analysis": {
+      "description": "Requêtes pour l'analyse de corrélations",
+      "requests": {
+        "REQUEST_VARIABLE_CORRELATION": {
+          "description": "Analyser la corrélation entre variables",
+          "parameters": ["variable_a", "variable_b", "correlation_type"],
+          "example": "::REQUEST_VARIABLE_CORRELATION:: cpu_usage memory_usage pearson",
+          "return_type": "correlation_analysis",
+          "priority": "high"
+        },
+        "REQUEST_EVENT_CORRELATION": {
+          "description": "Détecter les corrélations entre événements",
+          "parameters": ["event_a", "event_b", "time_lag"],
+          "example": "::REQUEST_EVENT_CORRELATION:: tool_usage file_change 300",
+          "return_type": "event_correlation",
+          "priority": "high"
+        },
+        "REQUEST_CAUSAL_RELATIONSHIP": {
+          "description": "Identifier les relations causales",
+          "parameters": ["cause_event", "effect_event"],
+          "example": "::REQUEST_CAUSAL_RELATIONSHIP:: memory_spike tool_error",
+          "return_type": "causal_relationship",
+          "priority": "critical"
+        },
+        "REQUEST_MULTIVARIATE_CORRELATION": {
+          "description": "Analyse de corrélation multivariée",
+          "parameters": ["variables_list"],
+          "example": "::REQUEST_MULTIVARIATE_CORRELATION:: cpu_usage,memory_usage,disk_io",
+          "return_type": "multivariate_correlation",
+          "priority": "medium"
+        }
+      }
+    },
+    "trend_analysis": {
+      "description": "Requêtes pour l'analyse de tendances",
+      "requests": {
+        "REQUEST_LINEAR_TREND": {
+          "description": "Analyser les tendances linéaires",
+          "parameters": ["metric_name", "time_period"],
+          "example": "::REQUEST_LINEAR_TREND:: memory_usage 7_days",
+          "return_type": "linear_trend",
+          "priority": "medium"
+        },
+        "REQUEST_NONLINEAR_TREND": {
+          "description": "Analyser les tendances non-linéaires",
+          "parameters": ["metric_name", "trend_type"],
+          "example": "::REQUEST_NONLINEAR_TREND:: cpu_usage exponential",
+          "return_type": "nonlinear_trend",
+          "priority": "medium"
+        },
+        "REQUEST_SEASONAL_TREND": {
+          "description": "Identifier les tendances saisonnières",
+          "parameters": ["metric_name", "season_length"],
+          "example": "::REQUEST_SEASONAL_TREND:: tool_usage 24_hours",
+          "return_type": "seasonal_trend",
+          "priority": "low"
+        },
+        "REQUEST_TREND_BREAKPOINT": {
+          "description": "Détecter les points de rupture de tendance",
+          "parameters": ["metric_name", "sensitivity"],
+          "example": "::REQUEST_TREND_BREAKPOINT:: memory_usage 0.05",
+          "return_type": "trend_breakpoint",
+          "priority": "high"
+        }
+      }
+    },
+    "classification_analysis": {
+      "description": "Requêtes pour la classification",
+      "requests": {
+        "REQUEST_EVENT_CLASSIFICATION": {
+          "description": "Classifier les événements détectés",
+          "parameters": ["event_type", "classification_criteria"],
+          "example": "::REQUEST_EVENT_CLASSIFICATION:: anomaly severity",
+          "return_type": "event_classification",
+          "priority": "medium"
+        },
+        "REQUEST_PATTERN_CLASSIFICATION": {
+          "description": "Classifier les patterns identifiés",
+          "parameters": ["pattern_type", "classification_method"],
+          "example": "::REQUEST_PATTERN_CLASSIFICATION:: temporal clustering",
+          "return_type": "pattern_classification",
+          "priority": "medium"
+        },
+        "REQUEST_BEHAVIOR_CLASSIFICATION": {
+          "description": "Classifier les comportements système",
+          "parameters": ["behavior_metrics"],
+          "example": "::REQUEST_BEHAVIOR_CLASSIFICATION:: resource_usage,response_time",
+          "return_type": "behavior_classification",
+          "priority": "high"
+        },
+        "REQUEST_ANOMALY_CLASSIFICATION": {
+          "description": "Classifier les anomalies détectées",
+          "parameters": ["anomaly_type", "classification_model"],
+          "example": "::REQUEST_ANOMALY_CLASSIFICATION:: performance supervised",
+          "return_type": "anomaly_classification",
+          "priority": "critical"
+        }
+      }
+    },
+    "statistical_analysis": {
+      "description": "Requêtes pour l'analyse statistique",
+      "requests": {
+        "REQUEST_DESCRIPTIVE_STATS": {
+          "description": "Statistiques descriptives des données",
+          "parameters": ["metric_name", "time_window"],
+          "example": "::REQUEST_DESCRIPTIVE_STATS:: cpu_usage 3600",
+          "return_type": "descriptive_stats",
+          "priority": "low"
+        },
+        "REQUEST_DISTRIBUTION_ANALYSIS": {
+          "description": "Analyser la distribution des données",
+          "parameters": ["metric_name", "distribution_type"],
+          "example": "::REQUEST_DISTRIBUTION_ANALYSIS:: memory_usage normal",
+          "return_type": "distribution_analysis",
+          "priority": "medium"
+        },
+        "REQUEST_OUTLIER_DETECTION": {
+          "description": "Détecter les valeurs aberrantes",
+          "parameters": ["metric_name", "outlier_method"],
+          "example": "::REQUEST_OUTLIER_DETECTION:: cpu_usage iqr",
+          "return_type": "outlier_detection",
+          "priority": "high"
+        },
+        "REQUEST_CONFIDENCE_INTERVALS": {
+          "description": "Calculer les intervalles de confiance",
+          "parameters": ["metric_name", "confidence_level"],
+          "example": "::REQUEST_CONFIDENCE_INTERVALS:: memory_usage 0.95",
+          "return_type": "confidence_intervals",
+          "priority": "medium"
+        }
+      }
+    }
+  },
+  
+  "metadata": {
+    "analysis_methods": ["statistical", "machine_learning", "pattern_recognition"],
+    "confidence_thresholds": {
+      "high": 0.9,
+      "medium": 0.7,
+      "low": 0.5
+    },
+    "priority_levels": {
+      "critical": "immediate_analysis",
+      "high": "rapid_analysis",
+      "medium": "normal_analysis",
+      "low": "background_analysis"
+    }
+  }
+} 
