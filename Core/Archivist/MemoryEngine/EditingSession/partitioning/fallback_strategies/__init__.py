@@ -7,10 +7,14 @@ l'analyse AST échoue ou n'est pas applicable.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
-# Imports seront ajoutés au fur et à mesure de l'implémentation
+from .regex_partitioner import RegexPartitioner
+from .textual_partitioner import TextualPartitioner
+from .emergency_partitioner import EmergencyPartitioner
 
 __all__ = [
-    # Sera complété lors de l'implémentation
+    'RegexPartitioner',
+    'TextualPartitioner',
+    'EmergencyPartitioner'
 ]
 
 __version__ = "1.0.0"

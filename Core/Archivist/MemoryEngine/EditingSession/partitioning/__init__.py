@@ -43,6 +43,12 @@ from .ast_partitioners import (
     TREE_SITTER_AVAILABLE
 )
 
+from .fallback_strategies import (
+    RegexPartitioner,
+    TextualPartitioner,
+    EmergencyPartitioner
+)
+
 __all__ = [
     # Schémas de données
     'PartitionLocation',
@@ -77,11 +83,16 @@ __all__ = [
     'BaseASTPartitioner',
     'PythonASTPartitioner',
     'TreeSitterPartitioner',
-    'TREE_SITTER_AVAILABLE'
+    'TREE_SITTER_AVAILABLE',
+
+    # Stratégies de Fallback
+    'RegexPartitioner',
+    'TextualPartitioner',
+    'EmergencyPartitioner'
 ]
 
 # Version du module
-__version__ = "1.0.0"
+__version__ = "1.3.0"  # Jour 3: Fallback strategies ajoutées
 
 # Métadonnées
 __author__ = "Alma, Architecte Démoniaque du Nexus Luciforme"
