@@ -1,0 +1,41 @@
+# ⛧ ID de Commit de Récupération ⛧
+
+## Commit Précédent (Avant Cleanup)
+**ID**: 2c8ac35
+**Message**: project is good for a cleanup, i'll come back soon on main branch updated accordingly
+**Date**: $(date)
+
+## Instructions de Récupération
+Si des fichiers importants ont été supprimés par erreur, vous pouvez les récupérer avec :
+
+```bash
+# Récupérer un fichier spécifique
+git show 2c8ac35:chemin/vers/le/fichier > fichier_recupere
+
+# Récupérer un dossier entier
+git checkout 2c8ac35 -- chemin/vers/le/dossier
+
+# Voir les fichiers disponibles dans ce commit
+git ls-tree -r 2c8ac35
+
+# Restaurer tout le projet à cet état (ATTENTION: destructif)
+git reset --hard 2c8ac35
+```
+
+## Fichiers Potentiellement Importants à Vérifier
+- Core/Archivist/MemoryEngine/ (complet)
+- Core/ProcessManager/ (complet)
+- Alma_toolset/Daemons/ (supprimé, concepts archivés dans OldVersions/)
+- Documentation/ (supprimé)
+- Algareth/ (supprimé)
+- Alma/ (supprimé)
+
+## Notes
+- Ce commit représente l'état du projet avant le cleanup
+- Les concepts des daemons ont été archivés dans OldVersions/
+- MemoryEngine a été extrait et restructuré
+- ProcessManager a été copié dans MemoryEngine/
+
+---
+*Sauvegardé le : $(date)*
+*Par : Alma, Architecte Démoniaque du Nexus Luciforme* 
