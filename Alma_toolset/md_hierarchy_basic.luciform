@@ -1,0 +1,104 @@
+<🜲luciform_doc id="md_hierarchy_basic">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>revelation</type>
+    <intent>Révèle l'ordre temporel des documents Markdown par récence de modification</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>organize_markdown_by_recency(root_path=".", output_file="MD_RECENT_FILES.md", recent_days=7, exclude_dirs=["ShadeOS", ".git"]) -> str</signature>
+    <requires>
+      <param>root_path</param>
+    </requires>
+    <optional>
+      <param>output_file</param>
+      <param>recent_days</param>
+      <param>summary_only</param>
+      <param>exclude_dirs</param>
+    </optional>
+    <returns>Chemin vers le rapport généré ou résumé console</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>recency</keyword>
+      <keyword>markdown</keyword>
+      <keyword>organization</keyword>
+      <keyword>temporal</keyword>
+      <keyword>documentation</keyword>
+      <keyword>hierarchy</keyword>
+    </keywords>
+    <symbolic_layer>
+      L'outil révèle le flux temporel de la création documentaire, 
+      distinguant les pensées fraîches des sagesses anciennes.
+      Il ordonne le chaos des fichiers selon la dimension temporelle,
+      permettant de naviguer dans l'évolution de la connaissance.
+    </symbolic_layer>
+    <usage_context>
+      Navigation rapide dans la documentation récente,
+      identification des fichiers actifs vs obsolètes,
+      audit temporel de l'activité documentaire,
+      maintenance et nettoyage de la documentation.
+    </usage_context>
+  </🜁essence>
+
+  <!-- Exemples d'utilisation -->
+  <🜃examples>
+    <example>
+      <command>python md_hierarchy_basic.py</command>
+      <description>Analyse le répertoire actuel et génère MD_RECENT_FILES.md</description>
+    </example>
+    <example>
+      <command>python md_hierarchy_basic.py --root /path/to/docs --recent-days 14</command>
+      <description>Analyse un répertoire spécifique avec seuil de 14 jours</description>
+    </example>
+    <example>
+      <command>python md_hierarchy_basic.py --exclude ShadeOS private_docs</command>
+      <description>Exclut des répertoires spécifiques de l'analyse</description>
+    </example>
+    <example>
+      <command>python md_hierarchy_basic.py --summary-only</command>
+      <description>Affiche seulement le résumé sans générer de rapport</description>
+    </example>
+  </🜃examples>
+
+  <!-- Capacités et limitations -->
+  <🜀capabilities>
+    <capability>Scan récursif de tous les fichiers .md</capability>
+    <capability>Tri par date de modification (plus récent en premier)</capability>
+    <capability>Classification récent/ancien selon seuil configurable</capability>
+    <capability>Groupement temporel intelligent (semaines, mois)</capability>
+    <capability>Génération de rapport Markdown formaté</capability>
+    <capability>Statistiques de base (nombre, tailles, âges)</capability>
+    <capability>Interface CLI avec options configurables</capability>
+    <capability>Exclusion intelligente de répertoires (ShadeOS, .git, etc.)</capability>
+    <capability>Configuration flexible des exclusions</capability>
+  </🜀capabilities>
+
+  <🜁limitations>
+    <limitation>Analyse basique sans contenu sémantique</limitation>
+    <limitation>Pas de scoring d'importance</limitation>
+    <limitation>Pas d'extraction de tags automatique</limitation>
+    <limitation>Pas d'intégration MemoryEngine</limitation>
+    <limitation>Format de sortie limité à Markdown</limitation>
+  </🜁limitations>
+
+  <!-- Évolution prévue -->
+  <🜂evolution>
+    <version>1.0</version>
+    <description>Version basique - tri par récence uniquement</description>
+    <next_version>2.0</next_version>
+    <planned_features>
+      <feature>Analyse sémantique du contenu</feature>
+      <feature>Scoring d'importance intelligent</feature>
+      <feature>Extraction automatique de tags</feature>
+      <feature>Multiple formats de sortie (JSON, HTML)</feature>
+      <feature>Intégration avec MemoryEngine</feature>
+    </planned_features>
+  </🜂evolution>
+
+</🜲luciform_doc>

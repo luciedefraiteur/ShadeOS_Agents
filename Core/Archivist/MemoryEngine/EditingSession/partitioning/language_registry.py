@@ -11,6 +11,11 @@ from .partition_schemas import PartitionResult, PartitioningError
 from .ast_partitioners.base_ast_partitioner import BaseASTPartitioner
 from .ast_partitioners.python_ast_partitioner import PythonASTPartitioner
 from .ast_partitioners.tree_sitter_partitioner import TreeSitterPartitioner, TREE_SITTER_AVAILABLE
+from .fallback_strategies import (
+    RegexPartitioner,
+    TextualPartitioner,
+    EmergencyPartitioner
+)
 from .error_logger import log_partitioning_error, log_partitioning_warning
 
 
@@ -219,29 +224,19 @@ class LanguageRegistry:
         partitioner = self.get_partitioner(language)
         
         if not partitioner:
-            # Fallback : tentative avec Tree-sitter générique
-            if TREE_SITTER_AVAILABLE:
-                try:
-                    partitioner = TreeSitterPartitioner(language)
-                    log_partitioning_warning(
-                        "fallback_partitioner",
-                        f"Using fallback Tree-sitter partitioner for {language}",
-                        file_path
-                    )
-                except Exception as e:
-                    log_partitioning_error(
-                        "no_partitioner_available",
-                        f"No partitioner available for {language}: {e}",
-                        file_path,
-                        exception=e
-                    )
-                    raise PartitioningError(f"No partitioner available for language: {language}")
-            else:
-                raise PartitioningError(f"No partitioner available for language: {language}")
+            # Cascade de fallbacks intelligente
+            partitioner = self._get_fallback_partitioner(language, file_path)
         
         # Partitionnement
         try:
-            result = partitioner.partition(content, file_path)
+            # Adaptation selon le type de partitionneur
+            if isinstance(partitioner, (RegexPartitioner, TextualPartitioner, EmergencyPartitioner)):
+                # Les fallbacks ont besoin du langage
+                result = partitioner.partition(content, file_path, language)
+            else:
+                # Les partitionneurs AST classiques
+                result = partitioner.partition(content, file_path)
+
             result.metadata['detected_language'] = language
             result.metadata['partitioner_type'] = type(partitioner).__name__
             return result
@@ -253,7 +248,68 @@ class LanguageRegistry:
                 exception=e
             )
             raise
-    
+
+    def _get_fallback_partitioner(self, language: str, file_path: str) -> BaseASTPartitioner:
+        """Obtient un partitionneur de fallback selon la cascade intelligente."""
+
+        # Niveau 1 : Tree-sitter (si disponible et langage supporté)
+        if TREE_SITTER_AVAILABLE and language != 'unknown':
+            try:
+                partitioner = TreeSitterPartitioner(language)
+                log_partitioning_warning(
+                    "fallback_tree_sitter",
+                    f"Using Tree-sitter fallback for {language}",
+                    file_path
+                )
+                return partitioner
+            except Exception as e:
+                log_partitioning_warning(
+                    "tree_sitter_fallback_failed",
+                    f"Tree-sitter fallback failed for {language}: {e}",
+                    file_path
+                )
+
+        # Niveau 2 : Regex Partitioner
+        try:
+            partitioner = RegexPartitioner()
+            log_partitioning_warning(
+                "fallback_regex",
+                f"Using Regex fallback for {language}",
+                file_path
+            )
+            return partitioner
+        except Exception as e:
+            log_partitioning_warning(
+                "regex_fallback_failed",
+                f"Regex fallback failed: {e}",
+                file_path
+            )
+
+        # Niveau 3 : Textual Partitioner
+        try:
+            partitioner = TextualPartitioner()
+            log_partitioning_warning(
+                "fallback_textual",
+                f"Using Textual fallback for {language}",
+                file_path
+            )
+            return partitioner
+        except Exception as e:
+            log_partitioning_warning(
+                "textual_fallback_failed",
+                f"Textual fallback failed: {e}",
+                file_path
+            )
+
+        # Niveau 4 : Emergency Partitioner (ne peut jamais échouer)
+        partitioner = EmergencyPartitioner()
+        log_partitioning_warning(
+            "fallback_emergency",
+            f"Using Emergency fallback for {language} (guaranteed success)",
+            file_path
+        )
+        return partitioner
+
     def register_partitioner(self, language: str, partitioner: BaseASTPartitioner):
         """Enregistre un partitionneur personnalisé."""
         self.partitioners[language.lower()] = partitioner
