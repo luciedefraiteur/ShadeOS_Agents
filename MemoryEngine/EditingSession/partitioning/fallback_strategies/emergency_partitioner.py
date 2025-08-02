@@ -23,18 +23,18 @@ class EmergencyPartitioner:
         self.overlap_lines = overlap_lines
         self.location_tracker = LocationTracker()
     
-    def partition(self, content: str, file_path: str, language: str = "unknown") -> PartitionResult:
-        """Partitionnement d'urgence garanti de fonctionner."""
+    def partition(self, file_path: str, content: str) -> PartitionResult:
+        """Partitionne le contenu en utilisant une stratégie d'urgence."""
         
         start_time = time.time()
         result = PartitionResult(
             file_path=file_path,
-            file_type=language,
+            file_type="unknown",
             total_lines=len(content.split('\n')),
             total_chars=len(content),
             partitions=[],
             strategy_used=PartitionMethod.EMERGENCY,
-            success=True  # Toujours succès
+            success=False
         )
         
         try:

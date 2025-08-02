@@ -139,8 +139,8 @@ class RegexPartitioner:
                     re.compile(pattern, re.MULTILINE) for pattern in patterns
                 ]
     
-    def partition(self, content: str, file_path: str, language: str) -> PartitionResult:
-        """Partitionne le contenu avec des regex."""
+    def partition(self, file_path: str, content: str, language: str) -> PartitionResult:
+        """Partitionne le contenu en utilisant des expressions régulières."""
         
         start_time = time.time()
         result = PartitionResult(

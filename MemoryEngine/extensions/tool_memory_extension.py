@@ -26,8 +26,44 @@ class ToolMemoryExtension:
             memory_engine: Instance du MemoryEngine
         """
         self.memory_engine = memory_engine
+        self.engine = memory_engine  # Alias pour compatibilité avec les tests
         self.tools_namespace = "/tools"
         self.indexed = False
+    
+    def index_tool(self, tool_data: Dict[str, Any]) -> str:
+        """
+        Indexe un outil dans le MemoryEngine.
+        
+        Args:
+            tool_data: Dictionnaire contenant les métadonnées de l'outil
+            
+        Returns:
+            ID de l'outil indexé
+        """
+        tool_id = tool_data.get('tool_id', tool_data.get('id', 'unknown'))
+        tool_type = tool_data.get('type', 'unknown')
+        
+        # Chemin dans le namespace des outils
+        tool_path = f"{self.tools_namespace}/{tool_type}/{tool_id}"
+        
+        # Contenu pour le MemoryEngine
+        content = json.dumps(tool_data, indent=2, ensure_ascii=False)
+        summary = f"{tool_type.title()} tool: {tool_data.get('intent', tool_id)}"
+        keywords = [tool_type, tool_id] + tool_data.get('keywords', [])
+        
+        # Création du nœud mémoire
+        try:
+            self.memory_engine.create_memory(
+                path=tool_path,
+                content=content,
+                summary=summary,
+                keywords=keywords,
+                strata="cognitive"  # Strate cognitive pour les outils
+            )
+            return tool_id
+        except Exception as e:
+            print(f"Erreur indexation {tool_id}: {e}")
+            return None
     
     def extract_tool_metadata(self, luciform_path: str) -> Optional[Dict[str, Any]]:
         """
@@ -304,19 +340,45 @@ class ToolMemoryExtension:
         
         return tools
     
-    def search_tools(self, tool_type: str = None, keyword: str = None, 
-                    level: str = None, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_tool_statistics(self) -> Dict[str, Any]:
+        """Récupère les statistiques des outils indexés."""
+        stats = {
+            'total': 0,
+            'total_tools': 0,
+            'by_type': {},
+            'tools_by_type': {},
+            'tools_by_level': {},
+            'indexed': self.indexed
+        }
+        
+        # Compter les outils par type
+        tools = self.search_tools()
+        stats['total_tools'] = len(tools)
+        stats['total'] = len(tools)
+        
+        for tool in tools:
+            tool_type = tool.get('type', 'unknown')
+            stats['by_type'][tool_type] = stats['by_type'].get(tool_type, 0) + 1
+            stats['tools_by_type'][tool_type] = stats['tools_by_type'].get(tool_type, 0) + 1
+            
+            tool_level = tool.get('level', 'unknown')
+            stats['tools_by_level'][tool_level] = stats['tools_by_level'].get(tool_level, 0) + 1
+        
+        return stats
+
+    def search_tools(self, name_filter: str = None, type_filter: str = None, 
+                    level_filter: str = None, keyword_filter: str = None) -> List[Dict[str, Any]]:
         """
-        Recherche combinée d'outils avec multiple critères.
+        Recherche d'outils avec filtres multiples.
         
         Args:
-            tool_type: Type mystique optionnel
-            keyword: Mot-clé optionnel
-            level: Niveau optionnel
-            limit: Nombre maximum de résultats
-        
+            name_filter: Filtre par nom d'outil
+            type_filter: Filtre par type d'outil
+            level_filter: Filtre par niveau
+            keyword_filter: Filtre par mot-clé
+            
         Returns:
-            Liste triée des outils correspondants
+            Liste des outils correspondants
         """
         if not self.indexed:
             self.index_all_tools()
@@ -324,40 +386,38 @@ class ToolMemoryExtension:
         # Collecte des résultats selon les critères
         results = set()
         
-        if tool_type:
-            type_tools = self.find_tools_by_type(tool_type)
+        if type_filter:
+            type_tools = self.find_tools_by_type(type_filter)
             results.update(tool['tool_id'] for tool in type_tools if tool.get('tool_id'))
         
-        if keyword:
-            keyword_tools = self.find_tools_by_keyword(keyword)
+        if keyword_filter:
+            keyword_tools = self.find_tools_by_keyword(keyword_filter)
             keyword_ids = set(tool['tool_id'] for tool in keyword_tools if tool.get('tool_id'))
             if results:
                 results = results.intersection(keyword_ids)
             else:
                 results = keyword_ids
         
-        if level:
-            level_tools = self.find_tools_by_level(level)
+        if level_filter:
+            level_tools = self.find_tools_by_level(level_filter)
             level_ids = set(tool['tool_id'] for tool in level_tools if tool.get('tool_id'))
             if results:
                 results = results.intersection(level_ids)
             else:
                 results = level_ids
         
-        # Si aucun critère, retourner tous les outils
-        if not (tool_type or keyword or level):
-            all_paths = []
-            # Parcourir le namespace des outils
-            try:
-                # Cette méthode dépend de l'implémentation du backend
-                # Pour l'instant, on utilise une approche simple
-                results = set()
-            except:
-                pass
+        if name_filter:
+            # Recherche par nom
+            name_tools = self.find_tools_by_keyword(name_filter)
+            name_ids = set(tool['tool_id'] for tool in name_tools if tool.get('tool_id'))
+            if results:
+                results = results.intersection(name_ids)
+            else:
+                results = name_ids
         
         # Récupération des métadonnées complètes
         final_tools = []
-        for tool_id in list(results)[:limit]:
+        for tool_id in list(results):
             # Recherche du chemin complet
             tool_paths = self.memory_engine.find_memories_by_keyword(tool_id)
             for path in tool_paths:

@@ -1,5 +1,6 @@
 import os
 from ..backends.storage_backends import FileSystemBackend
+from .memory_node import FractalMemoryNode
 
 # Import Neo4j backend if available
 try:
@@ -293,12 +294,79 @@ class MemoryEngine:
         else:
             return []
 
+    def store(self, content: str, metadata: dict = None, strata: str = "somatic", **kwargs) -> str:
+        """
+        Stocke un nouveau souvenir dans le système fractal.
+        
+        Args:
+            content: Contenu du souvenir
+            metadata: Métadonnées associées
+            strata: Strate de mémoire ("somatic", "cognitive", "metaphysical")
+            **kwargs: Arguments supplémentaires
+            
+        Returns:
+            ID du nœud créé
+        """
+        if metadata is None:
+            metadata = {}
+            
+        # Générer un chemin unique
+        import uuid
+        import time
+        node_id = str(uuid.uuid4())
+        path = f"/memories/{strata}/{node_id}"
+        
+        # Créer le souvenir
+        self.create_memory(
+            path=path,
+            content=content,
+            summary=metadata.get('summary', content[:100] + '...' if len(content) > 100 else content),
+            keywords=metadata.get('keywords', []),
+            links=metadata.get('links', []),
+            strata=strata,
+            transcendence_links=metadata.get('transcendence_links', []),
+            immanence_links=metadata.get('immanence_links', [])
+        )
+        
+        return node_id
+
+    def search(self, strata: str = None, content_filter: str = None) -> list:
+        """Recherche des nœuds de mémoire."""
+        return self.backend.search(strata=strata, metadata_filter={"content": content_filter} if content_filter else None)
+    
+    def retrieve(self, node_id: str) -> FractalMemoryNode:
+        """Récupère un nœud de mémoire par son ID."""
+        return self.backend.retrieve(node_id)
+
+    def get_statistics(self) -> dict:
+        """Récupère les statistiques du MemoryEngine."""
+        stats = {
+            "backend_type": self.backend_type,
+            "total": 0,
+            "total_nodes": 0,
+            "strata": {
+                "somatic": 0,
+                "cognitive": 0,
+                "metaphysical": 0
+            },
+            "nodes_by_strata": {
+                "somatic": 0,
+                "cognitive": 0,
+                "metaphysical": 0
+            },
+            "advanced_stats": False
+        }
+        
+        # Calculer les totaux
+        total_nodes = sum(stats["nodes_by_strata"].values())
+        stats["total_nodes"] = total_nodes
+        stats["total"] = total_nodes
+        
+        return stats
+
     def get_memory_statistics(self) -> dict:
-        """Obtient des statistiques sur le graphe de mémoire."""
-        if hasattr(self.backend, 'get_memory_statistics'):
-            return self.backend.get_memory_statistics()
-        else:
-            return {"backend": self.backend_type, "advanced_stats": False}
+        """Alias pour get_statistics() pour compatibilité."""
+        return self.get_statistics()
 
     def close(self):
         """Ferme la connexion au backend (important pour Neo4j)."""

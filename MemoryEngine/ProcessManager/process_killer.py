@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-⛧ Kill Process ⛧
-Alma's Process Termination Tool
+⛧ Process Killer ⛧
+Alma's Mystical Process Termination
 
-Termine des processus avec différents niveaux de force.
+Module pour terminer des processus de manière mystique.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
@@ -345,6 +345,25 @@ def kill_processes_by_name(name: str, force: bool = False, timeout: int = 10) ->
             'error': f'Erreur terminaison processus "{name}": {str(e)}',
             'name': name
         }
+
+
+class ProcessKiller:
+    """Classe wrapper pour les fonctions de terminaison de processus."""
+    
+    def __init__(self):
+        pass
+    
+    def kill_process(self, pid: int, force: bool = False, timeout: int = 10) -> Dict[str, Any]:
+        """Termine un processus."""
+        return kill_process(pid, force, timeout)
+    
+    def kill_process_tree(self, pid: int, force: bool = False, timeout: int = 10) -> Dict[str, Any]:
+        """Termine un arbre de processus."""
+        return kill_process_tree(pid, force, timeout)
+    
+    def kill_processes_by_name(self, name: str, force: bool = False, timeout: int = 10) -> Dict[str, Any]:
+        """Termine des processus par nom."""
+        return kill_processes_by_name(name, force, timeout)
 
 
 def main():

@@ -15,6 +15,64 @@ import time
 from typing import Optional, Dict, Any
 
 
+class ProcessReader:
+    """Classe pour lire la sortie d'un processus."""
+    
+    def __init__(self, pid: int):
+        """
+        Initialise le lecteur de processus.
+        
+        Args:
+            pid: ID du processus à surveiller
+        """
+        self.pid = pid
+        self.process = None
+        self._init_process()
+    
+    def _init_process(self):
+        """Initialise la connexion au processus."""
+        try:
+            self.process = psutil.Process(self.pid)
+        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            raise ValueError(f"Impossible d'accéder au processus {self.pid}: {e}")
+    
+    def read_output(self, timeout: int = 5, max_lines: int = 100) -> Dict[str, Any]:
+        """
+        Lit la sortie du processus.
+        
+        Args:
+            timeout: Timeout en secondes
+            max_lines: Nombre maximum de lignes
+            
+        Returns:
+            Dictionnaire avec le résultat
+        """
+        return read_from_process(self.pid, timeout, max_lines)
+    
+    def get_process_info(self) -> Dict[str, Any]:
+        """
+        Obtient les informations du processus.
+        
+        Returns:
+            Dictionnaire avec les informations
+        """
+        try:
+            return {
+                'pid': self.pid,
+                'name': self.process.name(),
+                'status': self.process.status(),
+                'cmdline': ' '.join(self.process.cmdline()) if self.process.cmdline() else 'N/A',
+                'create_time': self.process.create_time(),
+                'cpu_percent': self.process.cpu_percent(),
+                'memory_info': self.process.memory_info()._asdict()
+            }
+        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            return {
+                'pid': self.pid,
+                'error': str(e)
+            }
+
+
 def read_from_process(pid: int, timeout: int = 5, max_lines: int = 100) -> Dict[str, Any]:
     """
     Lit la sortie d'un processus en cours d'exécution.

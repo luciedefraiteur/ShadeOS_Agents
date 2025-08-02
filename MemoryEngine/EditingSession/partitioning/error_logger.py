@@ -359,14 +359,26 @@ class PartitioningErrorLogger:
 global_error_logger = PartitioningErrorLogger()
 
 
-def log_partitioning_error(error_type: str, message: str, file_path: str,
-                          strategy: Optional[PartitionMethod] = None,
-                          context: Dict[str, Any] = None,
-                          exception: Optional[Exception] = None) -> ErrorInfo:
-    """Fonction utilitaire pour logger une erreur."""
-    return global_error_logger.log_error(
-        error_type, message, file_path, strategy, context, exception
-    )
+def log_partitioning_error(error_type: str, message: str, file_path: str = None, 
+                           line: int = None, details: str = None):
+    """Enregistre une erreur de partitionnement."""
+    global global_error_logger
+    if global_error_logger:
+        global_error_logger.log_error(error_type, message, file_path, line, details)
+    else:
+        # Fallback simple
+        print(f"❌ Partitioning Error [{error_type}]: {message}")
+        if file_path:
+            print(f"   File: {file_path}")
+        if line:
+            print(f"   Line: {line}")
+        if details:
+            print(f"   Details: {details}")
+
+def log_partitioning_error_legacy(error_type: str, message: str, file_path: str = None, 
+                                 line: int = None, details: str = None):
+    """Alias pour compatibilité avec les anciens appels."""
+    return log_partitioning_error(error_type, message, file_path, line, details)
 
 
 def log_partitioning_warning(warning_type: str, message: str, file_path: str,

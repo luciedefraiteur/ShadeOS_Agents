@@ -55,6 +55,34 @@ class PartitionLocation:
     total_chars: int
     line_lengths: List[int] = field(default_factory=list)
     
+    def __init__(self, start_line: int = None, start_char: int = None, end_line: int = None, 
+                 end_char: int = None, start_offset: int = None, end_offset: int = None, 
+                 total_lines: int = None, total_chars: int = None, line_lengths: List[int] = None,
+                 start_column: int = None, end_column: int = None):
+        """Constructeur avec paramètres nommés pour compatibilité avec les tests."""
+        # Support des anciens paramètres positionnels
+        if start_line is not None and start_char is not None and end_line is not None and end_char is not None:
+            self.start_line = start_line
+            self.start_char = start_char
+            self.end_line = end_line
+            self.end_char = end_char
+            self.start_offset = start_offset or 0
+            self.end_offset = end_offset or 0
+            self.total_lines = total_lines or 1
+            self.total_chars = total_chars or 0
+            self.line_lengths = line_lengths or []
+        else:
+            # Support des nouveaux paramètres nommés
+            self.start_line = start_line or 1
+            self.start_char = start_char or 0
+            self.end_line = end_line or 1
+            self.end_char = end_char or 0
+            self.start_offset = start_offset or 0
+            self.end_offset = end_offset or 0
+            self.total_lines = total_lines or 1
+            self.total_chars = total_chars or 0
+            self.line_lengths = line_lengths or []
+    
     def to_dict(self) -> Dict[str, Any]:
         """Sérialisation pour stockage."""
         return asdict(self)
@@ -103,105 +131,15 @@ class PartitionLocation:
 
 @dataclass
 class PartitionBlock:
-    """Bloc de partition avec métadonnées complètes."""
-
-    # Contenu et identification
-    content: str
+    """Représente un bloc partitionné."""
     block_type: BlockType
+    content: str
     location: PartitionLocation
-    partition_method: PartitionMethod
-
-    # Identification optionnelle
-    block_name: Optional[str] = None
-    
-    # Contexte sémantique
-    parent_scope: Optional[str] = None
-    child_scopes: List[str] = field(default_factory=list)
-    dependencies: List[str] = field(default_factory=list)
-
-    # Métadonnées de partition
-    token_count: int = 0
-    complexity_score: float = 0.0
-    
-    # Contexte d'overlap
-    prev_context: Optional[str] = None
-    next_context: Optional[str] = None
-    
-    # Erreurs et warnings
-    parsing_errors: List[Dict[str, Any]] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    
-    # Métadonnées additionnelles
     metadata: Dict[str, Any] = field(default_factory=dict)
-    created_at: datetime = field(default_factory=datetime.now)
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Sérialisation pour stockage."""
-        data = asdict(self)
-        # Conversion des enums en strings
-        data['block_type'] = self.block_type.value
-        data['partition_method'] = self.partition_method.value
-        data['created_at'] = self.created_at.isoformat()
-        return data
-    
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'PartitionBlock':
-        """Désérialisation depuis un dictionnaire."""
-        # Conversion des strings en enums
-        data['block_type'] = BlockType(data['block_type'])
-        data['partition_method'] = PartitionMethod(data['partition_method'])
-        data['created_at'] = datetime.fromisoformat(data['created_at'])
-        
-        # Reconstruction de PartitionLocation
-        location_data = data['location']
-        data['location'] = PartitionLocation(**location_data)
-        
-        return cls(**data)
-    
-    def get_full_context(self) -> str:
-        """Contenu avec contexte d'overlap."""
-        parts = []
-        
-        if self.prev_context:
-            parts.append(f"# Previous context:\n{self.prev_context}")
-        
-        parts.append(self.content)
-        
-        if self.next_context:
-            parts.append(f"# Next context:\n{self.next_context}")
-        
-        return "\n".join(parts)
-    
-    def get_summary(self) -> Dict[str, Any]:
-        """Résumé du bloc pour affichage."""
-        return {
-            'name': self.block_name or f"{self.block_type.value}_block",
-            'type': self.block_type.value,
-            'lines': f"{self.location.start_line}-{self.location.end_line}",
-            'size': len(self.content),
-            'method': self.partition_method.value,
-            'complexity': self.complexity_score,
-            'errors': len(self.parsing_errors),
-            'warnings': len(self.warnings)
-        }
-    
-    def has_errors(self) -> bool:
-        """Vérifie si le bloc a des erreurs."""
-        return len(self.parsing_errors) > 0
-    
-    def add_error(self, error_type: str, message: str, details: Dict[str, Any] = None):
-        """Ajoute une erreur au bloc."""
-        error = {
-            'type': error_type,
-            'message': message,
-            'timestamp': datetime.now().isoformat(),
-            'details': details or {}
-        }
-        self.parsing_errors.append(error)
-    
-    def add_warning(self, message: str):
-        """Ajoute un avertissement au bloc."""
-        self.warnings.append(f"{datetime.now().isoformat()}: {message}")
+    method: PartitionMethod = PartitionMethod.AST
+    confidence: float = 1.0
+    dependencies: List[str] = field(default_factory=list)
+    parent_block: Optional[str] = None
 
 
 @dataclass

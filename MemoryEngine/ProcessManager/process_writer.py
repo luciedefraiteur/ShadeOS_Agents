@@ -3,7 +3,7 @@
 ⛧ Write To Process ⛧
 Alma's Process Writing Tool
 
-Écrit des données vers l'entrée d'un processus en cours d'exécution.
+Écrit des données vers un processus en cours d'exécution.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
@@ -11,18 +11,65 @@ import os
 import sys
 import psutil
 import subprocess
-import signal
+import time
 from typing import Optional, Dict, Any
 
 
-def write_to_process(pid: int, data: str, add_newline: bool = True) -> Dict[str, Any]:
+class ProcessWriter:
+    """Classe pour écrire vers un processus."""
+    
+    def __init__(self, pid: int):
+        """
+        Initialise l'écrivain de processus.
+        
+        Args:
+            pid: ID du processus cible
+        """
+        self.pid = pid
+        self.process = None
+        self._init_process()
+    
+    def _init_process(self):
+        """Initialise la connexion au processus."""
+        try:
+            self.process = psutil.Process(self.pid)
+        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            raise ValueError(f"Impossible d'accéder au processus {self.pid}: {e}")
+    
+    def write_data(self, data: str, timeout: int = 5) -> Dict[str, Any]:
+        """
+        Écrit des données vers le processus.
+        
+        Args:
+            data: Données à écrire
+            timeout: Timeout en secondes
+            
+        Returns:
+            Dictionnaire avec le résultat
+        """
+        return write_to_process(self.pid, data, timeout)
+    
+    def is_process_alive(self) -> bool:
+        """
+        Vérifie si le processus est toujours actif.
+        
+        Returns:
+            True si le processus est actif
+        """
+        try:
+            return self.process.is_running()
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            return False
+
+
+def write_to_process(pid: int, data: str, timeout: int = 5) -> Dict[str, Any]:
     """
-    Écrit des données vers l'entrée d'un processus.
+    Écrit des données vers un processus en cours d'exécution.
     
     Args:
         pid: ID du processus cible
         data: Données à écrire
-        add_newline: Ajouter un retour à la ligne
+        timeout: Timeout en secondes pour l'écriture
     
     Returns:
         Dict avec le résultat de l'écriture
@@ -33,7 +80,7 @@ def write_to_process(pid: int, data: str, add_newline: bool = True) -> Dict[str,
             return {
                 'success': False,
                 'error': f'Processus PID {pid} n\'existe pas',
-                'pid': pid
+                'bytes_written': 0
             }
         
         # Récupération des informations du processus
@@ -48,36 +95,30 @@ def write_to_process(pid: int, data: str, add_newline: bool = True) -> Dict[str,
             return {
                 'success': False,
                 'error': f'Impossible d\'accéder au processus {pid}: {e}',
-                'pid': pid
+                'bytes_written': 0
             }
-        
-        # Préparation des données
-        if add_newline and not data.endswith('\n'):
-            data += '\n'
         
         # Tentative d'écriture via /proc (Linux)
         if os.name == 'posix':
-            result = _write_via_proc_fd(pid, data)
+            result = _write_to_proc_fd(pid, data, timeout)
             if result['success']:
                 return {
                     'success': True,
                     'pid': pid,
                     'process_info': process_info,
-                    'data_sent': data,
-                    'bytes_written': len(data.encode('utf-8')),
+                    'bytes_written': result['bytes_written'],
                     'method': 'proc_fd'
                 }
         
-        # Fallback : tentative via signal + pipe
-        result = _write_via_signal(pid, data)
+        # Fallback : tentative d'écriture via strace/ptrace
+        result = _write_via_strace(pid, data, timeout)
         if result['success']:
             return {
                 'success': True,
                 'pid': pid,
                 'process_info': process_info,
-                'data_sent': data,
-                'bytes_written': len(data.encode('utf-8')),
-                'method': 'signal'
+                'bytes_written': result['bytes_written'],
+                'method': 'strace'
             }
         
         # Si aucune méthode ne fonctionne
@@ -86,14 +127,15 @@ def write_to_process(pid: int, data: str, add_newline: bool = True) -> Dict[str,
             'error': f'Impossible d\'écrire vers le processus {pid}',
             'pid': pid,
             'process_info': process_info,
+            'bytes_written': 0,
             'note': 'Le processus peut ne pas accepter d\'entrée ou être protégé'
         }
         
     except Exception as e:
         return {
             'success': False,
-            'error': f'Erreur écriture vers processus {pid}: {str(e)}',
-            'pid': pid
+            'error': f'Erreur écriture processus {pid}: {str(e)}',
+            'bytes_written': 0
         }
 
 

@@ -26,6 +26,7 @@ class LanguageRegistry:
         self.partitioners: Dict[str, BaseASTPartitioner] = {}
         self.language_mappings: Dict[str, str] = {}
         self.extension_mappings: Dict[str, str] = {}
+        self.languages: Dict[str, Dict[str, Any]] = {}  # Attribut pour les tests
         self._init_default_mappings()
         self._init_default_partitioners()
     
@@ -162,45 +163,58 @@ class LanguageRegistry:
     
     def _detect_language_by_content(self, content: str) -> Optional[str]:
         """Détecte le langage par analyse du contenu."""
+        if not content:
+            return None
         
-        # Patterns de détection
-        patterns = {
-            'python': [
-                'def ', 'class ', 'import ', 'from ', '__init__',
-                'if __name__ == "__main__"'
-            ],
-            'javascript': [
-                'function ', 'var ', 'let ', 'const ', '=>', 'require(',
-                'module.exports', 'console.log'
-            ],
-            'typescript': [
-                'interface ', 'type ', ': string', ': number', ': boolean',
-                'export interface', 'import type'
-            ],
-            'rust': [
-                'fn ', 'struct ', 'enum ', 'impl ', 'use ', 'mod ',
-                'let mut', 'match '
-            ],
-            'go': [
-                'package ', 'func ', 'type ', 'struct ', 'interface ',
-                'import ', 'var ', 'const '
-            ],
-            'java': [
-                'public class', 'private ', 'protected ', 'public static void main',
-                'import java.', '@Override'
-            ]
-        }
+        # Détection Python
+        python_indicators = [
+            'def ', 'class ', 'import ', 'from ', 'if __name__', 
+            'print(', 'return ', 'self.', 'async def', 'await ',
+            'try:', 'except:', 'finally:', 'with ', 'for ', 'while ',
+            'lambda ', 'yield ', 'raise ', 'assert '
+        ]
         
-        # Score par langage
-        scores = {}
-        for language, keywords in patterns.items():
-            score = sum(1 for keyword in keywords if keyword in content)
-            if score > 0:
-                scores[language] = score
+        content_lower = content.lower()
+        python_score = sum(1 for indicator in python_indicators if indicator in content_lower)
         
-        # Retourne le langage avec le meilleur score
-        if scores:
-            return max(scores, key=scores.get)
+        if python_score >= 2:  # Au moins 2 indicateurs Python
+            return 'python'
+        
+        # Détection JavaScript/TypeScript
+        js_indicators = [
+            'function ', 'const ', 'let ', 'var ', 'console.log',
+            'export ', 'import ', '=>', 'async function', 'await ',
+            'class ', 'extends ', 'new ', 'this.', 'prototype'
+        ]
+        
+        js_score = sum(1 for indicator in js_indicators if indicator in content_lower)
+        
+        if js_score >= 2:
+            return 'javascript'
+        
+        # Détection Rust
+        rust_indicators = [
+            'fn ', 'let ', 'mut ', 'pub ', 'struct ', 'enum ',
+            'impl ', 'trait ', 'use ', 'mod ', 'extern crate',
+            'unsafe ', 'match ', 'if let', 'while let'
+        ]
+        
+        rust_score = sum(1 for indicator in rust_indicators if indicator in content_lower)
+        
+        if rust_score >= 2:
+            return 'rust'
+        
+        # Détection Go
+        go_indicators = [
+            'func ', 'package ', 'import ', 'var ', 'const ',
+            'type ', 'struct ', 'interface ', 'go ', 'defer ',
+            'select ', 'case ', 'default:', 'chan ', 'map['
+        ]
+        
+        go_score = sum(1 for indicator in go_indicators if indicator in content_lower)
+        
+        if go_score >= 2:
+            return 'go'
         
         return None
     
@@ -319,6 +333,28 @@ class LanguageRegistry:
             "language_registry"
         )
     
+    def register_language(self, language: str, partitioner: BaseASTPartitioner, 
+                          extensions: List[str] = None, aliases: List[str] = None,
+                          fallback: str = None):
+        """Enregistre un nouveau langage avec son partitionneur."""
+        self.partitioners[language] = partitioner
+        self.languages[language] = {
+            'partitioner': partitioner,
+            'extensions': extensions or [],
+            'aliases': aliases or [],
+            'fallback': fallback or 'textual'
+        }
+        
+        # Enregistrer les extensions
+        if extensions:
+            for ext in extensions:
+                self.extension_mappings[ext] = language
+        
+        # Enregistrer les alias
+        if aliases:
+            for alias in aliases:
+                self.language_mappings[alias] = language
+    
     def get_supported_languages(self) -> List[str]:
         """Retourne la liste des langages supportés."""
         return list(self.partitioners.keys())
@@ -401,9 +437,15 @@ class LanguageRegistry:
 global_language_registry = LanguageRegistry()
 
 
-def partition_file(file_path: str, content: str, 
-                  language: Optional[str] = None) -> PartitionResult:
-    """Fonction utilitaire pour partitionner un fichier."""
+def partition_file(file_path: str, content: str = None, language: Optional[str] = None) -> PartitionResult:
+    """Partitionne un fichier en utilisant le registre global."""
+    if content is None:
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+        except Exception as e:
+            raise PartitioningError(f"Impossible de lire le fichier {file_path}: {e}")
+    
     return global_language_registry.partition_file(file_path, content, language)
 
 

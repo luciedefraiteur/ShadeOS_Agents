@@ -1,0 +1,24 @@
+{
+    "id": "af60d8a0-48aa-4e38-ba24-3b509c2297e7",
+    "timestamp": "2025-08-02T16:18:01.553660",
+    "content": "{\n  \"name\": \"data_analyzer\",\n  \"description\": \"Analyse de données statistiques\",\n  \"type\": \"analysis\",\n  \"metadata\": {\n    \"version\": \"2.0\",\n    \"tags\": [\n      \"data\",\n      \"statistics\"\n    ]\n  }\n}",
+    "metadata": {
+        "summary": "Analysis tool: unknown",
+        "keywords": [
+            "analysis",
+            "unknown"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "analysis",
+        "unknown"
+    ],
+    "children": [],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": []
+}

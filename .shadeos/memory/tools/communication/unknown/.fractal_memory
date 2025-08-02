@@ -1,0 +1,24 @@
+{
+    "id": "c8c57922-ddec-45b6-bbc1-8e7e7460e750",
+    "timestamp": "2025-08-02T17:16:37.304007",
+    "content": "{\n  \"name\": \"tool4\",\n  \"type\": \"communication\"\n}",
+    "metadata": {
+        "summary": "Communication tool: unknown",
+        "keywords": [
+            "communication",
+            "unknown"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "communication",
+        "unknown"
+    ],
+    "children": [],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": []
+}

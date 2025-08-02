@@ -24,20 +24,26 @@ def safe_replace_lines_in_file(path: str, start_line: int, end_line: int, new_li
         return False
 
     original_lines = original_content.splitlines(keepends=True)
+    total_lines = len(original_lines)
     
     if debug:
-        print(f"[DEBUG - safe_replace_lines_in_file] Contenu original (lignes): {len(original_lines)}", file=sys.stderr)
+        print(f"[DEBUG - safe_replace_lines_in_file] Contenu original (lignes): {total_lines}", file=sys.stderr)
         print(f"[DEBUG - safe_replace_lines_in_file] Lignes à remplacer: {start_line}-{end_line}", file=sys.stderr)
         print(f"[DEBUG - safe_replace_lines_in_file] Nouvelles lignes: {new_lines}", file=sys.stderr)
 
     # Vérifie si les lignes à remplacer sont valides
-    if not (1 <= start_line <= end_line <= len(original_lines) + 1):
-        error_msg = f"Plage de lignes invalide {start_line}-{end_line} pour le fichier {path} (total {len(original_lines)} lignes)."
+    # Conversion explicite en int pour éviter les problèmes de type
+    start_line_int = int(start_line)
+    end_line_int = int(end_line)
+    total_lines_int = int(total_lines)
+    
+    if not (1 <= start_line_int <= end_line_int <= total_lines_int + 1):
+        error_msg = f"Plage de lignes invalide {start_line_int}-{end_line_int} pour le fichier {path} (total {total_lines_int} lignes)."
         if debug:
             print(f"[DEBUG - safe_replace_lines_in_file] {error_msg}", file=sys.stderr)
         return False
 
-    new_lines_list = original_lines[:start_line - 1] + [l + '\n' for l in new_lines] + original_lines[end_line:]
+    new_lines_list = original_lines[:start_line_int - 1] + [l + '\n' for l in new_lines] + original_lines[end_line_int:]
     new_content = "".join(new_lines_list)
 
     if debug:

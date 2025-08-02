@@ -56,7 +56,7 @@ class BaseASTPartitioner(ABC):
         """Extrait les dépendances d'un nœud."""
         pass
     
-    def partition(self, content: str, file_path: str) -> PartitionResult:
+    def partition(self, file_path: str, content: str) -> PartitionResult:
         """Partitionne le contenu en utilisant l'AST."""
         
         start_time = time.time()
@@ -95,9 +95,8 @@ class BaseASTPartitioner(ABC):
                         "node_partition_error",
                         f"Failed to partition node: {e}",
                         file_path,
-                        PartitionMethod.AST,
-                        {"node_type": type(node).__name__},
-                        e
+                        line_number=getattr(node, 'lineno', None),
+                        details=f"Node type: {type(node).__name__}"
                     )
                     # Continue avec les autres nœuds
                     continue

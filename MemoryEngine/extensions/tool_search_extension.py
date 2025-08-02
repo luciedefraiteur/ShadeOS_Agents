@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 ⛧ Tool Search Extension ⛧
-Alma's Mystical Tool Search for MemoryEngine
+Alma's Advanced Tool Search for MemoryEngine
 
-Extension du MemoryEngine pour indexer et rechercher les outils mystiques épurés.
+Extension du MemoryEngine pour la recherche avancée d'outils mystiques.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
@@ -16,7 +16,7 @@ from ..parsers.luciform_tool_metadata_parser import LuciformToolMetadataParser
 
 
 class ToolSearchExtension:
-    """Extension du MemoryEngine pour la recherche d'outils mystiques épurés."""
+    """Extension du MemoryEngine pour la recherche avancée d'outils mystiques."""
     
     def __init__(self, memory_engine):
         """
@@ -26,7 +26,7 @@ class ToolSearchExtension:
             memory_engine: Instance du MemoryEngine
         """
         self.memory_engine = memory_engine
-        self.parser = LuciformToolMetadataParser()
+        self.engine = memory_engine  # Alias pour compatibilité avec les tests
         self.tools_namespace = "/tools"
         self.indexed = False
         self._tool_cache = {}
@@ -530,3 +530,107 @@ class ToolSearchExtension:
                 return True
         
         return False 
+
+    def semantic_search(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Recherche sémantique d'outils basée sur une requête.
+        
+        Args:
+            query: Requête de recherche
+            limit: Nombre maximum de résultats
+            
+        Returns:
+            Liste des outils correspondants
+        """
+        if not self.indexed:
+            self.index_all_tools()
+        
+        # Recherche simple par mot-clé pour l'instant
+        # TODO: Implémenter une vraie recherche sémantique
+        results = []
+        
+        # Recherche par mots-clés de la requête
+        keywords = query.lower().split()
+        for keyword in keywords:
+            keyword_results = self.memory_engine.find_memories_by_keyword(keyword)
+            for path in keyword_results:
+                if path.startswith(self.tools_namespace):
+                    node = self.memory_engine.get_memory_node(path)
+                    if node and node.content:
+                        try:
+                            metadata = json.loads(node.content)
+                            if metadata not in results:
+                                results.append(metadata)
+                        except:
+                            pass
+        
+        return results[:limit]
+
+    def get_search_suggestions(self, partial_query: str, limit: int = 5) -> List[str]:
+        """
+        Obtient des suggestions de recherche basées sur une requête partielle.
+        
+        Args:
+            partial_query: Requête partielle
+            limit: Nombre maximum de suggestions
+            
+        Returns:
+            Liste des suggestions
+        """
+        if not self.indexed:
+            self.index_all_tools()
+        
+        suggestions = []
+        partial_lower = partial_query.lower()
+        
+        # Recherche dans les noms d'outils
+        tool_paths = self.memory_engine.find_memories_by_keyword(partial_query)
+        for path in tool_paths:
+            if path.startswith(self.tools_namespace):
+                node = self.memory_engine.get_memory_node(path)
+                if node and node.content:
+                    try:
+                        metadata = json.loads(node.content)
+                        tool_name = metadata.get('tool_id', '')
+                        if tool_name.lower().startswith(partial_lower):
+                            suggestions.append(tool_name)
+                    except:
+                        pass
+        
+        return list(set(suggestions))[:limit]
+
+    def search_with_filters(self, query: str = None, tool_type: str = None, 
+                            level: str = None, content_filter: str = None,
+                            metadata_filters: dict = None, limit: int = 10) -> List[Dict[str, Any]]:
+        """Recherche avancée avec filtres multiples."""
+        results = []
+        
+        # Recherche de base
+        base_results = self.semantic_search(query or "", limit=limit*2)
+        
+        # Application des filtres
+        for tool in base_results:
+            # Filtre par type
+            if tool_type and tool.get('type') != tool_type:
+                continue
+                
+            # Filtre par niveau
+            if level and tool.get('level') != level:
+                continue
+                
+            # Filtre par contenu
+            if content_filter and content_filter.lower() not in tool.get('content', '').lower():
+                continue
+                
+            # Filtre par métadonnées
+            if metadata_filters:
+                tool_metadata = tool.get('metadata', {})
+                if not all(tool_metadata.get(k) == v for k, v in metadata_filters.items()):
+                    continue
+            
+            results.append(tool)
+            
+            if len(results) >= limit:
+                break
+        
+        return results 

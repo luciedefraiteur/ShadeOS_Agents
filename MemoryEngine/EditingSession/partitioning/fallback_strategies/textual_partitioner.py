@@ -23,13 +23,13 @@ class TextualPartitioner:
         self.overlap_lines = overlap_lines
         self.location_tracker = LocationTracker()
     
-    def partition(self, content: str, file_path: str, language: str = "unknown") -> PartitionResult:
-        """Partitionne le contenu par analyse textuelle."""
+    def partition(self, file_path: str, content: str) -> PartitionResult:
+        """Partitionne le contenu en utilisant une approche textuelle simple."""
         
         start_time = time.time()
         result = PartitionResult(
             file_path=file_path,
-            file_type=language,
+            file_type="text",
             total_lines=len(content.split('\n')),
             total_chars=len(content),
             partitions=[],
