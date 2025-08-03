@@ -1,0 +1,12 @@
+{
+  "IAIntrospectionDaemons/templates/V3/debug_agent_template_v3.luciform": {
+    "exists": false,
+    "size": 0,
+    "readable": false
+  },
+  "IAIntrospectionDaemons/templates/V3/personal_assistant_template_v3.luciform": {
+    "exists": false,
+    "size": 0,
+    "readable": false
+  }
+}

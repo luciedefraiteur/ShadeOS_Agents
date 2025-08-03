@@ -1,0 +1,33 @@
+{
+  "injector_status": {
+    "debug_injector": {
+      "created": true,
+      "type": "DebugAgentInjectorV3",
+      "methods": [
+        "create_debug_prompt",
+        "get_session_summary",
+        "inject_into_template",
+        "language_registry",
+        "memory_engine",
+        "session_data",
+        "tool_memory",
+        "update_session_data"
+      ]
+    },
+    "assistant_injector": {
+      "created": true,
+      "type": "PersonalAssistantInjectorV3",
+      "methods": [
+        "create_assistant_prompt",
+        "get_session_summary",
+        "inject_into_template",
+        "language_registry",
+        "memory_engine",
+        "session_data",
+        "tool_memory",
+        "update_session_data"
+      ]
+    }
+  },
+  "all_injectors_created": true
+}

@@ -259,7 +259,7 @@ class LanguageRegistry:
                 "partitioning_failed",
                 f"Partitioning failed for {language}: {e}",
                 file_path,
-                exception=e
+                details=str(e)
             )
             raise
 
