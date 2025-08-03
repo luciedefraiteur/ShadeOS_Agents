@@ -24,13 +24,17 @@ class FractalMemoryNode:
     summary: str = field(init=False)
     keywords: List[str] = field(default_factory=list)
 
-    # Relations hiérarchiques et associatives
-    children: List[Dict[str, str]] = field(default_factory=list)
+    # Relations associatives fractales
     linked_memories: List[Dict[str, str]] = field(default_factory=list)
 
     # Relations verticales de la Respiration
     transcendence_links: List[Dict[str, str]] = field(default_factory=list)  # Vers l'abstraction ↑
     immanence_links: List[Dict[str, str]] = field(default_factory=list)      # Vers la concrétisation ↓
+
+    # Liens temporels virtuels (injectés dynamiquement)
+    temporal_uuid: str = field(default=None)
+    previous_temporal_uuid: str = field(default=None)
+    next_temporal_uuid: str = field(default=None)
 
     def __post_init__(self):
         """Initialisation post-création pour la compatibilité."""
@@ -56,10 +60,12 @@ class FractalMemoryNode:
             'metadata': self.metadata,
             'strata': self.strata,
             'keywords': self.keywords,
-            'children': self.children,
             'linked_memories': self.linked_memories,
             'transcendence_links': self.transcendence_links,
-            'immanence_links': self.immanence_links
+            'immanence_links': self.immanence_links,
+            'temporal_uuid': self.temporal_uuid,
+            'previous_temporal_uuid': self.previous_temporal_uuid,
+            'next_temporal_uuid': self.next_temporal_uuid
         }
 
     @staticmethod
@@ -78,17 +84,10 @@ class FractalMemoryNode:
             id=data.get('id', str(uuid.uuid4())),
             timestamp=data.get('timestamp', datetime.now().isoformat()),
             keywords=data.get('keywords', []),
-            children=data.get('children', []),
             linked_memories=data.get('linked_memories', []),
             transcendence_links=data.get('transcendence_links', []),
             immanence_links=data.get('immanence_links', [])
         )
-
-    def add_child(self, path: str, summary: str):
-        """Ajoute un descripteur d'enfant à la liste."""
-        # Évite les doublons
-        if not any(child['path'] == path for child in self.children):
-            self.children.append({"path": path, "summary": summary})
 
     def add_link(self, path: str, summary: str):
         """Ajoute un lien interdimensionnel à la liste."""

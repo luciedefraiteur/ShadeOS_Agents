@@ -1,6 +1,7 @@
 import os
 from ..backends.storage_backends import FileSystemBackend
 from .memory_node import FractalMemoryNode
+from .temporal_index import TemporalIndex
 
 # Import Neo4j backend if available
 try:
@@ -48,6 +49,10 @@ class MemoryEngine:
             raise ValueError(f"Unknown backend_type: {backend_type}")
 
         self.backend_type = type(self.backend).__name__
+        
+        # Initialisation de l'index temporel
+        from .temporal_index import TemporalIndex
+        self.temporal_index = TemporalIndex(backend_type, base_path)
 
     def create_memory(self, path: str, content: str, summary: str, keywords: list,
                      links: list = None, strata: str = "somatic",
@@ -73,11 +78,26 @@ class MemoryEngine:
         else:
             # Old FileSystem backend
             self.backend.write(path, content, summary, keywords, links or [])
+        
+        # Indexation temporelle automatique
+        metadata = {
+            "path": path,
+            "strata": strata,
+            "keywords": keywords,
+            "summary": summary,
+            "content": content
+        }
+        self.temporal_index.auto_record(path, metadata)
+        
         return True
 
     def get_memory_node(self, path: str):
-        """Récupère le contenu complet d'un nœud mémoire."""
-        return self.backend.read(path)
+        """Récupère le contenu complet d'un nœud mémoire avec injection des liens temporels."""
+        node = self.backend.read(path)
+        if node:
+            # Injection des liens temporels virtuels
+            self.temporal_index.inject_temporal_links(node)
+        return node
 
     def forget_memory(self, path: str, cleanup_links: bool = True) -> bool:
         """
@@ -251,11 +271,6 @@ class MemoryEngine:
     def find_memories_by_keyword(self, keyword: str) -> list:
         """Trouve les chemins des souvenirs contenant un mot-clé spécifique."""
         return self.backend.find_by_keyword(keyword)
-
-    def list_children(self, path: str = '.') -> list:
-        """Liste les enfants directs d'un nœud mémoire."""
-        node = self.backend.read(path)
-        return node.children
 
     def list_links(self, path: str = '.') -> list:
         """Liste les liens interdimensionnels d'un nœud mémoire."""
