@@ -336,6 +336,16 @@ class ToolRegistry:
                 openai_tools.append(tool_format)
         
         return openai_tools
+    
+    def invoke_tool(self, tool_id: str, **kwargs) -> Dict[str, Any]:
+        """Proxy pour invoquer un outil via le ToolInvoker."""
+        from MemoryEngine.EditingSession.Tools.tool_invoker import ToolInvoker
+        
+        # Créer un invoker temporaire si nécessaire
+        if not hasattr(self, '_invoker'):
+            self._invoker = ToolInvoker(self)
+        
+        return self._invoker.invoke_tool(tool_id, **kwargs)
 
 
 # Instance globale
