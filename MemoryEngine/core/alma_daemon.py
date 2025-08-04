@@ -35,13 +35,18 @@ class AlmaDaemon:
         from MemoryEngine.core.discussion_timeline import DiscussionTimeline
         self.discussion_timeline = DiscussionTimeline("~/shadeos_memory")
         
+        # Interlocuteurs
+        self.archiviste_daemon = None  # Archiviste pour accès mémoire
+        self.orchestrator = None  # Orchestrator pour communication
+        
         # Métriques
         self.metrics = {
             "messages_received": 0,
             "messages_sent": 0,
             "tasks_completed": 0,
             "assistant_calls": 0,
-            "errors": 0
+            "errors": 0,
+            "archiviste_queries": 0
         }
         
         # Démarrage du thread
@@ -150,50 +155,74 @@ Analyse chaque requête, planifie l'exécution, et rapporte tes résultats.
         self.current_status = "completed"
         self.metrics["tasks_completed"] += 1
     
-    def _analyze_request_with_ai(self, content: str) -> Dict[str, Any]:
-        """Analyse la requête avec l'IA."""
-        print("🧠 Alma analyse la requête avec l'IA...")
+    def set_archiviste_daemon(self, archiviste_daemon):
+        """Connecte Alma à l'Archiviste daemon"""
+        self.archiviste_daemon = archiviste_daemon
+        print("🕷️ Alma connecté à l'Archiviste daemon")
+    
+    def set_orchestrator(self, orchestrator):
+        """Connecte Alma à l'Orchestrator"""
+        self.orchestrator = orchestrator
+        print("🕷️ Alma connecté à l'Orchestrator")
+    
+    def query_archiviste(self, message: str) -> str:
+        """Envoie une requête à l'Archiviste et attend une réponse"""
+        if not self.archiviste_daemon:
+            return "Erreur : Archiviste daemon non connecté"
         
-        # Préparation de l'historique des messages
+        try:
+            self.metrics["archiviste_queries"] += 1
+            response = self.archiviste_daemon.send_message(message, "alma")
+            return response
+        except Exception as e:
+            return f"Erreur communication avec l'Archiviste : {str(e)}"
+    
+    def _analyze_request_with_ai(self, content: str) -> Dict[str, Any]:
+        """Analyse la requête avec l'IA en incluant le contexte de l'Archiviste"""
+        # Préparer l'historique des messages
         message_history = self._prepare_message_history()
         
-        # Création du prompt d'analyse avec historique
-        analysis_prompt = f"""
-{self.prompt}
+        # Préparer le contexte de l'Archiviste si disponible
+        archiviste_context = ""
+        if self.archiviste_daemon:
+            try:
+                archiviste_context = self.query_archiviste("Décris-moi les types de mémoire disponibles")
+            except:
+                archiviste_context = "Archiviste non disponible"
+        
+        analysis_prompt = f"""{self.prompt}
 
 **HISTORIQUE DES MESSAGES (WhatsApp-style) :**
 {message_history}
 
+**CONTEXTE DE L'ARCHIVISTE (Types de mémoire disponibles) :**
+{archiviste_context}
+
 **REQUÊTE ACTUELLE À ANALYSER :**
 {content}
 
-**INSTRUCTIONS :**
-Analyse cette requête en tenant compte de l'historique des messages.
-Identifie :
-1. Les tâches à exécuter
-2. Les assistants IA à utiliser
-3. L'ordre d'exécution
-4. Les priorités
-5. Les références à des messages précédents
+**TÂCHE :** Analyse cette requête et détermine :
+1. L'intention principale (développement, debug, recherche, etc.)
+2. Les actions nécessaires
+3. Les ressources requises
+4. La priorité et complexité
 
-Réponds au format JSON :
+**RÉPONSE EN JSON :**
 {{
-  "tasks": [
+  "intention": "développement|debug|recherche|analyse|autre",
+  "actions": [
     {{
-      "id": "<uuid>",
-      "description": "<description>",
-      "assistant": "<assistant_to_use>",
-      "priority": "<high|normal|low>",
-      "dependencies": ["<task_ids>"]
+      "type": "assistant_call|archiviste_query|memory_access|file_operation",
+      "description": "description de l'action",
+      "priority": "high|normal|low",
+      "parameters": {{}}
     }}
   ],
-  "overall_priority": "<high|normal|low>",
-  "estimated_duration": "<estimation>",
-  "context_references": ["<références aux messages précédents>"]
-}}
-"""
-        
-        # Appel à l'IA pour analyse
+  "resources": ["memory_engine", "assistant_generaliste", "archiviste"],
+  "complexity": "simple|medium|complex",
+  "estimated_time": "estimation en minutes"
+}}"""
+
         try:
             import subprocess
             
@@ -201,20 +230,20 @@ Réponds au format JSON :
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
             
             if result.returncode == 0:
-                # Tentative de parsing JSON
-                try:
-                    analysis = json.loads(result.stdout.strip())
-                    print("✅ Analyse IA terminée")
-                    return analysis
-                except json.JSONDecodeError:
-                    print("⚠️ Erreur parsing JSON, utilisation du fallback")
-                    return self._fallback_analysis(content)
-            else:
-                print(f"❌ Erreur Ollama: {result.stderr}")
-                return self._fallback_analysis(content)
+                response_text = result.stdout.strip()
+                # Chercher le JSON dans la réponse
+                json_start = response_text.find('{')
+                json_end = response_text.rfind('}') + 1
                 
+                if json_start != -1 and json_end > json_start:
+                    json_str = response_text[json_start:json_end]
+                    return json.loads(json_str)
+            
+            # Fallback si pas de JSON valide
+            return self._fallback_analysis(content)
+            
         except Exception as e:
-            print(f"❌ Erreur lors de l'analyse IA: {e}")
+            print(f"Erreur analyse IA Alma : {e}")
             return self._fallback_analysis(content)
     
     def _fallback_analysis(self, content: str) -> Dict[str, Any]:

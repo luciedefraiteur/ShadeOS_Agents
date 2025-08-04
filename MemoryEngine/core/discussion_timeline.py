@@ -24,11 +24,11 @@ class DiscussionTimeline:
             with open(timeline_file, 'r', encoding='utf-8') as f:
                 self.timelines[interlocutor] = json.load(f)
     
-    def add_message(self, interlocutor: str, message: Dict[str, Any], direction: str = "incoming"):
+    def add_message(self, interlocutor: str, message: Any, direction: str = "incoming"):
         """Ajoute un message à la timeline d'un interlocuteur."""
+        # Initialisation de la timeline si nécessaire
         if interlocutor not in self.timelines:
             self.timelines[interlocutor] = {
-                "interlocutor": interlocutor,
                 "created_at": datetime.now().isoformat(),
                 "messages": [],
                 "metadata": {
@@ -45,7 +45,7 @@ class DiscussionTimeline:
             "direction": direction,
             "message": message,
             "content": self._extract_content(message),
-            "message_type": message.get("type", "message")
+            "message_type": self._extract_message_type(message)
         }
         
         # Ajout à la timeline
@@ -67,11 +67,17 @@ class DiscussionTimeline:
         
         print(f"📱 Message ajouté à la timeline de {interlocutor}")
     
-    def _extract_content(self, message: Dict[str, Any]) -> str:
+    def _extract_content(self, message: Any) -> str:
         """Extrait le contenu d'un message."""
         if isinstance(message, dict):
             return message.get("content", str(message))
         return str(message)
+    
+    def _extract_message_type(self, message: Any) -> str:
+        """Extrait le type d'un message."""
+        if isinstance(message, dict):
+            return message.get("type", "message")
+        return "message"
     
     def _save_timeline(self, interlocutor: str):
         """Sauvegarde la timeline d'un interlocuteur."""
