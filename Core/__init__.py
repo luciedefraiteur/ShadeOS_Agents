@@ -31,6 +31,9 @@ from .ProcessManager import (
 # Import des Utils
 from .Utils import string_utils
 
+# Import de l'IntrospectiveParser
+from .IntrospectiveParser import IntelligentIntrospectiveParser, UniversalIntrospectiveThread
+
 __all__ = [
     # LLM Providers
     'LLMProvider',
@@ -55,4 +58,8 @@ __all__ = [
     
     # Utils
     'string_utils',
+    
+    # IntrospectiveParser
+    'IntelligentIntrospectiveParser',
+    'UniversalIntrospectiveThread',
 ]
