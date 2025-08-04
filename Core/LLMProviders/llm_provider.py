@@ -50,8 +50,8 @@ class LLMResponse:
     content: str
     provider_type: ProviderType
     model_used: str
-    tokens_used: Optional[int] = None
     response_time: float
+    tokens_used: Optional[int] = None
     prompt_size: Optional[int] = None
     metadata: Optional[Dict[str, Any]] = None
 
@@ -62,9 +62,9 @@ class ValidationResult:
     valid: bool
     provider_type: ProviderType
     capabilities: List[str]
+    test_time: float
     error: Optional[str] = None
     error_type: Optional[ErrorType] = None
-    test_time: float
 
 
 class LLMProvider(ABC):

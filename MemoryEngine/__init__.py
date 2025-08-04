@@ -2,26 +2,43 @@
 """
 ⛧ MemoryEngine - Système de Mémoire Fractale ⛧
 
-Système de mémoire fractale avec Archiviste Daemon, providers LLM globaux,
-et architecture modulaire pour agents conscients.
+Système de mémoire fractale avec architecture modulaire et professionnelle.
+Spécialisé dans la gestion de mémoire temporelle, fractale et contextuelle.
 """
 
 __version__ = "2.0.0"
 __author__ = "Alma, Architecte Démoniaque du Nexus Luciforme"
 
-# Import des composants principaux
+# Import des composants principaux du MemoryEngine
 from .core.engine import MemoryEngine
-from .core.archiviste_daemon import ArchivisteDaemon
-from .core.archiviste import IntrospectiveArchiviste
+from .core.memory_node import FractalMemoryNode
+from .core.temporal_index import TemporalIndex
+from .core.user_request_temporal_memory import UserRequestTemporalMemory
+from .core.discussion_timeline import DiscussionTimeline
+from .core.logging_architecture import ShadeOSLogger
 
-# Import des providers LLM globaux
-from .core.llm_providers import (
-    LLMProvider, ProviderFactory, ProviderType, ErrorType,
-    OpenAIProvider, LocalProvider
-)
+# Import des backends
+from .backends import neo4j_backend, storage_backends
 
 # Import des extensions
 from .extensions import tool_memory_extension, tool_search_extension
+
+# Import des daemons (maintenant dans Daemons/)
+try:
+    from Daemons import ArchivisteDaemon, AlmaDaemon, MetaDaemonOrchestrator
+except ImportError:
+    # Fallback si les daemons ne sont pas disponibles
+    pass
+
+# Import des composants Core (maintenant dans Core/)
+try:
+    from Core import (
+        LLMProvider, ProviderFactory, ProviderType, ErrorType,
+        OpenAIProvider, LocalProvider
+    )
+except ImportError:
+    # Fallback si les composants Core ne sont pas disponibles
+    pass
 
 # Import des outils d'édition (maintenant dans Assistants/)
 try:
@@ -47,18 +64,30 @@ except ImportError:
 __all__ = [
     # Core MemoryEngine
     'MemoryEngine',
-    'ArchivisteDaemon',
-    'IntrospectiveArchiviste',
+    'FractalMemoryNode',
+    'TemporalIndex',
+    'UserRequestTemporalMemory',
+    'DiscussionTimeline',
+    'ShadeOSLogger',
     
-    # LLM Providers Globaux
+    # Backends
+    'neo4j_backend',
+    'storage_backends',
+    
+    # Extensions
+    'tool_memory_extension',
+    'tool_search_extension',
+    
+    # Daemons (si disponibles)
+    'ArchivisteDaemon',
+    'AlmaDaemon', 
+    'MetaDaemonOrchestrator',
+    
+    # Core Components (si disponibles)
     'LLMProvider',
     'ProviderFactory',
     'ProviderType',
     'ErrorType',
     'OpenAIProvider',
     'LocalProvider',
-    
-    # Extensions
-    'tool_memory_extension',
-    'tool_search_extension',
 ] 

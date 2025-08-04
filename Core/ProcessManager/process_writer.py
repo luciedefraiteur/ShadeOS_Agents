@@ -9,6 +9,7 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 
 import os
 import sys
+import signal
 import psutil
 import subprocess
 import time

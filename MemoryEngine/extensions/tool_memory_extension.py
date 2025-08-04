@@ -12,7 +12,7 @@ import sys
 import json
 from typing import Dict, List, Optional, Any
 
-from ..parsers.luciform_parser import parse_luciform
+from Core.Parsers.luciform_parser import parse_luciform
 
 
 class ToolMemoryExtension:

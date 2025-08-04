@@ -12,7 +12,7 @@ import sys
 import json
 from typing import Dict, List, Optional, Any
 
-from ..parsers.luciform_tool_metadata_parser import LuciformToolMetadataParser
+from Core.Parsers.luciform_tool_metadata_parser import LuciformToolMetadataParser
 
 
 class ToolSearchExtension:

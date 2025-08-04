@@ -17,8 +17,8 @@ et configuration flexible pour tous les appels LLM du projet.
 __version__ = "1.0.0"
 __author__ = "Alma, Architecte Démoniaque du Nexus Luciforme"
 
-# Import depuis MemoryEngine (source principale)
-from MemoryEngine.core.llm_providers import (
+# Import depuis Core (nouvelle architecture)
+from Core.LLMProviders import (
     LLMProvider, ProviderStatus, LLMResponse, ValidationResult,
     ProviderType, ErrorType, ProviderFactory,
     OpenAIProvider, LocalProvider
