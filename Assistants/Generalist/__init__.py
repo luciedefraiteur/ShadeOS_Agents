@@ -4,8 +4,12 @@
 Assistants généralistes pour le débogage et l'analyse de code
 
 Contient :
-- V8_generalist_assistant : Assistant local avec LLMs
-- V8_generalist_openai : Assistant OpenAI
+- V8_generalist_assistant : Assistant avec système de providers LLM configurable
+- V8_generalist_openai : Assistant OpenAI (maintenant intégré dans V8)
+
+Système de providers supporté :
+- OpenAI : GPT-4, GPT-3.5-turbo
+- Local : Ollama (qwen2.5:7b-instruct, etc.)
 """
 
 from .V8_generalist_assistant import GeneralistAssistant

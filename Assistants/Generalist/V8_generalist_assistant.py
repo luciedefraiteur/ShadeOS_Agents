@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 from MemoryEngine.core.engine import MemoryEngine
 from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
+from LLMProviders import ProviderFactory, LLMProvider
 
 class GeneralistAssistantLogger:
     """Logger pour l'assistant généraliste."""
@@ -99,12 +100,26 @@ class GeneralistAssistantLogger:
 class GeneralistAssistant:
     """Assistant généraliste avec partitionneur et boucles de travail."""
     
-    def __init__(self, memory_engine: MemoryEngine, tool_registry: ToolRegistry, model: str = "qwen2.5:7b-instruct"):
+    def __init__(self, memory_engine: MemoryEngine, tool_registry: ToolRegistry, 
+                 provider_type: str = "local", model: str = "qwen2.5:7b-instruct", **provider_config):
+        """Initialise l'assistant généraliste avec provider LLM configurable."""
         self.memory_engine = memory_engine
         self.tool_registry = tool_registry
         self.primary_model = model
         self.name = "GeneralistAssistant"
         self.logger = GeneralistAssistantLogger("GeneralistAssistant")
+        
+        # Configuration du provider LLM
+        self.provider_type = provider_type
+        self.provider_config = {
+            "model": model,
+            "timeout": provider_config.get("timeout", 60),
+            "temperature": provider_config.get("temperature", 0.7),
+            **provider_config
+        }
+        
+        # Initialisation du provider (sera fait lors du premier appel)
+        self.provider = None
         
         # Créer le ToolInvoker
         from MemoryEngine.EditingSession.Tools.tool_invoker import ToolInvoker
@@ -116,35 +131,57 @@ class GeneralistAssistant:
         self.workflow_complete = False
         self.context = {}
         
-        self.logger.log_message("system", f"Assistant '{self.name}' initialisé avec modèle: {self.primary_model}")
+        self.logger.log_message("system", f"Assistant '{self.name}' initialisé avec provider: {provider_type}, modèle: {model}")
     
-    def _call_llm(self, prompt: str) -> Dict[str, Any]:
-        """Appelle le LLM local."""
+    async def _initialize_provider(self):
+        """Initialise le provider LLM si nécessaire."""
+        if self.provider is None:
+            try:
+                self.provider, validation = await ProviderFactory.create_and_validate_provider(
+                    self.provider_type, **self.provider_config
+                )
+                
+                if not validation.valid:
+                    raise Exception(f"Provider {self.provider_type} invalide: {validation.error}")
+                
+                self.logger.log_message("system", f"Provider {self.provider_type} initialisé avec succès")
+                
+            except Exception as e:
+                self.logger.log_message("system", f"Erreur d'initialisation du provider: {e}")
+                raise
+    
+    async def _call_llm(self, prompt: str) -> Dict[str, Any]:
+        """Appelle le LLM via le système de providers."""
         try:
-            result = subprocess.run(
-                ["ollama", "run", self.primary_model, prompt],
-                capture_output=True,
-                text=True,
-                timeout=60
-            )
+            # Initialisation du provider si nécessaire
+            await self._initialize_provider()
             
-            if result.returncode == 0:
-                return {
-                    "success": True,
-                    "response": result.stdout.strip(),
-                    "error": None
-                }
-            else:
+            # Appel du LLM
+            response = await self.provider.generate_response(prompt)
+            
+            if response.content.startswith("ERREUR:"):
                 return {
                     "success": False,
                     "response": None,
-                    "error": result.stderr
+                    "error": response.content,
+                    "provider_info": self.provider.get_provider_info()
                 }
+            else:
+                return {
+                    "success": True,
+                    "response": response.content,
+                    "error": None,
+                    "provider_info": self.provider.get_provider_info(),
+                    "response_time": response.response_time,
+                    "tokens_used": response.tokens_used
+                }
+                
         except Exception as e:
             return {
                 "success": False,
                 "response": None,
-                "error": str(e)
+                "error": str(e),
+                "provider_info": self.provider.get_provider_info() if self.provider else None
             }
     
     def _get_system_prompt(self) -> str:
@@ -253,7 +290,7 @@ IMPORTANT: Utilise EXACTEMENT les noms de paramètres indiqués ci-dessus !"""
             self.logger.log_tool_call(tool_name, arguments, error_result, self.current_iteration)
             return error_result
     
-    def _process_workflow_iteration(self, user_message: str, context: str = "") -> Dict[str, Any]:
+    async def _process_workflow_iteration(self, user_message: str, context: str = "") -> Dict[str, Any]:
         """Traite une itération du workflow."""
         self.current_iteration += 1
         
@@ -326,7 +363,7 @@ IMPORTANT: Utilise EXACTEMENT les noms de paramètres indiqués ci-dessus !"""
         
         # Appeler le LLM
         self.logger.log_message("user", user_message, self.current_iteration)
-        llm_result = self._call_llm(full_prompt)
+        llm_result = await self._call_llm(full_prompt)
         
         if not llm_result["success"]:
             return {
@@ -397,7 +434,7 @@ IMPORTANT: Utilise EXACTEMENT les noms de paramètres indiqués ci-dessus !"""
             "next_context": next_context
         }
     
-    def process_request(self, user_message: str) -> Dict[str, Any]:
+    async def process_request(self, user_message: str) -> Dict[str, Any]:
         """Traite une demande utilisateur avec boucles de travail."""
         print(f"🕷️ Assistant Généraliste - Traitement de: {user_message}")
         
@@ -409,7 +446,7 @@ IMPORTANT: Utilise EXACTEMENT les noms de paramètres indiqués ci-dessus !"""
         while not self.workflow_complete and self.current_iteration < self.max_iterations:
             print(f"🔄 Itération {self.current_iteration + 1}...")
             
-            iteration_result = self._process_workflow_iteration(user_message, context)
+            iteration_result = await self._process_workflow_iteration(user_message, context)
             
             if not iteration_result["success"]:
                 return {
@@ -508,7 +545,7 @@ if __name__ == "__main__":
     test_file.write_text(corrupted_content, encoding='utf-8')
     print(f"🔄 Fichier corrompu régénéré: {test_file}")
 
-def test_generalist_assistant():
+async def test_generalist_assistant():
     """Test de l'assistant généraliste."""
     print("🕷️ Test de l'Assistant Généraliste V8")
     print("=" * 60)
@@ -537,7 +574,7 @@ def test_generalist_assistant():
         regenerate_corrupted_file()
         
         # Traiter la demande
-        result = assistant.process_request(message)
+        result = await assistant.process_request(message)
         
         if result["success"]:
             print(f"✅ Succès: {result['iterations']} itérations en {result['duration']:.2f}s")
@@ -549,4 +586,5 @@ def test_generalist_assistant():
     print("\n🎉 Test de l'assistant généraliste terminé !")
 
 if __name__ == "__main__":
-    test_generalist_assistant() 
+    import asyncio
+    asyncio.run(test_generalist_assistant()) 
