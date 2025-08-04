@@ -95,8 +95,8 @@ Answer with just the method name.
 """
         
         try:
-            response = await self.llm_provider.generate(prompt, max_tokens=10)
-            method = response.strip().lower()
+            response = await self.llm_provider.generate_response(prompt)
+            method = response.content.strip().lower()
             
             # Validation de la réponse
             valid_methods = ["grep", "fractal", "temporal", "mixed"]

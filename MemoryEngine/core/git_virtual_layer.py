@@ -30,6 +30,19 @@ class GitCommit:
     insertions: int
     deletions: int
     metadata: Dict[str, Any]
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertit le commit en dictionnaire pour sérialisation JSON"""
+        return {
+            "hash": self.hash,
+            "author": self.author,
+            "date": self.date,
+            "message": self.message,
+            "files_changed": self.files_changed,
+            "insertions": self.insertions,
+            "deletions": self.deletions,
+            "metadata": self.metadata
+        }
 
 
 @dataclass
@@ -41,6 +54,17 @@ class GitSearchResult:
     patterns_found: List[str]
     search_method: str
     metadata: Dict[str, Any]
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertit le résultat en dictionnaire pour sérialisation JSON"""
+        return {
+            "query": self.query,
+            "commits": [commit.to_dict() for commit in self.commits],
+            "files_affected": self.files_affected,
+            "patterns_found": self.patterns_found,
+            "search_method": self.search_method,
+            "metadata": self.metadata
+        }
 
 
 class GitVirtualLayer:

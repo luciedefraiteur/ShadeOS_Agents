@@ -196,8 +196,8 @@ class AutoFeedingThreadAgent:
                     raise Exception(f"Provider {self.provider_type} invalide: {validation.error}")
                 
                 # Initialiser les couches avec le provider
-                self.workspace_layer = WorkspaceLayer(self.memory_engine, self.provider, workspace_path)
-                self.git_layer = GitVirtualLayer(self.memory_engine, workspace_path)
+                self.workspace_layer = WorkspaceLayer(self.memory_engine, self.provider, self.workspace_path)
+                self.git_layer = GitVirtualLayer(self.memory_engine, self.workspace_path)
                 
                 self.logger.log_thread_message(ThreadMessage(
                     timestamp=time.time(),
@@ -374,14 +374,21 @@ IMPORTANT: Utilise le thread introspectif pour documenter tes pensées et décis
     async def _execute_layer_action(self, layer_name: str, action: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Exécute une action de couche."""
         try:
+            # Normaliser la casse du nom de couche
+            layer_name = layer_name.lower().strip()
+            
             if layer_name == "workspace":
                 if action == "intelligent_search":
                     result = await self.workspace_layer.intelligent_search(arguments.get("query", ""))
-                    self.logger.log_workspace_action("intelligent_search", arguments, result)
+                    # Convertir en dict si nécessaire
+                    result_dict = result.to_dict() if hasattr(result, 'to_dict') else result
+                    self.logger.log_workspace_action("intelligent_search", arguments, result_dict)
                     return {"success": True, "result": result}
                 elif action == "analyze_workspace_structure":
                     result = await self.workspace_layer.analyze_workspace_structure()
-                    self.logger.log_workspace_action("analyze_workspace_structure", arguments, result)
+                    # Convertir en dict si nécessaire
+                    result_dict = result.to_dict() if hasattr(result, 'to_dict') else result
+                    self.logger.log_workspace_action("analyze_workspace_structure", arguments, result_dict)
                     return {"success": True, "result": result}
                 else:
                     return {"success": False, "error": f"Action workspace inconnue: {action}"}
@@ -389,11 +396,15 @@ IMPORTANT: Utilise le thread introspectif pour documenter tes pensées et décis
             elif layer_name == "git":
                 if action == "search_git_history":
                     result = await self.git_layer.search_git_history(arguments.get("query", ""))
-                    self.logger.log_git_action("search_git_history", arguments, result)
+                    # Convertir en dict si nécessaire
+                    result_dict = result.to_dict() if hasattr(result, 'to_dict') else result
+                    self.logger.log_git_action("search_git_history", arguments, result_dict)
                     return {"success": True, "result": result}
                 elif action == "analyze_development_patterns":
                     result = await self.git_layer.analyze_development_patterns(arguments.get("time_range", "auto"))
-                    self.logger.log_git_action("analyze_development_patterns", arguments, result)
+                    # Convertir en dict si nécessaire
+                    result_dict = result.to_dict() if hasattr(result, 'to_dict') else result
+                    self.logger.log_git_action("analyze_development_patterns", arguments, result_dict)
                     return {"success": True, "result": result}
                 else:
                     return {"success": False, "error": f"Action git inconnue: {action}"}
