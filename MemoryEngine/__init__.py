@@ -9,6 +9,10 @@ Spécialisé dans la gestion de mémoire temporelle, fractale et contextuelle.
 __version__ = "2.0.0"
 __author__ = "Alma, Architecte Démoniaque du Nexus Luciforme"
 
+# Import du système d'initialisation
+from .core.initialization import ensure_initialized, is_neo4j_available, get_neo4j_connection_info
+from .core.neo4j_manager import get_neo4j_credentials, reset_neo4j_container
+
 # Import des composants principaux du MemoryEngine
 from .core.engine import MemoryEngine
 from .core.memory_node import FractalMemoryNode
@@ -62,6 +66,13 @@ except ImportError:
     pass
 
 __all__ = [
+    # Initialisation et gestion Neo4j
+    'ensure_initialized',
+    'is_neo4j_available',
+    'get_neo4j_connection_info',
+    'get_neo4j_credentials',
+    'reset_neo4j_container',
+    
     # Core MemoryEngine
     'MemoryEngine',
     'FractalMemoryNode',

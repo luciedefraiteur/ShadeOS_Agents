@@ -1,0 +1,415 @@
+{
+  "test": [
+    "test_simple",
+    "mem_006"
+  ],
+  "simple": [
+    "test_simple"
+  ],
+  "archiviste": [
+    "mem_001",
+    "mem_007",
+    "git/branches/refactor/archiviste",
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "daemon": [
+    "mem_001",
+    "architecture/patterns/meta_daemon_orchestrator"
+  ],
+  "introspection": [
+    "mem_001",
+    "git/branches/refactor/archiviste",
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "développement": [
+    "mem_001",
+    "docs/backends/supported_backends"
+  ],
+  "cache": [
+    "mem_002",
+    "conversations/2025-08-01/cache_problem",
+    "conversations/2025-08-02/cache_solution",
+    "conversations/2025-08-03/cache_optimization",
+    "git/branches/bugfix/cache",
+    "git/branches/refactor/archiviste",
+    "performance/optimization/cache_intelligent",
+    "performance/results/llm_reduction",
+    "collaboration/alma/cache_implementation"
+  ],
+  "intelligent": [
+    "mem_002",
+    "conversations/2025-08-01/cache_problem",
+    "conversations/2025-08-02/cache_solution",
+    "conversations/2025-08-03/cache_optimization",
+    "git/branches/bugfix/cache",
+    "performance/optimization/cache_intelligent",
+    "collaboration/alma/cache_implementation"
+  ],
+  "rétroinjection": [
+    "mem_002",
+    "conversations/2025-08-03/cache_optimization",
+    "performance/optimization/cache_intelligent",
+    "collaboration/alma/cache_implementation"
+  ],
+  "apprentissage": [
+    "mem_002",
+    "conversations/2025-08-03/cache_optimization",
+    "performance/optimization/cache_intelligent",
+    "collaboration/alma/cache_implementation"
+  ],
+  "optimisation": [
+    "mem_003",
+    "mem_008",
+    "conversations/2025-08-03/cache_optimization",
+    "git/branches/feature/optimization",
+    "performance/optimization/cache_intelligent",
+    "performance/results/llm_reduction"
+  ],
+  "prompts": [
+    "mem_003",
+    "git/branches/feature/optimization",
+    "performance/results/llm_reduction"
+  ],
+  "llm": [
+    "mem_003"
+  ],
+  "métriques": [
+    "mem_003",
+    "git/branches/feature/optimization"
+  ],
+  "truc": [
+    "mem_004"
+  ],
+  "machin": [
+    "mem_004"
+  ],
+  "erreur": [
+    "mem_005"
+  ],
+  "code": [
+    "mem_005"
+  ],
+  "problème": [
+    "mem_007",
+    "conversations/2025-08-01/cache_problem"
+  ],
+  "mémoire": [
+    "mem_007"
+  ],
+  "système": [
+    "mem_007"
+  ],
+  "performances": [
+    "mem_008"
+  ],
+  "approche": [
+    "mem_008"
+  ],
+  "mise à jour": [
+    "conversations/2025-08-01/cache_problem"
+  ],
+  "obsolète": [
+    "conversations/2025-08-01/cache_problem"
+  ],
+  "solution": [
+    "conversations/2025-08-02/cache_solution"
+  ],
+  "reset": [
+    "conversations/2025-08-02/cache_solution"
+  ],
+  "UUID": [
+    "conversations/2025-08-02/cache_solution",
+    "modifications/2025-08-04/temporal_index_fix",
+    "modifications/2025-08-04/auto_record_bugfix",
+    "performance/analysis/temporal_index_bottleneck"
+  ],
+  "timestamps": [
+    "conversations/2025-08-02/cache_solution"
+  ],
+  "LLM": [
+    "conversations/2025-08-03/cache_optimization",
+    "git/branches/feature/optimization",
+    "performance/results/llm_reduction"
+  ],
+  "TemporalIndex": [
+    "modifications/2025-08-04/temporal_index_fix",
+    "performance/analysis/temporal_index_bottleneck"
+  ],
+  "refactorisation": [
+    "modifications/2025-08-04/temporal_index_fix"
+  ],
+  "liens": [
+    "modifications/2025-08-04/temporal_index_fix",
+    "docs/architecture/respiration_system"
+  ],
+  "bidirectionnels": [
+    "modifications/2025-08-04/temporal_index_fix"
+  ],
+  "KeyError": [
+    "modifications/2025-08-04/temporal_index_fix",
+    "performance/analysis/temporal_index_bottleneck"
+  ],
+  "Neo4jBackend": [
+    "modifications/2025-08-04/neo4j_validation"
+  ],
+  "validation": [
+    "modifications/2025-08-04/neo4j_validation"
+  ],
+  "authentification": [
+    "modifications/2025-08-04/neo4j_validation"
+  ],
+  "connexion": [
+    "modifications/2025-08-04/neo4j_validation",
+    "config/neo4j/connection_info"
+  ],
+  "paramètres": [
+    "modifications/2025-08-04/neo4j_validation",
+    "config/neo4j/default_params"
+  ],
+  "auto_record": [
+    "modifications/2025-08-04/auto_record_bugfix",
+    "performance/analysis/temporal_index_bottleneck"
+  ],
+  "bug": [
+    "modifications/2025-08-04/auto_record_bugfix"
+  ],
+  "index": [
+    "modifications/2025-08-04/auto_record_bugfix"
+  ],
+  "temporel": [
+    "modifications/2025-08-04/auto_record_bugfix"
+  ],
+  "correction": [
+    "modifications/2025-08-04/auto_record_bugfix",
+    "git/branches/bugfix/cache"
+  ],
+  "architecture": [
+    "docs/architecture/memory_engine_strates",
+    "architecture/layers/core_daemons_assistants",
+    "collaboration/team/daemon_architecture"
+  ],
+  "MemoryEngine": [
+    "docs/architecture/memory_engine_strates"
+  ],
+  "strates": [
+    "docs/architecture/memory_engine_strates"
+  ],
+  "somatic": [
+    "docs/architecture/memory_engine_strates"
+  ],
+  "cognitive": [
+    "docs/architecture/memory_engine_strates"
+  ],
+  "metaphysical": [
+    "docs/architecture/memory_engine_strates"
+  ],
+  "patterns": [
+    "docs/architecture/memory_engine_strates",
+    "performance/optimization/cache_intelligent"
+  ],
+  "respiration": [
+    "docs/architecture/respiration_system"
+  ],
+  "transcendence": [
+    "docs/architecture/respiration_system"
+  ],
+  "immanence": [
+    "docs/architecture/respiration_system"
+  ],
+  "vertical": [
+    "docs/architecture/respiration_system"
+  ],
+  "abstraction": [
+    "docs/architecture/respiration_system"
+  ],
+  "concrétisation": [
+    "docs/architecture/respiration_system"
+  ],
+  "backends": [
+    "docs/backends/supported_backends"
+  ],
+  "FileSystem": [
+    "docs/backends/supported_backends"
+  ],
+  "Neo4j": [
+    "docs/backends/supported_backends"
+  ],
+  "stockage": [
+    "docs/backends/supported_backends"
+  ],
+  "production": [
+    "docs/backends/supported_backends"
+  ],
+  "requêtes": [
+    "docs/backends/supported_backends"
+  ],
+  "branche": [
+    "git/branches/feature/optimization",
+    "git/branches/bugfix/cache",
+    "git/branches/refactor/archiviste"
+  ],
+  "feature": [
+    "git/branches/feature/optimization"
+  ],
+  "injection": [
+    "git/branches/feature/optimization"
+  ],
+  "bugfix": [
+    "git/branches/bugfix/cache"
+  ],
+  "synchronisation": [
+    "git/branches/bugfix/cache"
+  ],
+  "refactor": [
+    "git/branches/refactor/archiviste"
+  ],
+  "intelligente": [
+    "git/branches/refactor/archiviste",
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "analyse": [
+    "git/branches/refactor/archiviste",
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "pattern": [
+    "architecture/patterns/meta_daemon_orchestrator",
+    "architecture/patterns/introspective_thread",
+    "collaboration/team/daemon_architecture"
+  ],
+  "meta": [
+    "architecture/patterns/meta_daemon_orchestrator",
+    "collaboration/team/daemon_architecture"
+  ],
+  "orchestrator": [
+    "architecture/patterns/meta_daemon_orchestrator",
+    "collaboration/team/daemon_architecture"
+  ],
+  "coordination": [
+    "architecture/patterns/meta_daemon_orchestrator"
+  ],
+  "centralisée": [
+    "architecture/patterns/meta_daemon_orchestrator"
+  ],
+  "introspective": [
+    "architecture/patterns/introspective_thread"
+  ],
+  "thread": [
+    "architecture/patterns/introspective_thread"
+  ],
+  "auto-analyse": [
+    "architecture/patterns/introspective_thread"
+  ],
+  "IA": [
+    "architecture/patterns/introspective_thread"
+  ],
+  "daemons": [
+    "architecture/patterns/introspective_thread",
+    "architecture/layers/core_daemons_assistants",
+    "collaboration/team/daemon_architecture"
+  ],
+  "documentation": [
+    "architecture/patterns/introspective_thread"
+  ],
+  "couches": [
+    "architecture/layers/core_daemons_assistants"
+  ],
+  "core": [
+    "architecture/layers/core_daemons_assistants"
+  ],
+  "assistants": [
+    "architecture/layers/core_daemons_assistants"
+  ],
+  "responsabilités": [
+    "architecture/layers/core_daemons_assistants"
+  ],
+  "performance": [
+    "performance/analysis/temporal_index_bottleneck",
+    "performance/optimization/cache_intelligent",
+    "performance/results/llm_reduction"
+  ],
+  "goulot": [
+    "performance/analysis/temporal_index_bottleneck"
+  ],
+  "étranglement": [
+    "performance/analysis/temporal_index_bottleneck"
+  ],
+  "résultat": [
+    "performance/results/llm_reduction"
+  ],
+  "réduction": [
+    "performance/results/llm_reduction"
+  ],
+  "lucie": [
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "décisions": [
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "amélioration": [
+    "collaboration/lucie/archiviste_introspection"
+  ],
+  "alma": [
+    "collaboration/alma/cache_implementation"
+  ],
+  "implémentation": [
+    "collaboration/alma/cache_implementation"
+  ],
+  "adaptation": [
+    "collaboration/alma/cache_implementation"
+  ],
+  "équipe": [
+    "collaboration/team/daemon_architecture"
+  ],
+  "discussion": [
+    "collaboration/team/daemon_architecture"
+  ],
+  "config": [
+    "config/neo4j/docker_setup",
+    "config/neo4j/default_params",
+    "config/neo4j/connection_info"
+  ],
+  "neo4j": [
+    "config/neo4j/docker_setup",
+    "config/neo4j/default_params",
+    "config/neo4j/connection_info"
+  ],
+  "docker": [
+    "config/neo4j/docker_setup"
+  ],
+  "conteneur": [
+    "config/neo4j/docker_setup"
+  ],
+  "installation": [
+    "config/neo4j/docker_setup"
+  ],
+  "commande": [
+    "config/neo4j/docker_setup"
+  ],
+  "défaut": [
+    "config/neo4j/default_params"
+  ],
+  "user": [
+    "config/neo4j/default_params"
+  ],
+  "password": [
+    "config/neo4j/default_params"
+  ],
+  "ports": [
+    "config/neo4j/default_params"
+  ],
+  "URI": [
+    "config/neo4j/connection_info"
+  ],
+  "bolt": [
+    "config/neo4j/connection_info"
+  ],
+  "interface": [
+    "config/neo4j/connection_info"
+  ],
+  "web": [
+    "config/neo4j/connection_info"
+  ],
+  "identifiants": [
+    "config/neo4j/connection_info"
+  ]
+}

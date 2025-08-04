@@ -214,9 +214,9 @@ class TemporalIndex:
         # Index files
         self.index_files = {
             "timeline": self.temporal_dir / "timeline.json",
-            "intent": self.temporal_dir / "intent_index.json",
-            "strata": self.temporal_dir / "strata_index.json",
-            "keywords": self.temporal_dir / "keywords_index.json"
+            "intent_index": self.temporal_dir / "intent_index.json",
+            "strata_index": self.temporal_dir / "strata_index.json",
+            "keyword_index": self.temporal_dir / "keywords_index.json"
         }
         
         # Load existing indexes
@@ -280,7 +280,9 @@ class TemporalIndex:
         if self.temporal_index["timeline"]:
             previous_uuid = self.temporal_index["timeline"][-1]["uuid"]
             temporal_node.previous_temporal_uuid = previous_uuid
-            self.temporal_nodes[previous_uuid].next_temporal_uuid = temporal_uuid
+            # Vérifier que le nœud précédent existe avant de le modifier
+            if previous_uuid in self.temporal_nodes:
+                self.temporal_nodes[previous_uuid].next_temporal_uuid = temporal_uuid
         
         # Stockage
         self.temporal_nodes[temporal_uuid] = temporal_node

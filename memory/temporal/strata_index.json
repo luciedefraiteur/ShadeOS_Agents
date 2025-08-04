@@ -1,0 +1,41 @@
+{
+  "cognitive": [
+    "test_simple",
+    "mem_001",
+    "mem_002",
+    "mem_003",
+    "mem_004",
+    "mem_005",
+    "mem_006",
+    "mem_007",
+    "mem_008",
+    "conversations/2025-08-01/cache_problem",
+    "conversations/2025-08-02/cache_solution",
+    "conversations/2025-08-03/cache_optimization",
+    "modifications/2025-08-04/temporal_index_fix",
+    "modifications/2025-08-04/neo4j_validation",
+    "modifications/2025-08-04/auto_record_bugfix",
+    "docs/backends/supported_backends",
+    "git/branches/feature/optimization",
+    "git/branches/bugfix/cache",
+    "git/branches/refactor/archiviste",
+    "performance/analysis/temporal_index_bottleneck",
+    "performance/optimization/cache_intelligent",
+    "performance/results/llm_reduction",
+    "collaboration/lucie/archiviste_introspection",
+    "collaboration/alma/cache_implementation",
+    "collaboration/team/daemon_architecture"
+  ],
+  "metaphysical": [
+    "docs/architecture/memory_engine_strates",
+    "docs/architecture/respiration_system",
+    "architecture/patterns/meta_daemon_orchestrator",
+    "architecture/patterns/introspective_thread",
+    "architecture/layers/core_daemons_assistants"
+  ],
+  "somatic": [
+    "config/neo4j/docker_setup",
+    "config/neo4j/default_params",
+    "config/neo4j/connection_info"
+  ]
+}
