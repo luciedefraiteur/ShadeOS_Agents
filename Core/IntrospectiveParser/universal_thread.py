@@ -167,7 +167,7 @@ class UniversalIntrospectiveThread:
         recent_messages = list(self.thread_history)[-max_messages:]
         
         # Analyse des patterns récents
-        patterns = await self._extract_recent_patterns(recent_messages)
+        patterns = self._extract_recent_patterns(recent_messages)
         
         # Formatage du contexte
         context_parts = [
@@ -215,7 +215,7 @@ class UniversalIntrospectiveThread:
         avg_confidence = total_confidence / len(self.thread_history)
         
         # Analyse des patterns
-        patterns = await self._extract_recent_patterns(list(self.thread_history))
+        patterns = self._extract_recent_patterns(list(self.thread_history))
         
         # Insights sur le comportement
         insights = await self._generate_behavior_insights(patterns)
@@ -247,8 +247,8 @@ class UniversalIntrospectiveThread:
         total_confidence = sum(msg.overall_confidence for msg in self.thread_history)
         self.metrics.average_confidence = total_confidence / len(self.thread_history)
     
-    async def _extract_recent_patterns(self, messages: List[IntrospectiveMessage]) -> Dict[str, List[str]]:
-        """Extrait les patterns récents des messages"""
+    def _extract_recent_patterns(self, messages: List[IntrospectiveMessage]) -> Dict[str, List[str]]:
+        """Extrait les patterns récents des messages (version synchrone simplifiée)"""
         patterns = {
             "thoughts": [],
             "actions": [],
@@ -276,24 +276,30 @@ class UniversalIntrospectiveThread:
         return patterns
     
     async def _analyze_own_patterns(self):
-        """Analyse ses propres patterns de comportement"""
-        if len(self.thread_history) < 5:  # Pas assez de données
+        """Analyse ses propres patterns de comportement (simplifiée)"""
+        if len(self.thread_history) < 3:  # Réduit le seuil
             return
         
-        # Analyse simple des patterns récents
-        recent_messages = list(self.thread_history)[-5:]
-        patterns = await self._extract_recent_patterns(recent_messages)
+        # Analyse simple des patterns récents (sans appel LLM)
+        recent_messages = list(self.thread_history)[-3:]
+        patterns = self._extract_recent_patterns(recent_messages)
         
-        # Génération d'auto-observations basées sur les patterns
-        if len(patterns["thoughts"]) > 3:
+        # Comptage simple des éléments
+        total_thoughts = sum(len(msg.thoughts) for msg in recent_messages)
+        total_actions = sum(len(msg.actions) for msg in recent_messages)
+        total_observations = sum(len(msg.observations) for msg in recent_messages)
+        total_decisions = sum(len(msg.decisions) for msg in recent_messages)
+        
+        # Auto-observations basées sur des seuils simples
+        if total_thoughts > 2:
             await self.add_self_observation(
-                f"Je réfléchis beaucoup ({len(patterns['thoughts'])} pensées récentes)",
+                f"Je réfléchis beaucoup ({total_thoughts} pensées récentes)",
                 0.7
             )
         
-        if len(patterns["actions"]) > 2:
+        if total_actions > 1:
             await self.add_self_observation(
-                f"Je suis très actif ({len(patterns['actions'])} actions récentes)",
+                f"Je suis très actif ({total_actions} actions récentes)",
                 0.8
             )
     

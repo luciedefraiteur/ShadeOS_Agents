@@ -10,7 +10,7 @@ réelle du contenu.
 import json
 import time
 from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 from Core.LLMProviders import LLMProvider
 
@@ -37,6 +37,7 @@ class IntrospectiveMessage:
     decisions: List[IntrospectiveElement]
     overall_confidence: float
     context: Optional[Dict[str, Any]] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convertit en dictionnaire pour sérialisation"""
@@ -73,10 +74,15 @@ class IntelligentIntrospectiveParser:
         self.analysis_prompt = self._create_analysis_prompt()
     
     def _create_analysis_prompt(self) -> str:
-        """Crée le prompt d'analyse sémantique"""
+        """Crée le prompt d'analyse sémantique avec métriques intégrées"""
         return """
 Tu es un analyseur sémantique spécialisé dans l'extraction d'éléments introspectifs.
 Analyse la réponse d'IA fournie et identifie les éléments introspectifs.
+
+TÂCHES À EFFECTUER :
+1. Extrais les éléments introspectifs (pensées, actions, observations, décisions)
+2. Évalue la qualité de l'analyse et la confiance dans chaque élément
+3. Calcule les métriques d'analyse globale
 
 Types d'éléments à identifier :
 1. **PENSÉES** : Réflexions, doutes, analyses, raisonnements internes
@@ -89,6 +95,11 @@ Critères d'identification :
 - Une ACTION décrit ce qui va être fait ou ce qui est en cours
 - Une OBSERVATION constate un fait, un résultat, une information
 - Une DÉCISION représente un choix, une conclusion, une direction
+
+MÉTRIQUES D'ANALYSE (à inclure dans la réponse) :
+- Qualité_extraction: score 0-1 basé sur la précision de l'extraction
+- Richesse_introspection: score 0-1 basé sur la diversité des éléments trouvés
+- Cohérence_sémantique: score 0-1 basé sur la cohérence des éléments entre eux
 
 Retourne UNIQUEMENT un JSON valide avec cette structure :
 {
@@ -104,7 +115,12 @@ Retourne UNIQUEMENT un JSON valide avec cette structure :
     "decisions": [
         {"content": "texte de la décision", "confidence": 0.80}
     ],
-    "overall_confidence": 0.82
+    "overall_confidence": 0.82,
+    "analysis_metrics": {
+        "qualite_extraction": 0.85,
+        "richesse_introspection": 0.78,
+        "coherence_semantique": 0.90
+    }
 }
 
 Si aucun élément d'un type n'est trouvé, utilise un tableau vide.
@@ -144,8 +160,8 @@ La confidence doit être entre 0.0 et 1.0.
             # Parsing de la réponse JSON
             analysis_result = self._parse_json_response(llm_response.content)
             
-            # Construction du message introspectif
-            return IntrospectiveMessage(
+            # Construction du message introspectif avec métriques
+            message = IntrospectiveMessage(
                 entity_id=entity_id,
                 entity_type=entity_type,
                 timestamp=time.time(),
@@ -157,6 +173,12 @@ La confidence doit être entre 0.0 et 1.0.
                 overall_confidence=analysis_result.get("overall_confidence", 0.5),
                 context=context
             )
+            
+            # Ajout des métriques d'analyse dans les métadonnées
+            if "analysis_metrics" in analysis_result:
+                message.metadata["analysis_metrics"] = analysis_result["analysis_metrics"]
+            
+            return message
             
         except Exception as e:
             # Fallback en cas d'erreur

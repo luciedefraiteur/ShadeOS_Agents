@@ -100,7 +100,7 @@ class IntelligentCache:
         context_signature = self._create_context_signature(entity_id, entity_type, context)
         
         # Calcul du score d'efficacité initial
-        effectiveness_score = await self._calculate_effectiveness_score(message, context)
+        effectiveness_score = self._calculate_effectiveness_score(message, context)
         
         cache_entry = CacheEntry(
             response_hash=response_hash,
@@ -158,7 +158,7 @@ class IntelligentCache:
                                          current_context: Optional[Dict[str, Any]], 
                                          entity_id: str, entity_type: str) -> Dict[str, Any]:
         """
-        Analyse les différences contextuelles via LLM
+        Analyse les différences contextuelles via LLM avec injection de métriques
         
         Args:
             original_context: Contexte original
@@ -167,8 +167,16 @@ class IntelligentCache:
             entity_type: Type d'entité
             
         Returns:
-            Analyse des différences contextuelles
+            Analyse des différences contextuelles avec métriques intégrées
         """
+        # Injection dynamique de métriques dans le prompt principal
+        metrics_injection = """
+ÉVALUATION MÉTRIQUES (à inclure dans la réponse) :
+- Complexité_contextuelle: score 0-1 basé sur le nombre de différences
+- Impact_adaptation: score 0-1 basé sur l'impact des différences
+- Confiance_analyse: score 0-1 basé sur la clarté des différences
+"""
+        
         prompt = f"""
 Analyse les différences contextuelles entre deux contextes pour l'entité {entity_id} ({entity_type}).
 
@@ -178,7 +186,13 @@ Contexte original:
 Contexte actuel:
 {json.dumps(current_context, ensure_ascii=False, indent=2) if current_context else "Aucun contexte"}
 
-Identifie les différences significatives qui pourraient affecter l'analyse introspective.
+TÂCHES À EFFECTUER :
+1. Identifie les différences significatives qui pourraient affecter l'analyse introspective
+2. Évalue la complexité contextuelle et l'impact d'adaptation
+3. Calcule la confiance dans ton analyse
+
+{metrics_injection}
+
 Retourne un JSON avec cette structure:
 {{
     "significant_differences": [
@@ -190,7 +204,12 @@ Retourne un JSON avec cette structure:
         }}
     ],
     "adaptation_needed": true/false,
-    "adaptation_type": "description du type d'adaptation nécessaire"
+    "adaptation_type": "description du type d'adaptation nécessaire",
+    "metrics": {{
+        "complexity_contextuelle": 0.75,
+        "impact_adaptation": 0.60,
+        "confiance_analyse": 0.85
+    }}
 }}
 """
         
@@ -203,14 +222,19 @@ Retourne un JSON avec cette structure:
             return {
                 "significant_differences": [],
                 "adaptation_needed": False,
-                "adaptation_type": "none"
+                "adaptation_type": "none",
+                "metrics": {
+                    "complexity_contextuelle": 0.0,
+                    "impact_adaptation": 0.0,
+                    "confiance_analyse": 0.0
+                }
             }
     
     async def _perform_intelligent_adaptation(self, original_message: IntrospectiveMessage, 
                                             context_diff_analysis: Dict[str, Any], 
                                             current_context: Optional[Dict[str, Any]]) -> IntrospectiveMessage:
         """
-        Effectue l'adaptation intelligente via LLM
+        Effectue l'adaptation intelligente via LLM avec évaluation intégrée
         
         Args:
             original_message: Message original
@@ -218,13 +242,24 @@ Retourne un JSON avec cette structure:
             current_context: Contexte actuel
             
         Returns:
-            Message adapté
+            Message adapté avec métriques d'adaptation
         """
         if not context_diff_analysis.get("adaptation_needed", False):
             return original_message
         
+        # Injection de métriques d'adaptation dans le prompt
+        adaptation_metrics = """
+ÉVALUATION D'ADAPTATION (à inclure dans la réponse) :
+- Qualité_adaptation: score 0-1 basé sur la cohérence de l'adaptation
+- Fidélité_original: score 0-1 basé sur la préservation du sens original
+- Pertinence_contexte: score 0-1 basé sur l'adéquation au nouveau contexte
+"""
+        
         prompt = f"""
-Adapte ce message introspectif au nouveau contexte.
+TÂCHES À EFFECTUER :
+1. Adapte ce message introspectif au nouveau contexte
+2. Évalue la qualité de l'adaptation effectuée
+3. Calcule les métriques de fidélité et pertinence
 
 Message original:
 {json.dumps(original_message.to_dict(), ensure_ascii=False, indent=2)}
@@ -235,8 +270,10 @@ Analyse des différences contextuelles:
 Contexte actuel:
 {json.dumps(current_context, ensure_ascii=False, indent=2) if current_context else "Aucun contexte"}
 
+{adaptation_metrics}
+
 Adapte le message en conservant sa structure mais en ajustant le contenu selon les différences contextuelles.
-Retourne le message adapté au format JSON original.
+Retourne le message adapté avec les métriques d'évaluation au format JSON.
 """
         
         try:
@@ -257,16 +294,20 @@ Retourne le message adapté au format JSON original.
                 context=current_context
             )
             
+            # Stockage des métriques d'adaptation dans les métadonnées
+            if "adaptation_metrics" in adapted_data:
+                adapted_message.metadata["adaptation_metrics"] = adapted_data["adaptation_metrics"]
+            
             return adapted_message
             
         except Exception as e:
             print(f"⚠️ Erreur adaptation intelligente: {e}")
             return original_message
     
-    async def _calculate_effectiveness_score(self, message: IntrospectiveMessage, 
-                                           context: Optional[Dict[str, Any]]) -> float:
+    def _calculate_effectiveness_score(self, message: IntrospectiveMessage, 
+                                     context: Optional[Dict[str, Any]]) -> float:
         """
-        Calcule le score d'efficacité d'un message via analyse LLM
+        Calcule un score d'efficacité simple basé sur le contenu
         
         Args:
             message: Message introspectif
@@ -275,41 +316,25 @@ Retourne le message adapté au format JSON original.
         Returns:
             Score d'efficacité entre 0.0 et 1.0
         """
-        prompt = f"""
-Évalue l'efficacité de cette analyse introspective.
-
-Message introspectif:
-{json.dumps(message.to_dict(), ensure_ascii=False, indent=2)}
-
-Contexte:
-{json.dumps(context, ensure_ascii=False, indent=2) if context else "Aucun contexte"}
-
-Évalue l'efficacité selon ces critères:
-- Qualité de l'analyse sémantique
-- Pertinence des éléments extraits
-- Cohérence avec le contexte
-- Utilité pour les analyses futures
-
-Retourne un score entre 0.0 et 1.0 avec justification:
-{{
-    "score": 0.85,
-    "justification": "description de la justification"
-}}
-"""
+        # Score simple basé sur la présence d'éléments introspectifs
+        total_elements = len(message.thoughts) + len(message.actions) + len(message.observations) + len(message.decisions)
         
-        try:
-            response = await self.provider.generate_response(prompt, temperature=0.1)
-            evaluation = json.loads(response.content)
-            return evaluation.get("score", 0.5)
-        except Exception as e:
-            print(f"⚠️ Erreur calcul efficacité: {e}")
-            return 0.5
+        if total_elements == 0:
+            return 0.1  # Score très bas si aucun élément détecté
+        
+        # Score basé sur la confiance moyenne des éléments
+        all_elements = message.thoughts + message.actions + message.observations + message.decisions
+        if all_elements:
+            avg_confidence = sum(elem.confidence for elem in all_elements) / len(all_elements)
+            return min(avg_confidence, 0.9)  # Cap à 0.9 pour éviter les scores parfaits
+        
+        return 0.5  # Score par défaut
     
-    async def _learn_adaptation_effectiveness(self, cache_entry: CacheEntry, 
-                                            adapted_message: IntrospectiveMessage, 
-                                            context: Optional[Dict[str, Any]]):
+    def _learn_adaptation_effectiveness(self, cache_entry: CacheEntry, 
+                                      adapted_message: IntrospectiveMessage, 
+                                      context: Optional[Dict[str, Any]]):
         """
-        Apprend de l'efficacité de l'adaptation
+        Apprend de l'efficacité de l'adaptation (version simplifiée)
         
         Args:
             cache_entry: Entrée du cache
@@ -317,14 +342,10 @@ Retourne un score entre 0.0 et 1.0 avec justification:
             context: Contexte de l'adaptation
         """
         # Calcul de l'efficacité de l'adaptation
-        adaptation_effectiveness = await self._calculate_effectiveness_score(adapted_message, context)
+        adaptation_effectiveness = self._calculate_effectiveness_score(adapted_message, context)
         
         # Mise à jour du score d'efficacité
         cache_entry.effectiveness_score = (cache_entry.effectiveness_score + adaptation_effectiveness) / 2
-        
-        # Apprentissage des patterns d'adaptation réussis
-        if adaptation_effectiveness > 0.8:
-            await self._learn_successful_adaptation_pattern(cache_entry, context)
     
     async def _learn_successful_adaptation_pattern(self, cache_entry: CacheEntry, context: Optional[Dict[str, Any]]):
         """
