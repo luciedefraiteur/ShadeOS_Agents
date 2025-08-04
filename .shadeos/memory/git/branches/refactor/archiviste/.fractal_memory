@@ -1,0 +1,30 @@
+{
+    "id": "9cbb0bf4-36d5-470c-b006-a4679b27fc0b",
+    "timestamp": "2025-08-04T19:22:55.973891",
+    "content": "Branche refactor/archiviste : refactorisation complète de l'Archiviste avec introspection intelligente.",
+    "metadata": {
+        "summary": "Branche refactor archiviste",
+        "keywords": [
+            "git",
+            "branche",
+            "refactor",
+            "archiviste"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "git",
+        "branche",
+        "refactor",
+        "archiviste"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

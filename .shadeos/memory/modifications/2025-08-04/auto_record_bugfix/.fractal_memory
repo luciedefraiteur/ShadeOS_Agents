@@ -1,0 +1,30 @@
+{
+    "id": "0f368299-d286-4089-8d67-54588ce5551b",
+    "timestamp": "2025-08-04T19:22:55.958795",
+    "content": "Correction du bug dans _save_indexes avec KeyError 'intent'. Correction des clés dans self.index_files.",
+    "metadata": {
+        "summary": "Fix bug KeyError _save_indexes",
+        "keywords": [
+            "bug",
+            "fix",
+            "indexes",
+            "keyerror"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "bug",
+        "fix",
+        "indexes",
+        "keyerror"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

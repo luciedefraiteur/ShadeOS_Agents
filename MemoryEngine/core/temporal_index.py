@@ -334,7 +334,12 @@ class TemporalIndex:
     
     def inject_temporal_links(self, fractal_node):
         """Injecte les liens temporels virtuels dans un nœud fractal."""
-        temporal_node = self.get_temporal_by_fractal(fractal_node.path)
+        # Extraire le chemin depuis les métadonnées
+        path = fractal_node.metadata.get('path') if hasattr(fractal_node, 'metadata') else None
+        if not path:
+            return  # Pas de chemin, pas d'injection
+        
+        temporal_node = self.get_temporal_by_fractal(path)
         if temporal_node:
             fractal_node.temporal_uuid = temporal_node.uuid
             fractal_node.previous_temporal_uuid = temporal_node.previous_temporal_uuid

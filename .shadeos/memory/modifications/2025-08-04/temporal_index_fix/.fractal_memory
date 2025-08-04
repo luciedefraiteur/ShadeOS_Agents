@@ -1,0 +1,30 @@
+{
+    "id": "9d7d73f8-374b-4675-bb0c-c8fc942f0bdd",
+    "timestamp": "2025-08-04T19:22:55.954069",
+    "content": "Correction du bug KeyError dans TemporalIndex.auto_record(). Ajout de vérification if previous_uuid in self.temporal_nodes.",
+    "metadata": {
+        "summary": "Fix bug KeyError temporal_index",
+        "keywords": [
+            "bug",
+            "fix",
+            "temporal_index",
+            "keyerror"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "bug",
+        "fix",
+        "temporal_index",
+        "keyerror"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

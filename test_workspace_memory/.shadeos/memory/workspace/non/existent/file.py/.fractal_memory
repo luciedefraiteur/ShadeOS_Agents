@@ -1,0 +1,27 @@
+{
+    "id": "322b74bd-af73-4372-bca0-f1f21d60e549",
+    "timestamp": "2025-08-04T20:37:00.100793",
+    "content": "test content",
+    "metadata": {
+        "path": "workspace/non/existent/file.py",
+        "summary": "test content",
+        "keywords": [
+            "test",
+            "content"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "test",
+        "content"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}
