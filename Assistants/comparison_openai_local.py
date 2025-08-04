@@ -12,8 +12,8 @@ from typing import Dict, Any, List
 # Ajouter le répertoire racine au PYTHONPATH
 sys.path.insert(0, os.path.abspath('.'))
 
-from MemoryEngine.EditingSession.Tools.openai_assistants import OpenAIAssistantsIntegration
-from IAIntrospectionDaemons.debugging_local_llm_assistant.V7_phase2_enhanced import create_local_llm_assistant_v7_phase2_enhanced
+from Assistants.EditingSession.Tools.openai_assistants import OpenAIAssistantsIntegration
+from Assistants.Specialist.V7_safe import create_local_llm_assistant_v7_phase2_enhanced
 from MemoryEngine.core.engine import MemoryEngine
 
 
@@ -85,7 +85,7 @@ class OpenAIvsLocalComparison:
         
         # Initialiser OpenAI (si disponible)
         try:
-            from MemoryEngine.EditingSession.Tools.tool_registry import ToolRegistry
+            from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
             tool_registry = ToolRegistry(self.memory_engine)
             tool_registry.initialize()
             self.openai_integration = OpenAIAssistantsIntegration(tool_registry)

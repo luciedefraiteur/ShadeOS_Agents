@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional
 sys.path.insert(0, os.path.abspath('.'))
 
 from MemoryEngine.core.engine import MemoryEngine
-from MemoryEngine.EditingSession.Tools.tool_registry import ToolRegistry
+from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
 
 class GeneralistAssistantLogger:
     """Logger pour l'assistant généraliste."""

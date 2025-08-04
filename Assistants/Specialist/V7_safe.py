@@ -15,9 +15,9 @@ from typing import Dict, Any, List, Optional
 # Ajouter le répertoire racine au PYTHONPATH
 sys.path.insert(0, os.path.abspath('.'))
 
-from MemoryEngine.EditingSession.Tools.tool_registry import ToolRegistry
-from MemoryEngine.EditingSession.Tools.tool_invoker import ToolInvoker
-from MemoryEngine.EditingSession.Tools.tool_search import ToolSearchEngine
+from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
+from Assistants.EditingSession.Tools.tool_invoker import ToolInvoker
+from Assistants.EditingSession.Tools.tool_search import ToolSearchEngine
 
 
 class LocalLLMLoggerV7:

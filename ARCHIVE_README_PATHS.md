@@ -99,4 +99,25 @@ git grep "concept recherché" $(git rev-list --all)
 - **Architecture actuelle :** Focus sur l'Archiviste et MemoryEngine
 
 ## 🎯 Objectif du Cleanup
-Nettoyer la codebase tout en préservant l'accès à tous les concepts historiques via git. 
+Nettoyer la codebase tout en préservant l'accès à tous les concepts historiques via git.
+
+## ✅ Éléments Restaurés Après Cleanup
+**ATTENTION :** Les éléments suivants ont été restaurés car ils sont fonctionnels et nécessaires :
+
+### 🧠 MemoryEngine/EditingSession/
+- **Raison :** Module fonctionnel pour l'assistant IA OpenAI
+- **Fichiers :** Tous les outils d'intégration OpenAI, partitioning, etc.
+- **Status :** ✅ Restauré et fonctionnel
+
+### 🤖 IAIntrospectionDaemons/debugging_local_llm_assistant/
+- **V8_generalist_assistant.py** : Assistant généraliste local
+- **V7_safe.py** : Assistant spécialiste de débogage
+- **V8_generalist_openai.py** : Assistant généraliste OpenAI
+- **comparison_openai_local.py** : Comparaison des approches
+- **Status :** ✅ Restauré et fonctionnel
+
+### 📊 Résultat Final
+- **Fichiers .md supprimés :** ~2677 (obsolètes)
+- **Fichiers .md conservés :** 2 (ARCHIVE_README_PATHS.md, cleanup_plan.md)
+- **Code fonctionnel restauré :** EditingSession + Assistants V7/V8
+- **Codebase finale :** Propre, fonctionnelle, avec tous les composants essentiels 

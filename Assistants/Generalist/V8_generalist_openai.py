@@ -13,7 +13,7 @@ from typing import Dict, List, Any, Optional
 sys.path.insert(0, os.path.abspath('.'))
 
 from MemoryEngine.core.engine import MemoryEngine
-from MemoryEngine.EditingSession.Tools.tool_registry import ToolRegistry
+from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
 
 class GeneralistOpenAILogger:
     """Logger pour l'assistant généraliste OpenAI."""
