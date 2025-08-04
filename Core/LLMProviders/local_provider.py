@@ -23,7 +23,14 @@ class LocalProvider(LLMProvider):
         # Configuration Ollama spécifique
         self.model = config.get('model', 'qwen2.5:7b-instruct')
         self.ollama_host = config.get('ollama_host', 'http://localhost:11434')
-        self.ollama_binary = config.get('ollama_binary', '/usr/local/bin/ollama')
+        
+        # Détecter automatiquement le chemin d'Ollama
+        import shutil
+        ollama_path = shutil.which('ollama')
+        if ollama_path:
+            self.ollama_binary = ollama_path
+        else:
+            self.ollama_binary = config.get('ollama_binary', '/usr/local/bin/ollama')
         
         # Validation du modèle
         if not self.model:

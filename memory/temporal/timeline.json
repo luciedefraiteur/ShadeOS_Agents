@@ -2328,5 +2328,75 @@
     ],
     "previous_uuid": "5a5325be-edcb-4040-8d17-157f538298be",
     "next_uuid": null
+  },
+  {
+    "uuid": "42de23e4-3924-4b50-b685-259fa7136e3c",
+    "fractal_path": "/memories/cognitive/e771c667-c732-47c5-be17-3112bbcdb2fa",
+    "timestamp": "2025-08-04T22:30:37.765718",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "c0588f69-9cc9-4172-8bf1-be242e60d1fb",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c490e46d-6080-425a-8033-92adf19ce038",
+    "fractal_path": "/memories/cognitive/dffe4089-2adc-4269-8c21-bb224166be51",
+    "timestamp": "2025-08-04T22:30:40.793605",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "42de23e4-3924-4b50-b685-259fa7136e3c",
+    "next_uuid": null
+  },
+  {
+    "uuid": "68e03255-38b1-4da7-9b96-6138afa3a882",
+    "fractal_path": "/memories/cognitive/10f53d31-f266-4013-beba-a69c85236b79",
+    "timestamp": "2025-08-04T22:30:43.571136",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "c490e46d-6080-425a-8033-92adf19ce038",
+    "next_uuid": null
+  },
+  {
+    "uuid": "f869a46b-bf9e-48c9-8254-2ae39e8a336e",
+    "fractal_path": "/memories/cognitive/c650ad72-9107-4a9b-9a91-c35e9c6858fd",
+    "timestamp": "2025-08-04T22:30:46.719172",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "68e03255-38b1-4da7-9b96-6138afa3a882",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c476ccc8-fd90-40bf-8d8b-d78cac41c0ab",
+    "fractal_path": "/memories/cognitive/7f983c2f-0330-440e-98a9-2185da36b387",
+    "timestamp": "2025-08-04T22:30:49.709331",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "f869a46b-bf9e-48c9-8254-2ae39e8a336e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "aa32be11-eb16-4139-9c58-1187ee2c69ab",
+    "fractal_path": "/memories/cognitive/83a53d60-da75-4253-bb03-931f32262591",
+    "timestamp": "2025-08-04T22:30:52.776243",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "c476ccc8-fd90-40bf-8d8b-d78cac41c0ab",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c36b432b-7a5b-4627-9838-54227ad24f9e",
+    "fractal_path": "/memories/cognitive/b265417f-8b62-4617-986a-c551bcb9d79a",
+    "timestamp": "2025-08-04T22:30:55.588635",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "aa32be11-eb16-4139-9c58-1187ee2c69ab",
+    "next_uuid": null
   }
 ]

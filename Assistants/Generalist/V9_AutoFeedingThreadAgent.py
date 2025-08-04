@@ -139,6 +139,7 @@ class AutoFeedingThreadAgent:
         self.primary_model = model
         self.name = "AutoFeedingThreadAgent"
         self.logger = AutoFeedingThreadLogger("AutoFeedingThreadAgent")
+        self.workspace_path = workspace_path
         
         # Configuration du provider LLM
         self.provider_type = provider_type
@@ -162,9 +163,9 @@ class AutoFeedingThreadAgent:
             entity_type="assistant"
         )
         
-        # Couches workspace et git
-        self.workspace_layer = WorkspaceLayer(memory_engine, None, workspace_path)
-        self.git_layer = GitVirtualLayer(memory_engine, workspace_path)
+        # Couches workspace et git (seront mises à jour après initialisation du provider)
+        self.workspace_layer = None
+        self.git_layer = None
         
         # État du workflow
         self.current_iteration = 0
@@ -194,8 +195,9 @@ class AutoFeedingThreadAgent:
                 if not validation.valid:
                     raise Exception(f"Provider {self.provider_type} invalide: {validation.error}")
                 
-                # Mettre à jour les couches avec le provider
-                self.workspace_layer.llm_provider = self.provider
+                # Initialiser les couches avec le provider
+                self.workspace_layer = WorkspaceLayer(self.memory_engine, self.provider, workspace_path)
+                self.git_layer = GitVirtualLayer(self.memory_engine, workspace_path)
                 
                 self.logger.log_thread_message(ThreadMessage(
                     timestamp=time.time(),
@@ -439,6 +441,16 @@ IMPORTANT: Utilise le thread introspectif pour documenter tes pensées et décis
             return {
                 "success": False,
                 "error": f"Limite d'itérations atteinte ({self.max_iterations})",
+                "iteration": self.current_iteration
+            }
+        
+        # Initialiser le provider au début pour que les couches soient disponibles
+        try:
+            await self._initialize_provider()
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Erreur d'initialisation du provider: {e}",
                 "iteration": self.current_iteration
             }
         

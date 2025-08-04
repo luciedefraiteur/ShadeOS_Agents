@@ -339,7 +339,7 @@ class ToolRegistry:
     
     def invoke_tool(self, tool_id: str, **kwargs) -> Dict[str, Any]:
         """Proxy pour invoquer un outil via le ToolInvoker."""
-        from MemoryEngine.EditingSession.Tools.tool_invoker import ToolInvoker
+        from Assistants.EditingSession.Tools.tool_invoker import ToolInvoker
         
         # Créer un invoker temporaire si nécessaire
         if not hasattr(self, '_invoker'):

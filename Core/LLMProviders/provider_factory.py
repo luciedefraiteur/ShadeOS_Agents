@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional
 from .llm_provider import LLMProvider, ProviderType, ValidationResult, ErrorType
 from .openai_provider import OpenAIProvider
 from .local_provider import LocalProvider
+from .local_provider_http import LocalProviderHTTP
 
 
 class ProviderFactory:
@@ -26,6 +27,10 @@ class ProviderFactory:
         if provider_type == "openai":
             return OpenAIProvider(kwargs)
         elif provider_type == "local":
+            # Utiliser le provider HTTP par défaut
+            return LocalProviderHTTP(kwargs)
+        elif provider_type == "local_subprocess":
+            # Ancien provider subprocess (pour compatibilité)
             return LocalProvider(kwargs)
         else:
             raise ValueError(f"Provider inconnu: {provider_type}. Types supportés: openai, local")
@@ -81,7 +86,13 @@ class ProviderFactory:
                 "capabilities": ["chat_completion", "text_generation", "streaming", "function_calling"]
             },
             "local": {
-                "description": "Provider Ollama Local",
+                "description": "Provider Ollama Local (API HTTP)",
+                "required_config": ["model"],
+                "optional_config": ["ollama_host", "timeout", "temperature"],
+                "capabilities": ["text_generation", "chat_completion", "local_inference"]
+            },
+            "local_subprocess": {
+                "description": "Provider Ollama Local (Subprocess)",
                 "required_config": ["model"],
                 "optional_config": ["ollama_host", "ollama_binary", "timeout", "temperature"],
                 "capabilities": ["text_generation", "chat_completion", "local_inference"]

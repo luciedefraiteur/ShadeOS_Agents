@@ -66,6 +66,21 @@ class WorkspaceLayer:
         """
         Appel LLM simple pour choisir la méthode de recherche
         """
+        # Si pas de provider LLM, utiliser une détection simple
+        if self.llm_provider is None:
+            query_lower = query.lower()
+            
+            # Détection simple basée sur les mots-clés
+            if any(word in query_lower for word in ["grep", "search", "find", "file", "content"]):
+                return "grep"
+            elif any(word in query_lower for word in ["concept", "relation", "abstract", "memory"]):
+                return "fractal"
+            elif any(word in query_lower for word in ["time", "history", "recent", "old", "new"]):
+                return "temporal"
+            else:
+                return "mixed"
+        
+        # Sinon, utiliser le LLM
         prompt = f"""
 Query: "{query}"
 Context: {context}

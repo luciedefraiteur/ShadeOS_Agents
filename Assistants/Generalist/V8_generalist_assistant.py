@@ -122,7 +122,7 @@ class GeneralistAssistant:
         self.provider = None
         
         # Créer le ToolInvoker
-        from MemoryEngine.EditingSession.Tools.tool_invoker import ToolInvoker
+        from Assistants.EditingSession.Tools.tool_invoker import ToolInvoker
         self.tool_invoker = ToolInvoker(tool_registry)
         
         # État du workflow

@@ -105,8 +105,20 @@ class FractalSearchEngine:
         Returns:
             SearchQuery avec type détecté et paramètres
         """
-        # Prompt simple pour la détection
-        detection_prompt = f"""
+        # Si pas de provider LLM, utiliser une détection simple
+        if self.llm_provider is None:
+            query_lower = query.lower()
+            
+            # Détection simple basée sur les mots-clés
+            if any(word in query_lower for word in ["2025", "2024", "2023", "2022", "2021", "2020", "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre", "hier", "aujourd'hui", "demain", "récemment", "ancien", "nouveau"]):
+                search_type = SearchType.TEMPORAL
+                confidence = 0.8
+            else:
+                search_type = SearchType.FRACTAL_PURE
+                confidence = 0.7
+        else:
+            # Prompt simple pour la détection
+            detection_prompt = f"""
 Tu es un moteur de détection de type de recherche pour un système de mémoire fractale.
 
 Analyse cette requête et détermine le type de recherche :
@@ -125,28 +137,28 @@ Exemples:
 - "récemment" → TEMPORAL (0.8)
 - "architecture" → FRACTAL_PURE (0.85)
 """
-        
-        try:
-            response = await self.llm_provider.generate_response(detection_prompt)
-            response_text = response.content.strip()
             
-            # Parsing simple de la réponse
-            if "FRACTAL_PURE" in response_text:
-                search_type = SearchType.FRACTAL_PURE
-                confidence = self._extract_confidence(response_text)
-            elif "TEMPORAL" in response_text:
-                search_type = SearchType.TEMPORAL
-                confidence = self._extract_confidence(response_text)
-            else:
-                # Fallback: par défaut fractal
+            try:
+                response = await self.llm_provider.generate_response(detection_prompt)
+                response_text = response.content.strip()
+                
+                # Parsing simple de la réponse
+                if "FRACTAL_PURE" in response_text:
+                    search_type = SearchType.FRACTAL_PURE
+                    confidence = self._extract_confidence(response_text)
+                elif "TEMPORAL" in response_text:
+                    search_type = SearchType.TEMPORAL
+                    confidence = self._extract_confidence(response_text)
+                else:
+                    # Fallback: par défaut fractal
+                    search_type = SearchType.FRACTAL_PURE
+                    confidence = 0.5
+                    
+            except Exception as e:
+                # Fallback en cas d'erreur LLM
+                print(f"⚠️ Erreur détection LLM: {e}, fallback fractal")
                 search_type = SearchType.FRACTAL_PURE
                 confidence = 0.5
-                
-        except Exception as e:
-            # Fallback en cas d'erreur LLM
-            print(f"⚠️ Erreur détection LLM: {e}, fallback fractal")
-            search_type = SearchType.FRACTAL_PURE
-            confidence = 0.5
         
         # Génération des paramètres selon le type
         fractal_params = {}
