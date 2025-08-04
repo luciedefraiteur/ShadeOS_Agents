@@ -1,0 +1,30 @@
+{
+    "id": "80db5397-158e-4c77-a3c2-0c26127a7f65",
+    "timestamp": "2025-08-04T19:36:53.469069",
+    "content": "Orchestrateur de daemons avec batch processing.",
+    "metadata": {
+        "summary": "Daemon orchestrator",
+        "keywords": [
+            "daemon",
+            "orchestrator",
+            "batch",
+            "processing"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "daemon",
+        "orchestrator",
+        "batch",
+        "processing"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

@@ -1,0 +1,30 @@
+{
+    "id": "1771e061-5189-4ecb-8b4c-ad3c0139bab3",
+    "timestamp": "2025-08-04T19:22:55.943547",
+    "content": "Discussion sur les problèmes de cache dans MemoryEngine. Lucie a identifié des goulots d'étranglement dans l'index temporel.",
+    "metadata": {
+        "summary": "Problèmes de cache identifiés",
+        "keywords": [
+            "cache",
+            "performance",
+            "goulot",
+            "temporel"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "cache",
+        "performance",
+        "goulot",
+        "temporel"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

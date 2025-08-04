@@ -1,0 +1,28 @@
+{
+    "id": "4003426d-5dad-40ec-be57-03d45e64896b",
+    "timestamp": "2025-08-04T20:05:59.290452",
+    "content": "Contenu du nœud fractal 1 avec path: test/fractal_node_1",
+    "metadata": {
+        "summary": "Nœud fractal 1",
+        "keywords": [
+            "test",
+            "fractal",
+            "node"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "test",
+        "fractal",
+        "node"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

@@ -1,0 +1,30 @@
+{
+    "id": "059b5760-6f71-48e1-9bc6-e55e76793411",
+    "timestamp": "2025-08-04T19:22:55.965786",
+    "content": "Backends supportés : FileSystem (JSON) et Neo4j (graphe). Migration automatique entre backends.",
+    "metadata": {
+        "summary": "Documentation backends supportés",
+        "keywords": [
+            "backends",
+            "filesystem",
+            "neo4j",
+            "migration"
+        ],
+        "strata": "metaphysical",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "metaphysical",
+    "keywords": [
+        "backends",
+        "filesystem",
+        "neo4j",
+        "migration"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

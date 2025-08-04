@@ -1,0 +1,21 @@
+{
+    "id": "e4f78e4c-6b31-40d5-b24c-cc65a7b21008",
+    "timestamp": "2025-08-04T20:36:59.816336",
+    "content": "# Test Workspace Document\n\nThis is a test document for workspace memory.",
+    "metadata": {
+        "path": "workspace/test_workspace_doc.md",
+        "summary": "# Test Workspace Document\n\nThis is a test document for workspace memory.",
+        "keywords": [],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

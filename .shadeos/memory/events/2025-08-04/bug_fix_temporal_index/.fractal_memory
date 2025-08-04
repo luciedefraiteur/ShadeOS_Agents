@@ -1,0 +1,30 @@
+{
+    "id": "60b39fa5-0350-4134-9e1c-e10afd091e3b",
+    "timestamp": "2025-08-04T19:36:53.471637",
+    "content": "Correction du bug KeyError dans TemporalIndex.auto_record().",
+    "metadata": {
+        "summary": "Fix bug temporal_index",
+        "keywords": [
+            "bug",
+            "fix",
+            "temporal_index",
+            "keyerror"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "bug",
+        "fix",
+        "temporal_index",
+        "keyerror"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

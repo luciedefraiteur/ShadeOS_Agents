@@ -214,9 +214,9 @@ class TemporalIndex:
         # Index files
         self.index_files = {
             "timeline": self.temporal_dir / "timeline.json",
-            "intent": self.temporal_dir / "intent_index.json",
-            "strata": self.temporal_dir / "strata_index.json",
-            "keywords": self.temporal_dir / "keywords_index.json"
+            "intent_index": self.temporal_dir / "intent_index.json",
+            "strata_index": self.temporal_dir / "strata_index.json",
+            "keyword_index": self.temporal_dir / "keywords_index.json"
         }
         
         # Load existing indexes
@@ -280,7 +280,9 @@ class TemporalIndex:
         if self.temporal_index["timeline"]:
             previous_uuid = self.temporal_index["timeline"][-1]["uuid"]
             temporal_node.previous_temporal_uuid = previous_uuid
-            self.temporal_nodes[previous_uuid].next_temporal_uuid = temporal_uuid
+            # Vérifier que le nœud précédent existe avant de le modifier
+            if previous_uuid in self.temporal_nodes:
+                self.temporal_nodes[previous_uuid].next_temporal_uuid = temporal_uuid
         
         # Stockage
         self.temporal_nodes[temporal_uuid] = temporal_node
@@ -332,7 +334,12 @@ class TemporalIndex:
     
     def inject_temporal_links(self, fractal_node):
         """Injecte les liens temporels virtuels dans un nœud fractal."""
-        temporal_node = self.get_temporal_by_fractal(fractal_node.path)
+        # Extraire le chemin depuis les métadonnées
+        path = fractal_node.metadata.get('path') if hasattr(fractal_node, 'metadata') else None
+        if not path:
+            return  # Pas de chemin, pas d'injection
+        
+        temporal_node = self.get_temporal_by_fractal(path)
         if temporal_node:
             fractal_node.temporal_uuid = temporal_node.uuid
             fractal_node.previous_temporal_uuid = temporal_node.previous_temporal_uuid

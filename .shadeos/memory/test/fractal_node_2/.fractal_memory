@@ -1,0 +1,28 @@
+{
+    "id": "9e0090c2-1f89-4f3d-ba5b-a59458aaf5d3",
+    "timestamp": "2025-08-04T20:05:59.293271",
+    "content": "Contenu du nœud fractal 2",
+    "metadata": {
+        "summary": "Nœud fractal 2",
+        "keywords": [
+            "test",
+            "fractal",
+            "node"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "test",
+        "fractal",
+        "node"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

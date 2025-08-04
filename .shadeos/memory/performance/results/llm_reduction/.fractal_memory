@@ -1,0 +1,30 @@
+{
+    "id": "2649e2e7-af26-4e92-ba82-5b7acea543c1",
+    "timestamp": "2025-08-04T19:22:55.989501",
+    "content": "Résultats optimisation : réduction de 60% des appels LLM grâce au cache intelligent. Temps de réponse divisé par 3.",
+    "metadata": {
+        "summary": "Résultats réduction appels LLM",
+        "keywords": [
+            "performance",
+            "résultats",
+            "llm",
+            "réduction"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "performance",
+        "résultats",
+        "llm",
+        "réduction"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

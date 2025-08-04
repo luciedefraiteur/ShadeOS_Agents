@@ -1,0 +1,29 @@
+{
+    "id": "a0d9f403-ded1-4855-9c36-a61131c4fc04",
+    "timestamp": "2025-08-04T20:21:46.931883",
+    "content": "Analyse cognitive complexe avec métadonnées",
+    "metadata": {
+        "path": "test/cognitive/analysis",
+        "summary": "Analyse cognitive",
+        "keywords": [
+            "cognitive",
+            "analysis",
+            "complex"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "cognitive",
+        "analysis",
+        "complex"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

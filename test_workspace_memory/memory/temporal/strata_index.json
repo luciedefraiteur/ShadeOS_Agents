@@ -1,0 +1,12 @@
+{
+  "cognitive": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_doc.md",
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_doc.md",
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659",
+    "workspace/non/existent/file.py"
+  ]
+}

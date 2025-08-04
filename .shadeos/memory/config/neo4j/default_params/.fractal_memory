@@ -1,0 +1,30 @@
+{
+    "id": "94a365f2-431f-4710-a723-8625e3ea4a8f",
+    "timestamp": "2025-08-04T19:22:56.002783",
+    "content": "Paramètres par défaut Neo4j : APOC plugin activé, mémoire limitée à 2GB, restart policy unless-stopped.",
+    "metadata": {
+        "summary": "Paramètres par défaut Neo4j",
+        "keywords": [
+            "config",
+            "neo4j",
+            "paramètres",
+            "défaut"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "config",
+        "neo4j",
+        "paramètres",
+        "défaut"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}
