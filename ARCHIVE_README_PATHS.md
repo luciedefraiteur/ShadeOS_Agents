@@ -70,6 +70,12 @@
 - `./TestProject/README.md`
 - `./Alma_toolset/templates/README.md`
 
+### 🤖 Outils OpenAI Supprimés (Refactorisation 2025-08-04)
+**Raison :** Remplacés par les assistants V7/V8 plus cohérents avec l'architecture
+- `./Assistants/EditingSession/Tools/openai_assistants.py`
+- `./Assistants/EditingSession/Tools/openai_initializer.py`
+- `./Assistants/EditingSession/Tools/openai_integration.py`
+
 ### 👤 Alma
 - `./Alma/ALMA_PERSONALITY.md`
 
@@ -94,9 +100,11 @@ git grep "concept recherché" $(git rev-list --all)
 
 ## 📝 Notes
 - **Total fichiers .md :** 56
-- **Dossiers supprimés :** OldVersions, ShadeOS
+- **Dossiers supprimés :** OldVersions, ShadeOS, Alma_toolset
+- **Outils supprimés :** 3 outils OpenAI obsolètes
 - **Concepts préservés :** Tous accessibles via git
 - **Architecture actuelle :** Focus sur l'Archiviste et MemoryEngine
+- **Refactorisation :** Alma_toolset → Assistants/EditingSession/Tools
 
 ## 🎯 Objectif du Cleanup
 Nettoyer la codebase tout en préservant l'accès à tous les concepts historiques via git.
