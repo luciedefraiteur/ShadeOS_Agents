@@ -3,14 +3,19 @@
 ⛧ Fil de Discussion Introspectif - Archiviste ⛧
 Système où l'Archiviste se parle à lui-même et documente ses appels mémoire
 Géré dynamiquement par le système (pas par l'IA)
+
+INTÉGRATION AVEC LE SYSTÈME D'INTROSPECTION INTELLIGENTE
 """
 
 import json
 import time
-import re
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from pathlib import Path
+
+# Import du nouveau système d'introspection intelligente
+from Core.IntrospectiveParser import UniversalIntrospectiveThread, IntelligentIntrospectiveParser
+from Core.LLMProviders import LLMProvider
 
 
 @dataclass
@@ -164,113 +169,29 @@ class IntrospectiveThread:
         }
 
 
-class IntrospectiveParser:
-    """Parse les réponses de l'IA pour extraire le fil de discussion"""
-    
-    def __init__(self):
-        self.thought_patterns = [
-            r"je pense que",
-            r"je me dis que", 
-            r"je réfléchis",
-            r"je me demande",
-            r"je vois que",
-            r"je constate que",
-            r"je remarque que"
-        ]
-        
-        self.action_patterns = [
-            r"je vais",
-            r"je dois",
-            r"je commence par",
-            r"je continue avec",
-            r"je passe à",
-            r"je cherche",
-            r"je consulte"
-        ]
-        
-        self.observation_patterns = [
-            r"j'ai trouvé",
-            r"j'ai obtenu",
-            r"le résultat est",
-            r"cela me donne",
-            r"je vois",
-            r"je constate"
-        ]
-        
-        self.decision_patterns = [
-            r"je décide de",
-            r"je choisis de",
-            r"je vais donc",
-            r"par conséquent",
-            r"donc je"
-        ]
-    
-    def parse_ai_response(self, response: str) -> List[IntrospectiveMessage]:
-        """Parse une réponse de l'IA pour extraire les messages introspectifs"""
-        messages = []
-        
-        # Diviser en phrases
-        sentences = re.split(r'[.!?]+', response)
-        
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if not sentence:
-                continue
-            
-            sentence_lower = sentence.lower()
-            
-            # Détecter le type de message
-            message_type = None
-            if any(pattern in sentence_lower for pattern in self.thought_patterns):
-                message_type = "thought"
-            elif any(pattern in sentence_lower for pattern in self.action_patterns):
-                message_type = "action"
-            elif any(pattern in sentence_lower for pattern in self.observation_patterns):
-                message_type = "observation"
-            elif any(pattern in sentence_lower for pattern in self.decision_patterns):
-                message_type = "decision"
-            
-            if message_type:
-                messages.append(IntrospectiveMessage(
-                    timestamp=time.time(),
-                    speaker="archiviste",
-                    message_type=message_type,
-                    content=sentence
-                ))
-        
-        return messages
-    
-    def extract_memory_calls(self, response: str) -> List[Dict[str, Any]]:
-        """Extrait les appels mémoire mentionnés dans la réponse"""
-        memory_calls = []
-        
-        # Patterns pour détecter les appels mémoire
-        patterns = [
-            r"appel.*mémoire.*(\w+)\.(\w+)",
-            r"(\w+)\.(\w+)\(.*\)",
-            r"recherche.*(\w+)",
-            r"consultation.*(\w+)"
-        ]
-        
-        for pattern in patterns:
-            matches = re.finditer(pattern, response, re.IGNORECASE)
-            for match in matches:
-                memory_calls.append({
-                    "detected": match.group(0),
-                    "full_match": match.group(0)
-                })
-        
-        return memory_calls
+# L'ancien IntrospectiveParser basé sur des regex rigides a été supprimé
+# Remplacé par le système d'introspection intelligente basé sur LLM (IntelligentIntrospectiveParser)
 
 
 class IntrospectiveArchiviste:
-    """Archiviste avec fil de discussion introspectif géré dynamiquement"""
+    """Archiviste avec introspection intelligente basée sur LLM"""
     
-    def __init__(self, memory_engine, memory_registry):
+    def __init__(self, memory_engine, memory_registry, provider: LLMProvider):
         self.memory_engine = memory_engine
         self.memory_registry = memory_registry
+        self.provider = provider
+        
+        # Nouveau système d'introspection intelligente
+        self.intelligent_thread = UniversalIntrospectiveThread(
+            entity_id="archiviste",
+            entity_type="daemon",
+            provider=provider,
+            max_history=100,
+            enable_cache=True  # Cache intelligent activé
+        )
+        
+        # Compatibilité avec l'ancien système
         self.current_thread: Optional[IntrospectiveThread] = None
-        self.parser = IntrospectiveParser()
     
     def start_introspection(self, query: str) -> IntrospectiveThread:
         """Démarre un nouveau fil de discussion introspectif"""
@@ -289,37 +210,24 @@ class IntrospectiveArchiviste:
         
         return self.current_thread
     
-    def process_ai_response(self, response: str, cycle: int = 1) -> None:
-        """Traite une réponse de l'IA et met à jour le fil de discussion"""
-        if not self.current_thread:
-            return
+    async def process_ai_response(self, response: str, cycle: int = 1, context: Optional[Dict[str, Any]] = None) -> None:
+        """Traite une réponse de l'IA avec le nouveau système d'introspection intelligente"""
         
-        # Parser la réponse pour extraire les messages introspectifs
-        introspective_messages = self.parser.parse_ai_response(response)
+        # Utilisation du nouveau système intelligent
+        await self.intelligent_thread.add_response(response, context)
         
-        # Ajouter les messages au fil de discussion
-        for msg in introspective_messages:
+        # Compatibilité avec l'ancien système si nécessaire
+        if self.current_thread:
+            # Ajouter un message simple pour la compatibilité
             self.current_thread.add_message(
-                msg.speaker,
-                msg.message_type,
-                msg.content,
-                msg.metadata
-            )
-        
-        # Extraire les appels mémoire mentionnés
-        memory_calls = self.parser.extract_memory_calls(response)
-        if memory_calls:
-            self.current_thread.add_message(
-                "system",
-                "observation",
-                f"Appels mémoire détectés dans la réponse : {len(memory_calls)}",
-                {"detected_calls": memory_calls}
+                "archiviste",
+                "thought",
+                f"Réponse traitée par le système d'introspection intelligente (cycle {cycle})",
+                {"intelligent_processing": True, "cycle": cycle}
             )
     
-    def execute_memory_call(self, memory_type: str, method: str, parameters: Dict[str, Any]) -> List[Any]:
-        """Exécute un appel mémoire et le documente"""
-        if not self.current_thread:
-            return []
+    async def execute_memory_call(self, memory_type: str, method: str, parameters: Dict[str, Any]) -> List[Any]:
+        """Exécute un appel mémoire et le documente avec le nouveau système intelligent"""
         
         start_time = time.time()
         
@@ -350,63 +258,100 @@ class IntrospectiveArchiviste:
             
             duration = time.time() - start_time
             
-            # Documenter l'appel
-            self.current_thread.add_memory_call(
+            # Documentation avec le nouveau système intelligent
+            await self.intelligent_thread.add_memory_call(
                 memory_type=memory_type,
-                method=method,
-                parameters=parameters,
-                results=results,
-                duration=duration,
-                success=True
+                query=f"{method}({parameters})",
+                result=results,
+                confidence=1.0 if results else 0.5
             )
+            
+            # Compatibilité avec l'ancien système
+            if self.current_thread:
+                self.current_thread.add_memory_call(
+                    memory_type=memory_type,
+                    method=method,
+                    parameters=parameters,
+                    results=results,
+                    duration=duration,
+                    success=True
+                )
             
             return results
             
         except Exception as e:
             duration = time.time() - start_time
             
-            # Documenter l'erreur
-            self.current_thread.add_memory_call(
-                memory_type=memory_type,
-                method=method,
-                parameters=parameters,
-                results=[],
-                duration=duration,
-                success=False
+            # Documentation de l'erreur avec le nouveau système
+            await self.intelligent_thread.add_self_observation(
+                f"Erreur appel mémoire {memory_type}.{method}: {e}",
+                confidence=0.9
             )
             
+            # Compatibilité avec l'ancien système
+            if self.current_thread:
+                self.current_thread.add_memory_call(
+                    memory_type=memory_type,
+                    method=method,
+                    parameters=parameters,
+                    results=[],
+                    duration=duration,
+                    success=False
+                )
+            
+            print(f"❌ Erreur appel mémoire {memory_type}.{method}: {e}")
             return []
     
-    def get_context_for_next_prompt(self) -> str:
-        """Génère le contexte à injecter dans le prochain prompt"""
-        if not self.current_thread:
-            return ""
+    async def get_context_for_next_prompt(self) -> str:
+        """Génère le contexte à injecter dans le prochain prompt avec le nouveau système intelligent"""
         
-        return self.current_thread.get_context_for_prompt()
+        # Utilisation du nouveau système intelligent
+        intelligent_context = await self.intelligent_thread.get_context_for_prompt()
+        
+        # Compatibilité avec l'ancien système
+        if self.current_thread:
+            old_context = self.current_thread.get_context_for_prompt()
+            return f"{intelligent_context}\n\n{old_context}"
+        
+        return intelligent_context
     
-    def get_introspective_response(self) -> Dict[str, Any]:
-        """Génère la réponse finale avec le fil introspectif"""
-        if not self.current_thread:
-            return {"error": "Aucun fil de discussion actif"}
+    async def get_introspective_response(self) -> Dict[str, Any]:
+        """Génère la réponse finale avec le nouveau système d'introspection intelligente"""
         
-        thread = self.current_thread
+        # Analyse du comportement avec le nouveau système
+        behavior_analysis = await self.intelligent_thread.analyze_own_behavior()
+        
+        # Contexte intelligent
+        intelligent_context = await self.intelligent_thread.get_context_for_prompt()
+        
+        # Compatibilité avec l'ancien système
+        old_response = {}
+        if self.current_thread:
+            thread = self.current_thread
+            old_response = {
+                "thread_id": thread.thread_id,
+                "query": thread.query,
+                "duration": time.time() - thread.start_time,
+                "confidence": thread.confidence_score,
+                "satisfactory": thread.is_satisfactory,
+                "introspective_thread": {
+                    "summary": thread.get_thread_summary(),
+                    "messages": [msg.__dict__ for msg in thread.messages],
+                    "memory_calls_summary": thread.get_memory_calls_summary(),
+                    "recent_thoughts": [msg.content for msg in thread.get_recent_messages(3) if msg.message_type == "thought"]
+                },
+                "memory_calls": [call.__dict__ for call in thread.memory_calls],
+                "results_count": len([call for call in thread.memory_calls if call.success]),
+                "full_thread": thread.to_json()
+            }
         
         return {
             "type": "ARCHIVISTE_INTROSPECTIVE_RESPONSE",
-            "thread_id": thread.thread_id,
-            "query": thread.query,
-            "duration": time.time() - thread.start_time,
-            "confidence": thread.confidence_score,
-            "satisfactory": thread.is_satisfactory,
-            "introspective_thread": {
-                "summary": thread.get_thread_summary(),
-                "messages": [msg.__dict__ for msg in thread.messages],
-                "memory_calls_summary": thread.get_memory_calls_summary(),
-                "recent_thoughts": [msg.content for msg in thread.get_recent_messages(3) if msg.message_type == "thought"]
-            },
-            "memory_calls": [call.__dict__ for call in thread.memory_calls],
-            "results_count": len([call for call in thread.memory_calls if call.success]),
-            "full_thread": thread.to_json()
+            "intelligent_analysis": behavior_analysis,
+            "intelligent_context": intelligent_context,
+            "intelligent_summary": self.intelligent_thread.get_summary(),
+            "legacy_compatibility": old_response,
+            "cache_stats": self.intelligent_thread.cache.get_cache_stats() if self.intelligent_thread.cache else None
         }
 
 
