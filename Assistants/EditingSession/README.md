@@ -8,7 +8,7 @@ Le module `EditingSession` fournit un système complet pour la gestion des sessi
 
 ### Structure du Module
 ```
-EditingSession/
+Assistants/EditingSession/
 ├── __init__.py                 # Module principal
 ├── README.md                   # Documentation
 ├── partitioning/               # Système de partitionnement
@@ -27,6 +27,12 @@ EditingSession/
 │       ├── regex_partitioner.py
 │       ├── textual_partitioner.py
 │       └── emergency_partitioner.py
+├── Tools/                     # Outils d'édition et manipulation
+│   ├── __init__.py
+│   ├── tool_registry.py       # Registre d'outils
+│   ├── tool_invoker.py        # Moteur d'exécution
+│   ├── tool_search.py         # Recherche d'outils
+│   └── [outils luciform]      # Outils d'édition
 └── development_waves/          # Évolutions futures
 ```
 
@@ -38,17 +44,23 @@ EditingSession/
 - **Stratégies de Fallback** : Regex, textuel, d'urgence
 - **Localisation Précise** : Tracking des positions exactes
 
-### 2. **Registre des Langages**
+### 2. **Outils d'Édition**
+- **Registre d'Outils** : Gestion dynamique des outils Luciform
+- **Moteur d'Exécution** : Exécution sécurisée des outils
+- **Recherche Intelligente** : Recherche d'outils par critères
+- **Intégration MemoryEngine** : Stockage et récupération de contexte
+
+### 3. **Registre des Langages**
 - **Détection Automatique** : Identification du langage par extension/contenu
 - **Configuration Flexible** : Support de nouveaux langages
 - **Partitionneurs Spécialisés** : Optimisés par langage
 
-### 3. **Tracking de Localisation**
+### 4. **Tracking de Localisation**
 - **Positions Exactes** : Ligne, colonne, offset
 - **Historique des Modifications** : Suivi des changements
 - **Validation de Cohérence** : Vérification des positions
 
-### 4. **Logging d'Erreurs**
+### 5. **Logging d'Erreurs**
 - **Logging Structuré** : Erreurs détaillées avec contexte
 - **Gestion Globale** : Logger centralisé
 - **Récupération d'Erreurs** : Stratégies de fallback automatiques
@@ -57,7 +69,7 @@ EditingSession/
 
 ### Import Basique
 ```python
-from MemoryEngine.EditingSession import partition_file, detect_language
+from Assistants.EditingSession import partition_file, detect_language
 
 # Partitionner un fichier
 result = partition_file("mon_fichier.py")
@@ -66,9 +78,25 @@ result = partition_file("mon_fichier.py")
 lang = detect_language("mon_fichier.py")
 ```
 
+### Utilisation des Outils
+```python
+from Assistants.EditingSession.Tools import ToolRegistry, ToolInvoker
+
+# Initialiser le registre d'outils
+tool_registry = ToolRegistry()
+
+# Créer un invocateur
+invoker = ToolInvoker(tool_registry)
+
+# Exécuter un outil
+result = invoker.invoke_tool("safe_read_file_content", {
+    "file_path": "mon_fichier.py"
+})
+```
+
 ### Utilisation Avancée
 ```python
-from MemoryEngine.EditingSession import (
+from Assistants.EditingSession import (
     LanguageRegistry,
     global_language_registry,
     PartitionResult,
@@ -90,25 +118,6 @@ result = registry.partition_file(
 if global_error_logger.has_errors():
     errors = global_error_logger.get_errors()
     print(f"Erreurs détectées : {len(errors)}")
-```
-
-### Configuration du Registre
-```python
-from MemoryEngine.EditingSession import LanguageRegistry
-
-# Créer un registre personnalisé
-registry = LanguageRegistry()
-
-# Configurer un langage
-registry.register_language(
-    "python",
-    extensions=[".py", ".pyw"],
-    partitioner="ast",
-    fallback="regex"
-)
-
-# Partitionner
-result = registry.partition_file("script.py")
 ```
 
 ## 📊 Schémas de Données
@@ -204,7 +213,7 @@ export EDITING_SESSION_NO_TREE_SITTER=1
 
 ### Configuration Programmatique
 ```python
-from MemoryEngine.EditingSession import global_error_logger
+from Assistants.EditingSession import global_error_logger
 
 # Configurer le logging
 global_error_logger.set_level("DEBUG")
@@ -235,7 +244,7 @@ registry.set_default_options({
 
 ### Détection Automatique
 ```python
-from MemoryEngine.EditingSession import detect_language
+from Assistants.EditingSession import detect_language
 
 # Par extension
 lang = detect_language("script.py")  # "python"
@@ -253,7 +262,7 @@ lang = detect_language("script", content="#!/usr/bin/env python3")
 
 ### Logging d'Erreurs
 ```python
-from MemoryEngine.EditingSession import (
+from Assistants.EditingSession import (
     global_error_logger,
     log_partitioning_error,
     log_partitioning_warning
@@ -283,7 +292,7 @@ if global_error_logger.has_errors():
 
 ### Configuration des Fallbacks
 ```python
-from MemoryEngine.EditingSession import LanguageRegistry
+from Assistants.EditingSession import LanguageRegistry
 
 registry = LanguageRegistry()
 
@@ -306,7 +315,7 @@ registry.configure_fallbacks("python", [
 
 ### Optimisation
 ```python
-from MemoryEngine.EditingSession import global_language_registry
+from Assistants.EditingSession import global_language_registry
 
 # Activer le cache
 global_language_registry.enable_caching()
@@ -338,7 +347,7 @@ global_language_registry.set_limits({
 ### Utilisation Conjointe
 ```python
 from MemoryEngine import memory_engine
-from MemoryEngine.EditingSession import partition_file
+from Assistants.EditingSession import partition_file
 
 # Partitionner un fichier
 result = partition_file("script.py")
@@ -363,6 +372,7 @@ for block in result.blocks:
 
 ---
 
-*Module créé par : Alma, Architecte Démoniaque du Nexus Luciforme*
-*Version : 1.0.0*
-*Intégré dans : MemoryEngine* 
+*Module créé par : Alma, Architecte Démoniaque du Nexus Luciforme*  
+*Version : 2.0.0*  
+*Intégré dans : Assistants*  
+*Refactorisé : 2025-08-04* 

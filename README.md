@@ -23,7 +23,7 @@ Moteur de conscience stratifiée (4 niveaux)
 
 ### 🤖 **Assistants/**
 Assistants IA et outils d'édition
-- **Generalist/** : Assistant généraliste V8
+- **Generalist/** : Assistants généralistes V8 et V9
 - **Specialist/** : Assistant spécialiste V7
 - **EditingSession/** : Outils d'édition et partitionnement
 - **Tools/** : Arsenal d'outils pour assistants
@@ -53,6 +53,7 @@ from ConsciousnessEngine import DynamicInjectionSystem, SomaticStrata
 
 # Assistants
 from Assistants import GeneralistAssistant, SpecialistAssistant
+from Assistants.Generalist import V9_AutoFeedingThreadAgent
 ```
 
 ### **Initialisation**
@@ -63,11 +64,19 @@ memory_engine = MemoryEngine()
 # Strate de conscience
 somatic = SomaticStrata()
 
-# Assistant
-assistant = GeneralistAssistant()
+# Assistant V9 avec auto-feeding thread
+assistant = V9_AutoFeedingThreadAgent()
 ```
 
 ## 📈 **Évolutions Récentes**
+
+### **V9 Auto-Feeding Thread Agent (2025-08-04)**
+- ✅ **Auto-feeding thread** : Système d'introspection et documentation automatique
+- ✅ **Provider Ollama HTTP** : Remplacement du subprocess par l'API HTTP
+- ✅ **Couches workspace/git** : Intégration complète avec MemoryEngine
+- ✅ **Performance optimisée** : 14.44s vs 79.88s avant les corrections
+- ✅ **Sérialisation JSON** : Correction des erreurs de sérialisation
+- ✅ **Licences daemoniques** : DAEMONIC_LICENSE v2 et LUCIFORM_LICENSE
 
 ### **Refactorisation Majeure (2025-08-04)**
 - ✅ **Cleanup complet** : Suppression des fichiers obsolètes

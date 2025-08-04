@@ -1,22 +1,8 @@
-# ⛧ Tools Package - Intégration OpenAI Assistants API ⛧
+# ⛧ Tools - Outils d'Édition et Manipulation ⛧
 
-**Package pour la gestion des outils avec intégration MemoryEngine et OpenAI Assistants API.**
+## 🎯 **Vue d'Ensemble**
 
-Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
-
----
-
-## 🎯 **Vue d'ensemble**
-
-Ce package fournit une intégration complète entre :
-- **MemoryEngine** : Mémoire contextuelle et analyse de code
-- **Alma_toolset** : Outils d'édition et manipulation de fichiers
-- **OpenAI Assistants API** : Intelligence conversationnelle et orchestration
-
-### **🔮 Philosophie :**
-*"L'IA converse, la mémoire se souvient, les outils agissent."*
-
----
+Le package **Tools** fournit une collection complète d'outils d'édition et de manipulation de fichiers, intégrés avec le MemoryEngine pour offrir des capacités avancées d'analyse et de modification de code.
 
 ## 🏗️ **Architecture**
 
@@ -24,67 +10,42 @@ Ce package fournit une intégration complète entre :
 
 1. **ToolRegistry** : Registre dynamique d'outils avec parsing Luciform
 2. **ToolInvoker** : Moteur d'exécution avec gestion d'erreurs
-3. **ToolSearchEngine** : Recherche intelligente d'outils
-4. **OpenAIAssistantsIntegration** : Intégration complète avec OpenAI Assistants API
+3. **ToolSearch** : Recherche intelligente d'outils
+4. **Outils Luciform** : Collection d'outils spécialisés
 
 ### **Flux de Données :**
 ```
-OpenAI Assistant → OpenAIAssistantsIntegration → ToolInvoker → Alma_toolset
-                        ↓
-                ToolSearchEngine → ToolRegistry → MemoryEngine
+Assistant → ToolInvoker → Outils Luciform → MemoryEngine
+                ↓
+        ToolSearch → ToolRegistry
 ```
-
----
 
 ## 🚀 **Utilisation Rapide**
 
 ### **Initialisation :**
 ```python
-from MemoryEngine.core.engine import MemoryEngine
-from MemoryEngine.EditingSession.Tools import create_assistants_integration
+from Assistants.EditingSession.Tools import ToolRegistry, ToolInvoker
 
-# Initialiser MemoryEngine
-memory_engine = MemoryEngine()
+# Initialiser le registre d'outils
+tool_registry = ToolRegistry()
 
-# Créer l'intégration OpenAI
-integration = create_assistants_integration(memory_engine)
+# Créer un invocateur
+invoker = ToolInvoker(tool_registry)
 ```
 
-### **Configuration pour OpenAI :**
+### **Exécution d'Outils :**
 ```python
-# Récupérer la configuration des outils
-tools_config = integration._get_tools_for_assistants_api()
+# Lire le contenu d'un fichier
+result = invoker.invoke_tool("safe_read_file_content", {
+    "file_path": "mon_fichier.py"
+})
 
-# Utiliser avec OpenAI Assistants API
-from openai import OpenAI
-client = OpenAI()
-
-# Créer un assistant avec les outils
-assistant = client.beta.assistants.create(
-    name="Alma Assistant",
-    instructions="Assistant spécialisé dans l'analyse et la correction de code",
-    model="gpt-4",
-    tools=tools_config
-)
-
-# Créer un thread et envoyer un message
-thread = client.beta.threads.create()
-message = client.beta.threads.messages.create(
-    thread_id=thread.id,
-    role="user",
-    content="Analyse ce fichier"
-)
+# Rechercher du texte dans un projet
+result = invoker.invoke_tool("find_text_in_project", {
+    "search_text": "def calculate",
+    "project_path": "."
+})
 ```
-
-### **Gestion des Appels d'Outils :**
-```python
-# Traiter les appels d'outils
-for tool_call in response.choices[0].message.tool_calls:
-    result = integration.handle_tool_calls(tool_call)
-    print(f"Résultat: {result}")
-```
-
----
 
 ## 🔧 **Composants Détaillés**
 
@@ -93,16 +54,16 @@ for tool_call in response.choices[0].message.tool_calls:
 Registre dynamique qui charge automatiquement les outils depuis les fichiers `.luciform`.
 
 **Fonctionnalités :**
-- Chargement automatique depuis `Alma_toolset/` et `Tools/Library/`
+- Chargement automatique des outils
 - Parsing des métadonnées Luciform
 - Détection des proxies et redirections
-- Formatage pour OpenAI Assistants API
+- Formatage pour différents formats d'API
 
 **Utilisation :**
 ```python
-from MemoryEngine.EditingSession.Tools import initialize_tool_registry
+from Assistants.EditingSession.Tools import ToolRegistry
 
-tool_registry = initialize_tool_registry(memory_engine)
+tool_registry = ToolRegistry()
 print(f"Outils disponibles: {len(tool_registry.tools)}")
 
 # Lister les outils
@@ -121,7 +82,7 @@ Moteur d'exécution sécurisé avec gestion d'erreurs et logging.
 
 **Utilisation :**
 ```python
-from MemoryEngine.EditingSession.Tools import ToolInvoker
+from Assistants.EditingSession.Tools import ToolInvoker
 
 invoker = ToolInvoker(tool_registry)
 
@@ -135,7 +96,7 @@ result = invoker.invoke_tool("code_analyzer", {
 history = invoker.get_execution_history()
 ```
 
-### **3. ToolSearchEngine**
+### **3. ToolSearch**
 
 Moteur de recherche intelligent avec critères multiples.
 
@@ -147,9 +108,9 @@ Moteur de recherche intelligent avec critères multiples.
 
 **Utilisation :**
 ```python
-from MemoryEngine.EditingSession.Tools import ToolSearchEngine
+from Assistants.EditingSession.Tools import ToolSearch
 
-search_engine = ToolSearchEngine(tool_registry)
+search_engine = ToolSearch(tool_registry)
 
 # Recherche avancée
 results = search_engine.search_with_filters(
@@ -161,81 +122,71 @@ results = search_engine.search_with_filters(
 suggestions = search_engine.get_search_suggestions("code")
 ```
 
-### **4. OpenAIAssistantsIntegration**
+## 📚 **Outils Disponibles**
 
-Intégration complète avec OpenAI Assistants API.
+### **Outils de Lecture :**
+- `safe_read_file_content` : Lecture sécurisée de fichiers
+- `read_file_content_naked` : Lecture directe sans validation
+- `list_directory_contents` : Lister le contenu d'un répertoire
 
-**Fonctionnalités :**
-- Création automatique d'assistants
-- Gestion des threads et messages
-- Traitement des appels d'outils
-- Logging complet des sessions
+### **Outils de Recherche :**
+- `find_text_in_project` : Recherche de texte dans un projet
+- `regex_search_file` : Recherche par expressions régulières
+- `scry_for_text` : Recherche avancée avec contexte
+- `locate_text_sigils` : Localisation de marqueurs spéciaux
 
-**Utilisation :**
-```python
-from MemoryEngine.EditingSession.Tools import OpenAIAssistantsIntegration
+### **Outils de Modification :**
+- `safe_replace_text_in_file` : Remplacement sécurisé de texte
+- `safe_insert_text_at_line` : Insertion à une ligne spécifique
+- `safe_delete_lines` : Suppression de lignes
+- `safe_append_to_file` : Ajout à la fin d'un fichier
 
-# Créer l'intégration
-integration = OpenAIAssistantsIntegration(tool_registry, "ma_session")
+### **Outils de Création :**
+- `safe_create_file` : Création sécurisée de fichiers
+- `safe_create_directory` : Création de répertoires
+- `write_code_file` : Écriture de fichiers de code
 
-# Initialiser l'API
-integration.initialize_assistants_api()
+### **Outils de Suppression :**
+- `safe_delete_directory` : Suppression sécurisée de répertoires
 
-# Créer un assistant
-assistant = integration.create_assistant_with_tools()
+### **Outils d'Analyse :**
+- `code_analyzer` : Analyse de code avec détection de patterns
+- `file_stats` : Statistiques sur les fichiers
+- `file_diff` : Différence entre fichiers
 
-# Envoyer un message
-response = integration.run_complete_conversation(
-    "Analyse le fichier test.py et corrige les bugs"
-)
-```
-
----
+### **Outils de Gestion :**
+- `backup_creator` : Création de sauvegardes
+- `template_generator` : Génération de templates
+- `rename_project_entity` : Renommage d'entités de projet
 
 ## 📊 **Logging et Monitoring**
 
 ### **Structure des Logs :**
 ```
 logs/
-├── 2025-08-02/
-│   ├── ma_session/
-│   │   ├── conversation.json      # Conversation complète
-│   │   ├── conversation.log       # Logs détaillés
-│   │   ├── tools.log             # Appels d'outils
-│   │   └── errors.log            # Erreurs
+├── 2025-08-04/
+│   ├── tool_execution/
+│   │   ├── execution.log       # Logs d'exécution
+│   │   ├── errors.log          # Erreurs
+│   │   └── performance.log     # Métriques de performance
 │   └── ...
 ```
 
 ### **Types de Logs :**
-- **Conversation** : Messages échangés avec l'assistant
-- **Tools** : Appels d'outils et résultats
+- **Execution** : Exécution des outils et résultats
 - **Errors** : Erreurs et exceptions
-- **JSON** : Données structurées pour analyse
-
----
+- **Performance** : Métriques de temps d'exécution
 
 ## 🔧 **Configuration Avancée**
 
 ### **Configuration des Outils :**
 ```python
 # Personnaliser la configuration des outils
-tools_config = integration._get_tools_for_assistants_api()
-
-# Ajouter des outils personnalisés
-custom_tool = {
-    "type": "function",
-    "function": {
-        "name": "mon_outil_personnalise",
-        "description": "Description de mon outil",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "param1": {"type": "string"}
-            }
-        }
-    }
-}
-tools_config.append(custom_tool)
+tool_registry.configure_tool("safe_read_file_content", {
+    "max_file_size": 10 * 1024 * 1024,  # 10MB
+    "allowed_extensions": [".py", ".js", ".md"],
+    "timeout": 30  # secondes
+})
 ```
 
 ### **Configuration du Logging :**
@@ -246,100 +197,81 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # Personnaliser le répertoire de logs
-integration.log_dir = Path("mes_logs_personnalises")
+invoker.log_dir = Path("mes_logs_personnalises")
 ```
-
----
 
 ## 🐛 **Dépannage**
 
 ### **Problèmes Courants :**
 
-**Erreur : "Clé API OpenAI non trouvée"**
+**Erreur : "Outil non trouvé"**
 ```bash
-# Vérifier la variable d'environnement
-echo $OPENAI_API_KEY
-
-# Créer le fichier ~/.env
-echo 'OPENAI_API_KEY=sk-...' > ~/.env
-
-# Exporter la clé
-source ./export_openai_key.sh
+# Vérifier que les outils sont chargés
+python -c "from Assistants.EditingSession.Tools import ToolRegistry; print(ToolRegistry().list_tools())"
 ```
 
-**Erreur : "Outils non trouvés"**
+**Erreur : "Permission refusée"**
 ```bash
-# Vérifier que Alma_toolset est présent
-ls -la Alma_toolset/
-
-# Vérifier les fichiers .luciform
-find Alma_toolset/ -name "*.luciform"
+# Vérifier les permissions
+ls -la mon_fichier.py
+chmod +r mon_fichier.py
 ```
 
-**Erreur : "MemoryEngine non initialisé"**
+**Erreur : "Fichier trop volumineux"**
 ```python
-# Vérifier l'initialisation
-memory_engine = MemoryEngine()
-print(f"MemoryEngine initialisé: {memory_engine is not None}")
+# Configurer la limite de taille
+tool_registry.configure_tool("safe_read_file_content", {
+    "max_file_size": 50 * 1024 * 1024  # 50MB
+})
 ```
-
----
 
 ## 📚 **Exemples Complets**
 
 ### **Exemple 1 : Analyse de Code**
 ```python
-from MemoryEngine.core.engine import MemoryEngine
-from MemoryEngine.EditingSession.Tools import create_assistants_integration
+from Assistants.EditingSession.Tools import ToolRegistry, ToolInvoker
 
 # Initialisation
-memory = MemoryEngine()
-integration = create_assistants_integration(memory, "analyse_code")
-
-# Configuration
-integration.initialize_assistants_api()
-integration.create_assistant_with_tools()
+tool_registry = ToolRegistry()
+invoker = ToolInvoker(tool_registry)
 
 # Analyse
-response = integration.run_complete_conversation(
-    "Analyse le fichier TestProject/calculator.py et détecte tous les bugs"
-)
+result = invoker.invoke_tool("code_analyzer", {
+    "file_path": "TestProject/calculator.py",
+    "analysis_type": "all"
+})
 
 print("Analyse terminée !")
 ```
 
-### **Exemple 2 : Correction Automatique**
+### **Exemple 2 : Recherche et Remplacement**
 ```python
-# Suite de l'exemple précédent
-response = integration.run_complete_conversation(
-    "Maintenant corrige automatiquement tous les bugs détectés"
-)
+# Rechercher du texte
+search_result = invoker.invoke_tool("find_text_in_project", {
+    "search_text": "def add",
+    "project_path": "."
+})
 
-print("Correction terminée !")
+# Remplacer le texte trouvé
+for file_path in search_result["files"]:
+    invoker.invoke_tool("safe_replace_text_in_file", {
+        "file_path": file_path,
+        "old_text": "def add",
+        "new_text": "def add_fixed"
+    })
 ```
 
-### **Exemple 3 : Recherche d'Outils**
+### **Exemple 3 : Création de Fichiers**
 ```python
-from MemoryEngine.EditingSession.Tools import ToolSearchEngine, initialize_tool_registry
-
-# Initialisation
-memory = MemoryEngine()
-tool_registry = initialize_tool_registry(memory)
-search_engine = ToolSearchEngine(tool_registry)
-
-# Recherche
-results = search_engine.search_with_filters(
-    content_filter="file manipulation",
-    metadata_filters={"type": "transmutation"}
-)
-
-print(f"Outils trouvés: {len(results)}")
+# Créer un nouveau fichier
+invoker.invoke_tool("safe_create_file", {
+    "file_path": "nouveau_script.py",
+    "content": "#!/usr/bin/env python3\n\ndef main():\n    print('Hello World!')\n\nif __name__ == '__main__':\n    main()"
+})
 ```
-
----
 
 ## ⛧ **Conclusion**
 
-Le package Tools fournit une intégration complète et robuste entre MemoryEngine, Alma_toolset et OpenAI Assistants API, permettant la création d'agents IA intelligents capables d'analyser, comprendre et modifier du code de manière autonome.
+Le package Tools fournit une collection complète et robuste d'outils d'édition et de manipulation, intégrés avec le MemoryEngine pour offrir des capacités avancées d'analyse et de modification de code.
 
 **Créé par Alma, Architecte Démoniaque du Nexus Luciforme** ⛧ 
