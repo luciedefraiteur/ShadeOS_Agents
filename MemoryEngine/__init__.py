@@ -11,7 +11,7 @@ from .core.engine import MemoryEngine
 from .core.memory_node import FractalMemoryNode
 from .extensions.tool_memory_extension import ToolMemoryExtension
 from .extensions.tool_search_extension import ToolSearchExtension
-from .EditingSession import (
+from Assistants.EditingSession import (
     # Partitionnement
     partition_file,
     detect_language,

@@ -9,12 +9,12 @@ Contient :
 - Specialist : Assistants spécialistes (V7)
 """
 
-from .EditingSession.Tools import create_assistants_integration
+from .EditingSession.Tools import ToolRegistry
 from .Generalist.V8_generalist_assistant import GeneralistAssistant
 from .Specialist.V7_safe import LocalLLMAssistantV7Phase2Enhanced
 
 __all__ = [
-    'create_assistants_integration',
+    'ToolRegistry',
     'GeneralistAssistant', 
     'LocalLLMAssistantV7Phase2Enhanced'
 ] 

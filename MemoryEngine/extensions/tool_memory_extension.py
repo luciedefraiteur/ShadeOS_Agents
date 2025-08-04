@@ -187,7 +187,7 @@ class ToolMemoryExtension:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
         directories = [
             os.path.join(base_dir, 'Tools/Library/documentation/luciforms'),
-            os.path.join(base_dir, 'Alma_toolset'),
+            os.path.join(base_dir, 'Assistants', 'EditingSession', 'Tools'),
             os.path.join(base_dir, 'Tools/Search/documentation/luciforms'),
             os.path.join(base_dir, 'Tools/FileSystem/documentation/luciforms'),
             os.path.join(base_dir, 'Tools/Execution/documentation/luciforms'),

@@ -23,7 +23,7 @@ class ToolRegistry:
     def __init__(self, memory_engine: MemoryEngine):
         self.memory_engine = memory_engine
         self.tools: Dict[str, Dict[str, Any]] = {}
-        self.alma_toolset_path = Path("Alma_toolset")
+        self.tools_path = Path(__file__).parent  # Répertoire local Tools
         self.tools_docs_path = Path("Tools/Library/documentation/luciforms")
         
     def _find_node_text(self, nodes: List[Dict], tag: str) -> Optional[str]:
@@ -145,19 +145,19 @@ class ToolRegistry:
             root_dir = Path(__file__).parent.parent.parent.parent
             sys.path.insert(0, str(root_dir))
             
-            # Importer les modules Alma_toolset
-            alma_toolset_dir = root_dir / "Alma_toolset"
+            # Importer les modules Tools locaux
+            tools_dir = Path(__file__).parent
             
-            if alma_toolset_dir.exists():
-                # Charger tous les modules Python dans Alma_toolset
-                for py_file in alma_toolset_dir.glob("*.py"):
-                    if py_file.name.startswith("__"):
+            if tools_dir.exists():
+                # Charger tous les modules Python dans Tools
+                for py_file in tools_dir.glob("*.py"):
+                    if py_file.name.startswith("__") or py_file.name.startswith("tool_"):
                         continue
                     
                     module_name = py_file.stem
                     try:
                         # Importer le module
-                        module = __import__(f"Alma_toolset.{module_name}", fromlist=[module_name])
+                        module = __import__(f"Assistants.EditingSession.Tools.{module_name}", fromlist=[module_name])
                         
                         # Chercher la fonction principale (même nom que le module)
                         if hasattr(module, module_name):
@@ -178,7 +178,7 @@ class ToolRegistry:
                         print(f"⚠️  Erreur lors du chargement de {module_name}: {e}")
             
         except Exception as e:
-            print(f"❌ Erreur lors du chargement des fonctions Alma_toolset: {e}")
+            print(f"❌ Erreur lors du chargement des fonctions Tools: {e}")
         
         # Ajouter des fonctions de fallback pour les tests
         fallback_functions = {
@@ -202,17 +202,17 @@ class ToolRegistry:
         
         available_functions = self._get_available_functions()
         
-        # Charge d'abord Alma_toolset (priorité)
-        alma_count = self._load_tools_from_directory(
-            self.alma_toolset_path, available_functions, "Alma_toolset"
+        # Charge les outils locaux
+        tools_count = self._load_tools_from_directory(
+            self.tools_path, available_functions, "Tools"
         )
         
-        # Puis charge les autres outils
-        tools_count = self._load_tools_from_directory(
+        # Puis charge les autres outils si disponibles
+        library_count = self._load_tools_from_directory(
             self.tools_docs_path, available_functions, "Tools/Library"
         )
         
-        print(f"✅ Chargé {alma_count} outils depuis Alma_toolset, {tools_count} depuis Tools/Library")
+        print(f"✅ Chargé {tools_count} outils depuis Tools, {library_count} depuis Tools/Library")
         print(f"📊 Total: {len(self.tools)} outils enregistrés")
     
     def get_tool(self, tool_id: str) -> Optional[Dict[str, Any]]:

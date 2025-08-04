@@ -327,7 +327,7 @@ J'ai trouvé des informations intéressantes dans plusieurs types de mémoire. V
         workspace_data = {
             "structure": {
                 "root": "ShadeOS_Agents",
-                "main_directories": ["MemoryEngine", "Alma_toolset", "IAIntrospectionDaemons"],
+                "main_directories": ["MemoryEngine", "Assistants", "IAIntrospectionDaemons"],
                 "files_count": 127,
                 "directories_count": 23
             },
