@@ -1,0 +1,29 @@
+{
+    "id": "2668d988-0e16-4913-93a5-7dfaa8683d98",
+    "timestamp": "2025-08-04T20:21:46.938218",
+    "content": "Nœud avec liens multiples",
+    "metadata": {
+        "path": "test/mixed/links",
+        "summary": "Nœud avec liens",
+        "keywords": [
+            "links",
+            "multiple",
+            "connections"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "links",
+        "multiple",
+        "connections"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

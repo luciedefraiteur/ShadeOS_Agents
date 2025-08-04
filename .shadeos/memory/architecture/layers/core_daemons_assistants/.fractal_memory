@@ -1,0 +1,32 @@
+{
+    "id": "144274e7-27f7-4935-acd0-4f75fa7cbec8",
+    "timestamp": "2025-08-04T19:22:55.981205",
+    "content": "Couches architecture : Core (moteurs), Daemons (services), Assistants (interfaces). Séparation claire des responsabilités.",
+    "metadata": {
+        "summary": "Architecture couches core daemons assistants",
+        "keywords": [
+            "architecture",
+            "couches",
+            "core",
+            "daemons",
+            "assistants"
+        ],
+        "strata": "metaphysical",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "metaphysical",
+    "keywords": [
+        "architecture",
+        "couches",
+        "core",
+        "daemons",
+        "assistants"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

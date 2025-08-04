@@ -48,6 +48,7 @@ class FileSystemBackend:
         new_node = FractalMemoryNode(
             content=content,
             metadata={
+                'path': path,  # Ajout du chemin dans les métadonnées
                 'summary': summary,
                 'keywords': keywords,
                 'strata': strata,

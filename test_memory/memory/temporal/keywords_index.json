@@ -1,0 +1,110 @@
+{
+  "test": [
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic"
+  ],
+  "somatic": [
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic"
+  ],
+  "basic": [
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic"
+  ],
+  "cognitive": [
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis"
+  ],
+  "analysis": [
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis"
+  ],
+  "complex": [
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis",
+    "test/cognitive/analysis"
+  ],
+  "metaphysical": [
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence"
+  ],
+  "transcendence": [
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence"
+  ],
+  "spiritual": [
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence"
+  ],
+  "links": [
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links"
+  ],
+  "multiple": [
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links"
+  ],
+  "connections": [
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links",
+    "test/mixed/links"
+  ]
+}

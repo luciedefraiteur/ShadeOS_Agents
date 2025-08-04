@@ -1,0 +1,29 @@
+{
+    "id": "63338c9b-a2a4-48ed-98d5-287be870fb38",
+    "timestamp": "2025-08-04T20:21:46.937421",
+    "content": "Contenu métaphysique transcendant",
+    "metadata": {
+        "path": "test/metaphysical/transcendence",
+        "summary": "Transcendance métaphysique",
+        "keywords": [
+            "metaphysical",
+            "transcendence",
+            "spiritual"
+        ],
+        "strata": "metaphysical",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "metaphysical",
+    "keywords": [
+        "metaphysical",
+        "transcendence",
+        "spiritual"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

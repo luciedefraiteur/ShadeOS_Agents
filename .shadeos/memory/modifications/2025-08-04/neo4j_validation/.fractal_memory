@@ -1,0 +1,30 @@
+{
+    "id": "c1dfac8d-1e47-48e8-887a-5f27e3caaf9b",
+    "timestamp": "2025-08-04T19:22:55.956443",
+    "content": "Validation de la connexion Neo4j avec credentials par défaut. Test de création et récupération de nœuds mémoire.",
+    "metadata": {
+        "summary": "Validation connexion Neo4j",
+        "keywords": [
+            "neo4j",
+            "validation",
+            "connexion",
+            "credentials"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "neo4j",
+        "validation",
+        "connexion",
+        "credentials"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

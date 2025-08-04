@@ -1,0 +1,30 @@
+{
+    "id": "edc7cc9b-9567-40f3-8b20-e892ea053ea3",
+    "timestamp": "2025-08-04T19:22:56.000103",
+    "content": "Configuration Docker Neo4j : image neo4j:5, port 7474, credentials par défaut neo4j/fractal-memory-dev.",
+    "metadata": {
+        "summary": "Configuration Docker Neo4j",
+        "keywords": [
+            "config",
+            "neo4j",
+            "docker",
+            "setup"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "config",
+        "neo4j",
+        "docker",
+        "setup"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

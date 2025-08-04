@@ -1,0 +1,36 @@
+{
+  "somatic": [
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic",
+    "test/somatic/basic"
+  ],
+  "cognitive": [
+    "test/cognitive/analysis",
+    "test/mixed/links",
+    "test/cognitive/analysis",
+    "test/mixed/links",
+    "test/cognitive/analysis",
+    "test/mixed/links",
+    "test/cognitive/analysis",
+    "test/mixed/links",
+    "test/cognitive/analysis",
+    "test/mixed/links",
+    "test/cognitive/analysis",
+    "test/mixed/links",
+    "test/cognitive/analysis",
+    "test/mixed/links"
+  ],
+  "metaphysical": [
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence",
+    "test/metaphysical/transcendence"
+  ]
+}

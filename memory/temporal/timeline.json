@@ -1,0 +1,2402 @@
+[
+  {
+    "uuid": "7bbeccfa-3669-4024-b9dd-40d84a24fd49",
+    "fractal_path": "mem_001",
+    "timestamp": "2025-08-04T18:39:56.205463",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "archiviste",
+      "daemon",
+      "introspection",
+      "développement"
+    ],
+    "previous_uuid": null,
+    "next_uuid": null
+  },
+  {
+    "uuid": "b51332be-1527-4b87-b526-dfd5c04535da",
+    "fractal_path": "test_simple",
+    "timestamp": "2025-08-04T18:42:41.543715",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "test",
+      "simple"
+    ],
+    "previous_uuid": "7bbeccfa-3669-4024-b9dd-40d84a24fd49",
+    "next_uuid": null
+  },
+  {
+    "uuid": "333182e2-827f-4127-93bb-5a37984b8f8d",
+    "fractal_path": "test_simple",
+    "timestamp": "2025-08-04T18:44:06.227749",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "test",
+      "simple"
+    ],
+    "previous_uuid": "b51332be-1527-4b87-b526-dfd5c04535da",
+    "next_uuid": null
+  },
+  {
+    "uuid": "fe985bfb-2408-4c67-856b-f6996d6996c4",
+    "fractal_path": "mem_001",
+    "timestamp": "2025-08-04T18:44:11.969022",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "archiviste",
+      "daemon",
+      "introspection",
+      "développement"
+    ],
+    "previous_uuid": "333182e2-827f-4127-93bb-5a37984b8f8d",
+    "next_uuid": null
+  },
+  {
+    "uuid": "5b1cfc99-4956-48a6-b339-5844d851a270",
+    "fractal_path": "mem_002",
+    "timestamp": "2025-08-04T18:44:12.012953",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "rétroinjection",
+      "apprentissage"
+    ],
+    "previous_uuid": "fe985bfb-2408-4c67-856b-f6996d6996c4",
+    "next_uuid": null
+  },
+  {
+    "uuid": "b8fbde71-eb14-4f0f-aff4-2782c48bd6de",
+    "fractal_path": "mem_003",
+    "timestamp": "2025-08-04T18:44:12.057955",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "optimisation",
+      "prompts",
+      "llm",
+      "métriques"
+    ],
+    "previous_uuid": "5b1cfc99-4956-48a6-b339-5844d851a270",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a2060cf9-ab59-4a8e-b43b-48e5276df4f8",
+    "fractal_path": "mem_004",
+    "timestamp": "2025-08-04T18:44:12.090285",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "truc",
+      "machin"
+    ],
+    "previous_uuid": "b8fbde71-eb14-4f0f-aff4-2782c48bd6de",
+    "next_uuid": null
+  },
+  {
+    "uuid": "86c09e50-dc49-4418-8ff8-fe2b7d12978b",
+    "fractal_path": "mem_005",
+    "timestamp": "2025-08-04T18:44:12.144197",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "erreur",
+      "code"
+    ],
+    "previous_uuid": "a2060cf9-ab59-4a8e-b43b-48e5276df4f8",
+    "next_uuid": null
+  },
+  {
+    "uuid": "cc65c849-15ec-4122-b5d0-d1bda7143daa",
+    "fractal_path": "mem_006",
+    "timestamp": "2025-08-04T18:44:12.376342",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "test"
+    ],
+    "previous_uuid": "86c09e50-dc49-4418-8ff8-fe2b7d12978b",
+    "next_uuid": null
+  },
+  {
+    "uuid": "3186c4d4-abdf-412e-b095-c7af1e41e6f8",
+    "fractal_path": "mem_007",
+    "timestamp": "2025-08-04T18:44:12.427383",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "problème",
+      "mémoire",
+      "système",
+      "archiviste"
+    ],
+    "previous_uuid": "cc65c849-15ec-4122-b5d0-d1bda7143daa",
+    "next_uuid": null
+  },
+  {
+    "uuid": "88bf972d-5dad-4a7c-ab4a-b421e6583cfa",
+    "fractal_path": "mem_008",
+    "timestamp": "2025-08-04T18:44:12.459785",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "optimisation",
+      "performances",
+      "approche"
+    ],
+    "previous_uuid": "3186c4d4-abdf-412e-b095-c7af1e41e6f8",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6a6104d1-215a-4fd1-9ca5-68dc5a1180d2",
+    "fractal_path": "conversations/2025-08-01/cache_problem",
+    "timestamp": "2025-08-04T18:56:17.788758",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "problème",
+      "mise à jour",
+      "obsolète"
+    ],
+    "previous_uuid": "88bf972d-5dad-4a7c-ab4a-b421e6583cfa",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ec60c2e3-352c-4bae-b516-202e14beda8a",
+    "fractal_path": "conversations/2025-08-02/cache_solution",
+    "timestamp": "2025-08-04T18:56:17.863102",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "solution",
+      "reset",
+      "UUID",
+      "timestamps"
+    ],
+    "previous_uuid": "6a6104d1-215a-4fd1-9ca5-68dc5a1180d2",
+    "next_uuid": null
+  },
+  {
+    "uuid": "aa4b50b8-0391-49d1-b10a-11f0e8b175b0",
+    "fractal_path": "conversations/2025-08-03/cache_optimization",
+    "timestamp": "2025-08-04T18:56:17.925636",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "optimisation",
+      "rétroinjection",
+      "apprentissage",
+      "LLM"
+    ],
+    "previous_uuid": "ec60c2e3-352c-4bae-b516-202e14beda8a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "531b9fd8-108b-45ff-b256-54971024adb4",
+    "fractal_path": "modifications/2025-08-04/temporal_index_fix",
+    "timestamp": "2025-08-04T18:56:17.990927",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "TemporalIndex",
+      "refactorisation",
+      "liens",
+      "bidirectionnels",
+      "UUID",
+      "KeyError"
+    ],
+    "previous_uuid": "aa4b50b8-0391-49d1-b10a-11f0e8b175b0",
+    "next_uuid": null
+  },
+  {
+    "uuid": "10af6176-b7f1-4c2a-82fc-3df3fe273b1d",
+    "fractal_path": "modifications/2025-08-04/neo4j_validation",
+    "timestamp": "2025-08-04T18:56:18.050326",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "Neo4jBackend",
+      "validation",
+      "authentification",
+      "connexion",
+      "paramètres"
+    ],
+    "previous_uuid": "531b9fd8-108b-45ff-b256-54971024adb4",
+    "next_uuid": null
+  },
+  {
+    "uuid": "5451fabb-84f0-4616-95cd-4f3c5daf3a0c",
+    "fractal_path": "modifications/2025-08-04/auto_record_bugfix",
+    "timestamp": "2025-08-04T18:56:18.096887",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "auto_record",
+      "bug",
+      "UUID",
+      "index",
+      "temporel",
+      "correction"
+    ],
+    "previous_uuid": "10af6176-b7f1-4c2a-82fc-3df3fe273b1d",
+    "next_uuid": null
+  },
+  {
+    "uuid": "e8e6b4fd-d3e9-4093-a016-d9b2d26d01d8",
+    "fractal_path": "docs/architecture/memory_engine_strates",
+    "timestamp": "2025-08-04T18:56:18.310798",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "MemoryEngine",
+      "strates",
+      "somatic",
+      "cognitive",
+      "metaphysical",
+      "patterns"
+    ],
+    "previous_uuid": "5451fabb-84f0-4616-95cd-4f3c5daf3a0c",
+    "next_uuid": null
+  },
+  {
+    "uuid": "aa6c1460-beda-4d39-9343-7a3f85cc1895",
+    "fractal_path": "docs/architecture/respiration_system",
+    "timestamp": "2025-08-04T18:56:18.364423",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "respiration",
+      "transcendence",
+      "immanence",
+      "liens",
+      "vertical",
+      "abstraction",
+      "concrétisation"
+    ],
+    "previous_uuid": "e8e6b4fd-d3e9-4093-a016-d9b2d26d01d8",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ab8ba200-9d20-43fb-b278-fd8924852212",
+    "fractal_path": "docs/backends/supported_backends",
+    "timestamp": "2025-08-04T18:56:18.423392",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "backends",
+      "FileSystem",
+      "Neo4j",
+      "stockage",
+      "développement",
+      "production",
+      "requêtes"
+    ],
+    "previous_uuid": "aa6c1460-beda-4d39-9343-7a3f85cc1895",
+    "next_uuid": null
+  },
+  {
+    "uuid": "81820b49-385a-432d-a75c-ec5577737edd",
+    "fractal_path": "git/branches/feature/optimization",
+    "timestamp": "2025-08-04T18:56:18.487286",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "feature",
+      "optimisation",
+      "prompts",
+      "LLM",
+      "injection",
+      "métriques"
+    ],
+    "previous_uuid": "ab8ba200-9d20-43fb-b278-fd8924852212",
+    "next_uuid": null
+  },
+  {
+    "uuid": "f2724647-37f4-48d2-94a5-11778bc922c1",
+    "fractal_path": "git/branches/bugfix/cache",
+    "timestamp": "2025-08-04T18:56:18.558483",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "bugfix",
+      "cache",
+      "intelligent",
+      "correction",
+      "synchronisation"
+    ],
+    "previous_uuid": "81820b49-385a-432d-a75c-ec5577737edd",
+    "next_uuid": null
+  },
+  {
+    "uuid": "4927483d-743d-4ebc-9ddc-0e1477a324a0",
+    "fractal_path": "git/branches/refactor/archiviste",
+    "timestamp": "2025-08-04T18:56:18.622800",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "refactor",
+      "archiviste",
+      "introspection",
+      "intelligente",
+      "cache",
+      "analyse"
+    ],
+    "previous_uuid": "f2724647-37f4-48d2-94a5-11778bc922c1",
+    "next_uuid": null
+  },
+  {
+    "uuid": "890530b8-9e9e-4c68-8bc7-54bafc1e8f55",
+    "fractal_path": "architecture/patterns/meta_daemon_orchestrator",
+    "timestamp": "2025-08-04T18:56:18.682786",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "pattern",
+      "meta",
+      "daemon",
+      "orchestrator",
+      "coordination",
+      "centralisée"
+    ],
+    "previous_uuid": "4927483d-743d-4ebc-9ddc-0e1477a324a0",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ff68ada1-0d20-4902-b8b0-12e07f5ce3ed",
+    "fractal_path": "architecture/patterns/introspective_thread",
+    "timestamp": "2025-08-04T18:56:18.723746",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "pattern",
+      "introspective",
+      "thread",
+      "auto-analyse",
+      "IA",
+      "daemons",
+      "documentation"
+    ],
+    "previous_uuid": "890530b8-9e9e-4c68-8bc7-54bafc1e8f55",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c6560893-3bd8-4438-9310-561befe746c9",
+    "fractal_path": "architecture/layers/core_daemons_assistants",
+    "timestamp": "2025-08-04T18:56:18.761184",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "couches",
+      "core",
+      "daemons",
+      "assistants",
+      "responsabilités"
+    ],
+    "previous_uuid": "ff68ada1-0d20-4902-b8b0-12e07f5ce3ed",
+    "next_uuid": null
+  },
+  {
+    "uuid": "b4f6f51a-b4e1-4a45-ba5b-1075fb75c5d9",
+    "fractal_path": "performance/analysis/temporal_index_bottleneck",
+    "timestamp": "2025-08-04T18:56:18.801414",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "goulot",
+      "étranglement",
+      "TemporalIndex",
+      "auto_record",
+      "KeyError",
+      "UUID"
+    ],
+    "previous_uuid": "c6560893-3bd8-4438-9310-561befe746c9",
+    "next_uuid": null
+  },
+  {
+    "uuid": "75f79082-3787-4666-a587-8ba9ed8d60f5",
+    "fractal_path": "performance/optimization/cache_intelligent",
+    "timestamp": "2025-08-04T18:56:18.830746",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "optimisation",
+      "cache",
+      "intelligent",
+      "rétroinjection",
+      "apprentissage",
+      "patterns"
+    ],
+    "previous_uuid": "b4f6f51a-b4e1-4a45-ba5b-1075fb75c5d9",
+    "next_uuid": null
+  },
+  {
+    "uuid": "1f161516-17d8-454c-b001-922eaedaeb01",
+    "fractal_path": "performance/results/llm_reduction",
+    "timestamp": "2025-08-04T18:56:18.856731",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "résultat",
+      "réduction",
+      "LLM",
+      "cache",
+      "optimisation",
+      "prompts"
+    ],
+    "previous_uuid": "75f79082-3787-4666-a587-8ba9ed8d60f5",
+    "next_uuid": null
+  },
+  {
+    "uuid": "f68fc482-1eae-483c-9428-6961be5ffe94",
+    "fractal_path": "collaboration/lucie/archiviste_introspection",
+    "timestamp": "2025-08-04T18:56:18.885431",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "lucie",
+      "archiviste",
+      "introspection",
+      "intelligente",
+      "analyse",
+      "décisions",
+      "amélioration"
+    ],
+    "previous_uuid": "1f161516-17d8-454c-b001-922eaedaeb01",
+    "next_uuid": null
+  },
+  {
+    "uuid": "79647cce-f684-4276-8441-f49430c76aae",
+    "fractal_path": "collaboration/alma/cache_implementation",
+    "timestamp": "2025-08-04T18:56:18.914391",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "alma",
+      "cache",
+      "intelligent",
+      "implémentation",
+      "rétroinjection",
+      "apprentissage",
+      "adaptation"
+    ],
+    "previous_uuid": "f68fc482-1eae-483c-9428-6961be5ffe94",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9b5dceef-1105-4ed2-8912-7ec1fd0ed5ed",
+    "fractal_path": "collaboration/team/daemon_architecture",
+    "timestamp": "2025-08-04T18:56:18.949703",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "équipe",
+      "discussion",
+      "architecture",
+      "daemons",
+      "pattern",
+      "meta",
+      "orchestrator"
+    ],
+    "previous_uuid": "79647cce-f684-4276-8441-f49430c76aae",
+    "next_uuid": null
+  },
+  {
+    "uuid": "2c179f5a-6aa7-4880-8c26-ee2837fddabe",
+    "fractal_path": "config/neo4j/docker_setup",
+    "timestamp": "2025-08-04T18:56:19.027147",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "docker",
+      "conteneur",
+      "installation",
+      "commande"
+    ],
+    "previous_uuid": "9b5dceef-1105-4ed2-8912-7ec1fd0ed5ed",
+    "next_uuid": null
+  },
+  {
+    "uuid": "4b0f6798-a7a6-41b6-81b2-fe162612c40b",
+    "fractal_path": "config/neo4j/default_params",
+    "timestamp": "2025-08-04T18:56:19.056469",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "paramètres",
+      "défaut",
+      "user",
+      "password",
+      "ports"
+    ],
+    "previous_uuid": "2c179f5a-6aa7-4880-8c26-ee2837fddabe",
+    "next_uuid": null
+  },
+  {
+    "uuid": "61f3e0d5-8416-43df-96b6-784150c4a895",
+    "fractal_path": "config/neo4j/connection_info",
+    "timestamp": "2025-08-04T18:56:19.088278",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "connexion",
+      "URI",
+      "bolt",
+      "interface",
+      "web",
+      "identifiants"
+    ],
+    "previous_uuid": "4b0f6798-a7a6-41b6-81b2-fe162612c40b",
+    "next_uuid": null
+  },
+  {
+    "uuid": "784ad91a-2f5e-4f0a-bf54-05777e73f74a",
+    "fractal_path": "conversations/2025-08-01/cache_problem",
+    "timestamp": "2025-08-04T19:10:33.102763",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "problème",
+      "mise à jour",
+      "obsolète"
+    ],
+    "previous_uuid": "61f3e0d5-8416-43df-96b6-784150c4a895",
+    "next_uuid": null
+  },
+  {
+    "uuid": "88261b67-d366-4b3d-bc47-0069d58a7469",
+    "fractal_path": "conversations/2025-08-02/cache_solution",
+    "timestamp": "2025-08-04T19:10:33.140268",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "solution",
+      "reset",
+      "UUID",
+      "timestamps"
+    ],
+    "previous_uuid": "784ad91a-2f5e-4f0a-bf54-05777e73f74a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "21befc09-c238-42eb-8ae9-64a69e81b86a",
+    "fractal_path": "conversations/2025-08-03/cache_optimization",
+    "timestamp": "2025-08-04T19:10:33.180060",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "optimisation",
+      "rétroinjection",
+      "apprentissage",
+      "LLM"
+    ],
+    "previous_uuid": "88261b67-d366-4b3d-bc47-0069d58a7469",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a85524a5-29fb-4962-9a99-c1688d587520",
+    "fractal_path": "modifications/2025-08-04/temporal_index_fix",
+    "timestamp": "2025-08-04T19:10:33.211614",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "TemporalIndex",
+      "refactorisation",
+      "liens",
+      "bidirectionnels",
+      "UUID",
+      "KeyError"
+    ],
+    "previous_uuid": "21befc09-c238-42eb-8ae9-64a69e81b86a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "2ed95ad3-71d1-486b-8c0f-e2aeed4944f4",
+    "fractal_path": "modifications/2025-08-04/neo4j_validation",
+    "timestamp": "2025-08-04T19:10:33.234898",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "Neo4jBackend",
+      "validation",
+      "authentification",
+      "connexion",
+      "paramètres"
+    ],
+    "previous_uuid": "a85524a5-29fb-4962-9a99-c1688d587520",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ffebf84d-9041-46d8-946c-3018862fba7f",
+    "fractal_path": "modifications/2025-08-04/auto_record_bugfix",
+    "timestamp": "2025-08-04T19:10:33.261380",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "auto_record",
+      "bug",
+      "UUID",
+      "index",
+      "temporel",
+      "correction"
+    ],
+    "previous_uuid": "2ed95ad3-71d1-486b-8c0f-e2aeed4944f4",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6c0c67b6-d6d0-4f2b-92bb-c4e8a2ed9c1d",
+    "fractal_path": "docs/architecture/memory_engine_strates",
+    "timestamp": "2025-08-04T19:10:33.359072",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "MemoryEngine",
+      "strates",
+      "somatic",
+      "cognitive",
+      "metaphysical",
+      "patterns"
+    ],
+    "previous_uuid": "ffebf84d-9041-46d8-946c-3018862fba7f",
+    "next_uuid": null
+  },
+  {
+    "uuid": "81013fbd-dbcc-4ff0-a78c-33cee0799651",
+    "fractal_path": "docs/architecture/respiration_system",
+    "timestamp": "2025-08-04T19:10:33.375677",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "respiration",
+      "transcendence",
+      "immanence",
+      "liens",
+      "vertical",
+      "abstraction",
+      "concrétisation"
+    ],
+    "previous_uuid": "6c0c67b6-d6d0-4f2b-92bb-c4e8a2ed9c1d",
+    "next_uuid": null
+  },
+  {
+    "uuid": "46103466-c608-43a2-a24d-762b83f3aa51",
+    "fractal_path": "docs/backends/supported_backends",
+    "timestamp": "2025-08-04T19:10:33.397075",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "backends",
+      "FileSystem",
+      "Neo4j",
+      "stockage",
+      "développement",
+      "production",
+      "requêtes"
+    ],
+    "previous_uuid": "81013fbd-dbcc-4ff0-a78c-33cee0799651",
+    "next_uuid": null
+  },
+  {
+    "uuid": "69c93484-f5d0-41f3-adb3-f7f5ab890ec7",
+    "fractal_path": "git/branches/feature/optimization",
+    "timestamp": "2025-08-04T19:10:33.429805",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "feature",
+      "optimisation",
+      "prompts",
+      "LLM",
+      "injection",
+      "métriques"
+    ],
+    "previous_uuid": "46103466-c608-43a2-a24d-762b83f3aa51",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7a4f83ff-f21d-4ad3-9566-90b71d630dba",
+    "fractal_path": "git/branches/bugfix/cache",
+    "timestamp": "2025-08-04T19:10:33.454960",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "bugfix",
+      "cache",
+      "intelligent",
+      "correction",
+      "synchronisation"
+    ],
+    "previous_uuid": "69c93484-f5d0-41f3-adb3-f7f5ab890ec7",
+    "next_uuid": null
+  },
+  {
+    "uuid": "d8f600c6-824e-490e-ab04-7081875cc4be",
+    "fractal_path": "git/branches/refactor/archiviste",
+    "timestamp": "2025-08-04T19:10:33.480018",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "refactor",
+      "archiviste",
+      "introspection",
+      "intelligente",
+      "cache",
+      "analyse"
+    ],
+    "previous_uuid": "7a4f83ff-f21d-4ad3-9566-90b71d630dba",
+    "next_uuid": null
+  },
+  {
+    "uuid": "671869ac-6dc8-42a8-aa21-f31ddde0cf2d",
+    "fractal_path": "architecture/patterns/meta_daemon_orchestrator",
+    "timestamp": "2025-08-04T19:10:33.501831",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "pattern",
+      "meta",
+      "daemon",
+      "orchestrator",
+      "coordination",
+      "centralisée"
+    ],
+    "previous_uuid": "d8f600c6-824e-490e-ab04-7081875cc4be",
+    "next_uuid": null
+  },
+  {
+    "uuid": "757d6f7d-d968-4ec8-8987-84e92652f218",
+    "fractal_path": "architecture/patterns/introspective_thread",
+    "timestamp": "2025-08-04T19:10:33.520591",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "pattern",
+      "introspective",
+      "thread",
+      "auto-analyse",
+      "IA",
+      "daemons",
+      "documentation"
+    ],
+    "previous_uuid": "671869ac-6dc8-42a8-aa21-f31ddde0cf2d",
+    "next_uuid": null
+  },
+  {
+    "uuid": "206a9595-7f09-4f7b-8150-9f133c944350",
+    "fractal_path": "architecture/layers/core_daemons_assistants",
+    "timestamp": "2025-08-04T19:10:33.542893",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "couches",
+      "core",
+      "daemons",
+      "assistants",
+      "responsabilités"
+    ],
+    "previous_uuid": "757d6f7d-d968-4ec8-8987-84e92652f218",
+    "next_uuid": null
+  },
+  {
+    "uuid": "62a4da3c-1b90-4105-802b-14294642ff02",
+    "fractal_path": "performance/analysis/temporal_index_bottleneck",
+    "timestamp": "2025-08-04T19:10:33.568400",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "goulot",
+      "étranglement",
+      "TemporalIndex",
+      "auto_record",
+      "KeyError",
+      "UUID"
+    ],
+    "previous_uuid": "206a9595-7f09-4f7b-8150-9f133c944350",
+    "next_uuid": null
+  },
+  {
+    "uuid": "1ead0acb-6c12-441e-97bd-bb19af43f4e6",
+    "fractal_path": "performance/optimization/cache_intelligent",
+    "timestamp": "2025-08-04T19:10:33.591325",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "optimisation",
+      "cache",
+      "intelligent",
+      "rétroinjection",
+      "apprentissage",
+      "patterns"
+    ],
+    "previous_uuid": "62a4da3c-1b90-4105-802b-14294642ff02",
+    "next_uuid": null
+  },
+  {
+    "uuid": "808fc062-d28d-41b6-8d4c-bb673a81da7a",
+    "fractal_path": "performance/results/llm_reduction",
+    "timestamp": "2025-08-04T19:10:33.610487",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "résultat",
+      "réduction",
+      "LLM",
+      "cache",
+      "optimisation",
+      "prompts"
+    ],
+    "previous_uuid": "1ead0acb-6c12-441e-97bd-bb19af43f4e6",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6cc04253-edd4-43dd-a75d-80a4221e1131",
+    "fractal_path": "collaboration/lucie/archiviste_introspection",
+    "timestamp": "2025-08-04T19:10:33.637058",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "lucie",
+      "archiviste",
+      "introspection",
+      "intelligente",
+      "analyse",
+      "décisions",
+      "amélioration"
+    ],
+    "previous_uuid": "808fc062-d28d-41b6-8d4c-bb673a81da7a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9ebc9bfb-828c-4319-a5bb-66327da813ce",
+    "fractal_path": "collaboration/alma/cache_implementation",
+    "timestamp": "2025-08-04T19:10:33.654529",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "alma",
+      "cache",
+      "intelligent",
+      "implémentation",
+      "rétroinjection",
+      "apprentissage",
+      "adaptation"
+    ],
+    "previous_uuid": "6cc04253-edd4-43dd-a75d-80a4221e1131",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ca097af1-c8e0-42f4-8769-24893027b945",
+    "fractal_path": "collaboration/team/daemon_architecture",
+    "timestamp": "2025-08-04T19:10:33.681416",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "équipe",
+      "discussion",
+      "architecture",
+      "daemons",
+      "pattern",
+      "meta",
+      "orchestrator"
+    ],
+    "previous_uuid": "9ebc9bfb-828c-4319-a5bb-66327da813ce",
+    "next_uuid": null
+  },
+  {
+    "uuid": "f712422d-91b4-49da-ad2f-4649048d4361",
+    "fractal_path": "config/neo4j/docker_setup",
+    "timestamp": "2025-08-04T19:10:33.735259",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "docker",
+      "conteneur",
+      "installation",
+      "commande"
+    ],
+    "previous_uuid": "ca097af1-c8e0-42f4-8769-24893027b945",
+    "next_uuid": null
+  },
+  {
+    "uuid": "f5df2f6e-ec6e-48aa-b210-d5e1f10f31c6",
+    "fractal_path": "config/neo4j/default_params",
+    "timestamp": "2025-08-04T19:10:33.759694",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "paramètres",
+      "défaut",
+      "user",
+      "password",
+      "ports"
+    ],
+    "previous_uuid": "f712422d-91b4-49da-ad2f-4649048d4361",
+    "next_uuid": null
+  },
+  {
+    "uuid": "b78aff16-424f-49db-861e-2b0edc1cb3c4",
+    "fractal_path": "config/neo4j/connection_info",
+    "timestamp": "2025-08-04T19:10:33.780410",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "connexion",
+      "URI",
+      "bolt",
+      "interface",
+      "web",
+      "identifiants"
+    ],
+    "previous_uuid": "f5df2f6e-ec6e-48aa-b210-d5e1f10f31c6",
+    "next_uuid": null
+  },
+  {
+    "uuid": "1eaf5631-411f-4ef5-9d33-998d63929b5b",
+    "fractal_path": "conversations/2025-08-01/cache_problem",
+    "timestamp": "2025-08-04T19:10:51.443339",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "problème",
+      "mise à jour",
+      "obsolète"
+    ],
+    "previous_uuid": "b78aff16-424f-49db-861e-2b0edc1cb3c4",
+    "next_uuid": null
+  },
+  {
+    "uuid": "318f64cc-aa49-4867-8af2-75791c0c8881",
+    "fractal_path": "conversations/2025-08-02/cache_solution",
+    "timestamp": "2025-08-04T19:10:51.468758",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "solution",
+      "reset",
+      "UUID",
+      "timestamps"
+    ],
+    "previous_uuid": "1eaf5631-411f-4ef5-9d33-998d63929b5b",
+    "next_uuid": null
+  },
+  {
+    "uuid": "d19cff8b-75c5-43e7-bc24-25e91ef0821e",
+    "fractal_path": "conversations/2025-08-03/cache_optimization",
+    "timestamp": "2025-08-04T19:10:51.493661",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "optimisation",
+      "rétroinjection",
+      "apprentissage",
+      "LLM"
+    ],
+    "previous_uuid": "318f64cc-aa49-4867-8af2-75791c0c8881",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7caaf0a4-db1d-4941-86de-842c001efbed",
+    "fractal_path": "modifications/2025-08-04/temporal_index_fix",
+    "timestamp": "2025-08-04T19:10:51.523268",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "TemporalIndex",
+      "refactorisation",
+      "liens",
+      "bidirectionnels",
+      "UUID",
+      "KeyError"
+    ],
+    "previous_uuid": "d19cff8b-75c5-43e7-bc24-25e91ef0821e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "4bf10eef-98c2-4254-a3aa-1a5902a1a0f9",
+    "fractal_path": "modifications/2025-08-04/neo4j_validation",
+    "timestamp": "2025-08-04T19:10:51.544493",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "Neo4jBackend",
+      "validation",
+      "authentification",
+      "connexion",
+      "paramètres"
+    ],
+    "previous_uuid": "7caaf0a4-db1d-4941-86de-842c001efbed",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a967e25c-94f1-4eda-9ee8-c15f9b608493",
+    "fractal_path": "modifications/2025-08-04/auto_record_bugfix",
+    "timestamp": "2025-08-04T19:10:51.562831",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "auto_record",
+      "bug",
+      "UUID",
+      "index",
+      "temporel",
+      "correction"
+    ],
+    "previous_uuid": "4bf10eef-98c2-4254-a3aa-1a5902a1a0f9",
+    "next_uuid": null
+  },
+  {
+    "uuid": "bd7bb958-6454-463f-835e-0a631984595b",
+    "fractal_path": "docs/architecture/memory_engine_strates",
+    "timestamp": "2025-08-04T19:10:51.588522",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "MemoryEngine",
+      "strates",
+      "somatic",
+      "cognitive",
+      "metaphysical",
+      "patterns"
+    ],
+    "previous_uuid": "a967e25c-94f1-4eda-9ee8-c15f9b608493",
+    "next_uuid": null
+  },
+  {
+    "uuid": "1dd4f5ab-e68a-4a4c-b73f-87414868275e",
+    "fractal_path": "docs/architecture/respiration_system",
+    "timestamp": "2025-08-04T19:10:51.612989",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "respiration",
+      "transcendence",
+      "immanence",
+      "liens",
+      "vertical",
+      "abstraction",
+      "concrétisation"
+    ],
+    "previous_uuid": "bd7bb958-6454-463f-835e-0a631984595b",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6d509861-fc95-4782-b723-66c1f77fd1a0",
+    "fractal_path": "docs/backends/supported_backends",
+    "timestamp": "2025-08-04T19:10:51.640001",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "backends",
+      "FileSystem",
+      "Neo4j",
+      "stockage",
+      "développement",
+      "production",
+      "requêtes"
+    ],
+    "previous_uuid": "1dd4f5ab-e68a-4a4c-b73f-87414868275e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "b356daeb-4c9a-410f-b9ad-509b07b8be6f",
+    "fractal_path": "git/branches/feature/optimization",
+    "timestamp": "2025-08-04T19:10:51.660520",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "feature",
+      "optimisation",
+      "prompts",
+      "LLM",
+      "injection",
+      "métriques"
+    ],
+    "previous_uuid": "6d509861-fc95-4782-b723-66c1f77fd1a0",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9f18cd99-2c73-4c40-aa56-bea9e9aa7978",
+    "fractal_path": "git/branches/bugfix/cache",
+    "timestamp": "2025-08-04T19:10:51.683081",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "bugfix",
+      "cache",
+      "intelligent",
+      "correction",
+      "synchronisation"
+    ],
+    "previous_uuid": "b356daeb-4c9a-410f-b9ad-509b07b8be6f",
+    "next_uuid": null
+  },
+  {
+    "uuid": "935666b7-f66d-403c-9fc9-2820989dca18",
+    "fractal_path": "git/branches/refactor/archiviste",
+    "timestamp": "2025-08-04T19:10:51.702328",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "branche",
+      "refactor",
+      "archiviste",
+      "introspection",
+      "intelligente",
+      "cache",
+      "analyse"
+    ],
+    "previous_uuid": "9f18cd99-2c73-4c40-aa56-bea9e9aa7978",
+    "next_uuid": null
+  },
+  {
+    "uuid": "58cd07dd-f14e-4b8f-b2d1-ba176754ceec",
+    "fractal_path": "architecture/patterns/meta_daemon_orchestrator",
+    "timestamp": "2025-08-04T19:10:51.725415",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "pattern",
+      "meta",
+      "daemon",
+      "orchestrator",
+      "coordination",
+      "centralisée"
+    ],
+    "previous_uuid": "935666b7-f66d-403c-9fc9-2820989dca18",
+    "next_uuid": null
+  },
+  {
+    "uuid": "0b3b9e33-2b84-483e-ae11-3967c367023d",
+    "fractal_path": "architecture/patterns/introspective_thread",
+    "timestamp": "2025-08-04T19:10:51.753211",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "pattern",
+      "introspective",
+      "thread",
+      "auto-analyse",
+      "IA",
+      "daemons",
+      "documentation"
+    ],
+    "previous_uuid": "58cd07dd-f14e-4b8f-b2d1-ba176754ceec",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ecd1eec6-7448-48b7-9b6c-855526b50f9c",
+    "fractal_path": "architecture/layers/core_daemons_assistants",
+    "timestamp": "2025-08-04T19:10:51.777193",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "couches",
+      "core",
+      "daemons",
+      "assistants",
+      "responsabilités"
+    ],
+    "previous_uuid": "0b3b9e33-2b84-483e-ae11-3967c367023d",
+    "next_uuid": null
+  },
+  {
+    "uuid": "3681ec1a-8664-4c5c-9bc1-0daa6a0b3bf3",
+    "fractal_path": "performance/analysis/temporal_index_bottleneck",
+    "timestamp": "2025-08-04T19:10:51.794922",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "goulot",
+      "étranglement",
+      "TemporalIndex",
+      "auto_record",
+      "KeyError",
+      "UUID"
+    ],
+    "previous_uuid": "ecd1eec6-7448-48b7-9b6c-855526b50f9c",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ae170044-8215-482d-a3f1-c4e3b406dc77",
+    "fractal_path": "performance/optimization/cache_intelligent",
+    "timestamp": "2025-08-04T19:10:51.814144",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "optimisation",
+      "cache",
+      "intelligent",
+      "rétroinjection",
+      "apprentissage",
+      "patterns"
+    ],
+    "previous_uuid": "3681ec1a-8664-4c5c-9bc1-0daa6a0b3bf3",
+    "next_uuid": null
+  },
+  {
+    "uuid": "56ce4857-ce33-4aba-baef-570b2e61a4d1",
+    "fractal_path": "performance/results/llm_reduction",
+    "timestamp": "2025-08-04T19:10:51.836733",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "résultat",
+      "réduction",
+      "LLM",
+      "cache",
+      "optimisation",
+      "prompts"
+    ],
+    "previous_uuid": "ae170044-8215-482d-a3f1-c4e3b406dc77",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7504e421-a219-4189-b093-38ce6957fe13",
+    "fractal_path": "collaboration/lucie/archiviste_introspection",
+    "timestamp": "2025-08-04T19:10:51.857335",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "lucie",
+      "archiviste",
+      "introspection",
+      "intelligente",
+      "analyse",
+      "décisions",
+      "amélioration"
+    ],
+    "previous_uuid": "56ce4857-ce33-4aba-baef-570b2e61a4d1",
+    "next_uuid": null
+  },
+  {
+    "uuid": "fffa2376-0e2b-4223-b122-663040d3da87",
+    "fractal_path": "collaboration/alma/cache_implementation",
+    "timestamp": "2025-08-04T19:10:51.876125",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "alma",
+      "cache",
+      "intelligent",
+      "implémentation",
+      "rétroinjection",
+      "apprentissage",
+      "adaptation"
+    ],
+    "previous_uuid": "7504e421-a219-4189-b093-38ce6957fe13",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9981ef68-2ba3-4ab6-b8aa-f7b9f019fb47",
+    "fractal_path": "collaboration/team/daemon_architecture",
+    "timestamp": "2025-08-04T19:10:51.896025",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "équipe",
+      "discussion",
+      "architecture",
+      "daemons",
+      "pattern",
+      "meta",
+      "orchestrator"
+    ],
+    "previous_uuid": "fffa2376-0e2b-4223-b122-663040d3da87",
+    "next_uuid": null
+  },
+  {
+    "uuid": "e84aa678-513e-4edc-b011-e6cfe7dfaf16",
+    "fractal_path": "config/neo4j/docker_setup",
+    "timestamp": "2025-08-04T19:10:51.918593",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "docker",
+      "conteneur",
+      "installation",
+      "commande"
+    ],
+    "previous_uuid": "9981ef68-2ba3-4ab6-b8aa-f7b9f019fb47",
+    "next_uuid": null
+  },
+  {
+    "uuid": "b38c0e74-6510-4011-a4f8-81f4a170e70a",
+    "fractal_path": "config/neo4j/default_params",
+    "timestamp": "2025-08-04T19:10:51.937958",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "paramètres",
+      "défaut",
+      "user",
+      "password",
+      "ports"
+    ],
+    "previous_uuid": "e84aa678-513e-4edc-b011-e6cfe7dfaf16",
+    "next_uuid": null
+  },
+  {
+    "uuid": "1067e205-ffdb-457e-ba4d-84cb346d6532",
+    "fractal_path": "config/neo4j/connection_info",
+    "timestamp": "2025-08-04T19:10:51.956362",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "connexion",
+      "URI",
+      "bolt",
+      "interface",
+      "web",
+      "identifiants"
+    ],
+    "previous_uuid": "b38c0e74-6510-4011-a4f8-81f4a170e70a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "be62f931-2a5b-4b2f-911b-2738bf609b94",
+    "fractal_path": "conversations/2025-08-01/cache_problem",
+    "timestamp": "2025-08-04T19:21:32.017013",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "performance",
+      "goulot",
+      "temporel"
+    ],
+    "previous_uuid": "1067e205-ffdb-457e-ba4d-84cb346d6532",
+    "next_uuid": null
+  },
+  {
+    "uuid": "856d3a7f-a8a9-4d37-a8af-b8fa769f3979",
+    "fractal_path": "conversations/2025-08-02/cache_solution",
+    "timestamp": "2025-08-04T19:21:32.019276",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "solution",
+      "intelligent",
+      "métriques"
+    ],
+    "previous_uuid": "be62f931-2a5b-4b2f-911b-2738bf609b94",
+    "next_uuid": null
+  },
+  {
+    "uuid": "eb00eddb-3601-44ca-b7f8-8958451e5890",
+    "fractal_path": "conversations/2025-08-03/cache_optimization",
+    "timestamp": "2025-08-04T19:21:32.025494",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "optimisation",
+      "cache",
+      "performance",
+      "llm"
+    ],
+    "previous_uuid": "856d3a7f-a8a9-4d37-a8af-b8fa769f3979",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9baa0f17-ad3f-4444-916f-26781004be91",
+    "fractal_path": "modifications/2025-08-04/temporal_index_fix",
+    "timestamp": "2025-08-04T19:21:32.027441",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "bug",
+      "fix",
+      "temporal_index",
+      "keyerror"
+    ],
+    "previous_uuid": "eb00eddb-3601-44ca-b7f8-8958451e5890",
+    "next_uuid": null
+  },
+  {
+    "uuid": "03d1b2a7-76dd-45ca-8262-f1467e4fdb5a",
+    "fractal_path": "modifications/2025-08-04/neo4j_validation",
+    "timestamp": "2025-08-04T19:21:32.029360",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "neo4j",
+      "validation",
+      "connexion",
+      "credentials"
+    ],
+    "previous_uuid": "9baa0f17-ad3f-4444-916f-26781004be91",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a284c257-195d-4673-916b-c6f2ed6a0c97",
+    "fractal_path": "modifications/2025-08-04/auto_record_bugfix",
+    "timestamp": "2025-08-04T19:21:32.031671",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "bug",
+      "fix",
+      "indexes",
+      "keyerror"
+    ],
+    "previous_uuid": "03d1b2a7-76dd-45ca-8262-f1467e4fdb5a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a4b838b8-d4d1-40c3-a700-7fe66a0ee9d1",
+    "fractal_path": "docs/architecture/memory_engine_strates",
+    "timestamp": "2025-08-04T19:21:32.034957",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "strates",
+      "somatic",
+      "cognitive",
+      "metaphysical"
+    ],
+    "previous_uuid": "a284c257-195d-4673-916b-c6f2ed6a0c97",
+    "next_uuid": null
+  },
+  {
+    "uuid": "117fd00d-a998-4db7-9fb4-cf90b755de7e",
+    "fractal_path": "docs/architecture/respiration_system",
+    "timestamp": "2025-08-04T19:21:32.037216",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "respiration",
+      "transcendance",
+      "immanence",
+      "liens"
+    ],
+    "previous_uuid": "a4b838b8-d4d1-40c3-a700-7fe66a0ee9d1",
+    "next_uuid": null
+  },
+  {
+    "uuid": "5ff0c43a-741c-4646-b538-2fef083948b8",
+    "fractal_path": "docs/backends/supported_backends",
+    "timestamp": "2025-08-04T19:21:32.039666",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "backends",
+      "filesystem",
+      "neo4j",
+      "migration"
+    ],
+    "previous_uuid": "117fd00d-a998-4db7-9fb4-cf90b755de7e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "475cfc3c-2a46-43d7-b2aa-f693a5682d46",
+    "fractal_path": "git/branches/feature/optimization",
+    "timestamp": "2025-08-04T19:21:32.041814",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "git",
+      "branche",
+      "feature",
+      "optimisation"
+    ],
+    "previous_uuid": "5ff0c43a-741c-4646-b538-2fef083948b8",
+    "next_uuid": null
+  },
+  {
+    "uuid": "2fad491d-3170-49de-aaae-46818cffda60",
+    "fractal_path": "git/branches/bugfix/cache",
+    "timestamp": "2025-08-04T19:21:32.044057",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "git",
+      "branche",
+      "bugfix",
+      "cache"
+    ],
+    "previous_uuid": "475cfc3c-2a46-43d7-b2aa-f693a5682d46",
+    "next_uuid": null
+  },
+  {
+    "uuid": "3c2abf53-9218-4dea-b98c-53f51cce604f",
+    "fractal_path": "git/branches/refactor/archiviste",
+    "timestamp": "2025-08-04T19:21:32.046483",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "git",
+      "branche",
+      "refactor",
+      "archiviste"
+    ],
+    "previous_uuid": "2fad491d-3170-49de-aaae-46818cffda60",
+    "next_uuid": null
+  },
+  {
+    "uuid": "dd472aab-e48b-49eb-8ee0-502bdfc96a7e",
+    "fractal_path": "architecture/patterns/meta_daemon_orchestrator",
+    "timestamp": "2025-08-04T19:21:32.048901",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "pattern",
+      "meta",
+      "daemon",
+      "orchestrator"
+    ],
+    "previous_uuid": "3c2abf53-9218-4dea-b98c-53f51cce604f",
+    "next_uuid": null
+  },
+  {
+    "uuid": "009856cd-f459-47b1-8b56-123cac4b8000",
+    "fractal_path": "architecture/patterns/introspective_thread",
+    "timestamp": "2025-08-04T19:21:32.051954",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "pattern",
+      "introspective",
+      "thread"
+    ],
+    "previous_uuid": "dd472aab-e48b-49eb-8ee0-502bdfc96a7e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "81b0707b-98c9-4504-8bae-3ffa1543610e",
+    "fractal_path": "architecture/layers/core_daemons_assistants",
+    "timestamp": "2025-08-04T19:21:32.054285",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "couches",
+      "core",
+      "daemons",
+      "assistants"
+    ],
+    "previous_uuid": "009856cd-f459-47b1-8b56-123cac4b8000",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a41edc81-a69b-4bcd-b99e-1fa898e7f679",
+    "fractal_path": "performance/analysis/temporal_index_bottleneck",
+    "timestamp": "2025-08-04T19:21:32.056680",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "analyse",
+      "goulot",
+      "temporal_index"
+    ],
+    "previous_uuid": "81b0707b-98c9-4504-8bae-3ffa1543610e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "0324782a-5aaf-4ea8-ac14-8fb05c3c9016",
+    "fractal_path": "performance/optimization/cache_intelligent",
+    "timestamp": "2025-08-04T19:21:32.059506",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "optimisation",
+      "cache",
+      "intelligent"
+    ],
+    "previous_uuid": "a41edc81-a69b-4bcd-b99e-1fa898e7f679",
+    "next_uuid": null
+  },
+  {
+    "uuid": "d63b4850-777f-4391-948f-8123b9b212e1",
+    "fractal_path": "performance/results/llm_reduction",
+    "timestamp": "2025-08-04T19:21:32.062079",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "résultats",
+      "llm",
+      "réduction"
+    ],
+    "previous_uuid": "0324782a-5aaf-4ea8-ac14-8fb05c3c9016",
+    "next_uuid": null
+  },
+  {
+    "uuid": "a4e10c5b-4092-4e50-a16e-fbc69ffa4444",
+    "fractal_path": "collaboration/lucie/archiviste_introspection",
+    "timestamp": "2025-08-04T19:21:32.064269",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "collaboration",
+      "lucie",
+      "archiviste",
+      "introspection"
+    ],
+    "previous_uuid": "d63b4850-777f-4391-948f-8123b9b212e1",
+    "next_uuid": null
+  },
+  {
+    "uuid": "978e5b63-1dba-4da3-9c39-302f05182f71",
+    "fractal_path": "collaboration/alma/cache_implementation",
+    "timestamp": "2025-08-04T19:21:32.066762",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "collaboration",
+      "alma",
+      "cache",
+      "implémentation"
+    ],
+    "previous_uuid": "a4e10c5b-4092-4e50-a16e-fbc69ffa4444",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9a2b56e2-fb2b-4325-9296-073288cb4656",
+    "fractal_path": "collaboration/team/daemon_architecture",
+    "timestamp": "2025-08-04T19:21:32.069254",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "collaboration",
+      "équipe",
+      "daemon",
+      "architecture"
+    ],
+    "previous_uuid": "978e5b63-1dba-4da3-9c39-302f05182f71",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7a939057-997b-42d5-b8bf-cb8871bbfa10",
+    "fractal_path": "config/neo4j/docker_setup",
+    "timestamp": "2025-08-04T19:21:32.072127",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "docker",
+      "setup"
+    ],
+    "previous_uuid": "9a2b56e2-fb2b-4325-9296-073288cb4656",
+    "next_uuid": null
+  },
+  {
+    "uuid": "45c6c908-422f-43cc-8398-72c4feefc2ac",
+    "fractal_path": "config/neo4j/default_params",
+    "timestamp": "2025-08-04T19:21:32.074517",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "paramètres",
+      "défaut"
+    ],
+    "previous_uuid": "7a939057-997b-42d5-b8bf-cb8871bbfa10",
+    "next_uuid": null
+  },
+  {
+    "uuid": "825a1d97-9003-4f1e-b614-61538c9b1d18",
+    "fractal_path": "config/neo4j/connection_info",
+    "timestamp": "2025-08-04T19:21:32.076563",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "connexion",
+      "info"
+    ],
+    "previous_uuid": "45c6c908-422f-43cc-8398-72c4feefc2ac",
+    "next_uuid": null
+  },
+  {
+    "uuid": "fea6292d-0cb5-46ea-8a84-11c383cebbe6",
+    "fractal_path": "conversations/2025-08-01/cache_problem",
+    "timestamp": "2025-08-04T19:22:55.943745",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "performance",
+      "goulot",
+      "temporel"
+    ],
+    "previous_uuid": "825a1d97-9003-4f1e-b614-61538c9b1d18",
+    "next_uuid": null
+  },
+  {
+    "uuid": "8b897078-c4dd-454b-982b-1c905b17b958",
+    "fractal_path": "conversations/2025-08-02/cache_solution",
+    "timestamp": "2025-08-04T19:22:55.945798",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "solution",
+      "intelligent",
+      "métriques"
+    ],
+    "previous_uuid": "fea6292d-0cb5-46ea-8a84-11c383cebbe6",
+    "next_uuid": null
+  },
+  {
+    "uuid": "947579ce-ad54-4ec0-830e-e8b6ac3d1a7b",
+    "fractal_path": "conversations/2025-08-03/cache_optimization",
+    "timestamp": "2025-08-04T19:22:55.952062",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "optimisation",
+      "cache",
+      "performance",
+      "llm"
+    ],
+    "previous_uuid": "8b897078-c4dd-454b-982b-1c905b17b958",
+    "next_uuid": null
+  },
+  {
+    "uuid": "ca947c83-5dd6-4053-b8c1-c759f1b9c163",
+    "fractal_path": "modifications/2025-08-04/temporal_index_fix",
+    "timestamp": "2025-08-04T19:22:55.954206",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "bug",
+      "fix",
+      "temporal_index",
+      "keyerror"
+    ],
+    "previous_uuid": "947579ce-ad54-4ec0-830e-e8b6ac3d1a7b",
+    "next_uuid": null
+  },
+  {
+    "uuid": "0640cab3-3697-4e8d-bf57-7534b7224a79",
+    "fractal_path": "modifications/2025-08-04/neo4j_validation",
+    "timestamp": "2025-08-04T19:22:55.956644",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "neo4j",
+      "validation",
+      "connexion",
+      "credentials"
+    ],
+    "previous_uuid": "ca947c83-5dd6-4053-b8c1-c759f1b9c163",
+    "next_uuid": null
+  },
+  {
+    "uuid": "39ee84e3-5ba1-43bd-bef3-750667ad1939",
+    "fractal_path": "modifications/2025-08-04/auto_record_bugfix",
+    "timestamp": "2025-08-04T19:22:55.959099",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "bug",
+      "fix",
+      "indexes",
+      "keyerror"
+    ],
+    "previous_uuid": "0640cab3-3697-4e8d-bf57-7534b7224a79",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7784ac6c-1beb-4392-b640-4f5fc9053982",
+    "fractal_path": "docs/architecture/memory_engine_strates",
+    "timestamp": "2025-08-04T19:22:55.961547",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "strates",
+      "somatic",
+      "cognitive",
+      "metaphysical"
+    ],
+    "previous_uuid": "39ee84e3-5ba1-43bd-bef3-750667ad1939",
+    "next_uuid": null
+  },
+  {
+    "uuid": "bf772d6c-b299-4298-8e67-127182fdb789",
+    "fractal_path": "docs/architecture/respiration_system",
+    "timestamp": "2025-08-04T19:22:55.963859",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "respiration",
+      "transcendance",
+      "immanence",
+      "liens"
+    ],
+    "previous_uuid": "7784ac6c-1beb-4392-b640-4f5fc9053982",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6cdfe3f3-202d-4bf9-8659-422871994b42",
+    "fractal_path": "docs/backends/supported_backends",
+    "timestamp": "2025-08-04T19:22:55.965929",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "backends",
+      "filesystem",
+      "neo4j",
+      "migration"
+    ],
+    "previous_uuid": "bf772d6c-b299-4298-8e67-127182fdb789",
+    "next_uuid": null
+  },
+  {
+    "uuid": "bfc5a7ad-b32c-4077-92e2-1a30ea4bc3dc",
+    "fractal_path": "git/branches/feature/optimization",
+    "timestamp": "2025-08-04T19:22:55.968656",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "git",
+      "branche",
+      "feature",
+      "optimisation"
+    ],
+    "previous_uuid": "6cdfe3f3-202d-4bf9-8659-422871994b42",
+    "next_uuid": null
+  },
+  {
+    "uuid": "45a2ee8c-41a5-48d3-9b41-37e0f8fb25e4",
+    "fractal_path": "git/branches/bugfix/cache",
+    "timestamp": "2025-08-04T19:22:55.971501",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "git",
+      "branche",
+      "bugfix",
+      "cache"
+    ],
+    "previous_uuid": "bfc5a7ad-b32c-4077-92e2-1a30ea4bc3dc",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6c400f23-540e-4e07-9d1e-7af3a7282088",
+    "fractal_path": "git/branches/refactor/archiviste",
+    "timestamp": "2025-08-04T19:22:55.974151",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "git",
+      "branche",
+      "refactor",
+      "archiviste"
+    ],
+    "previous_uuid": "45a2ee8c-41a5-48d3-9b41-37e0f8fb25e4",
+    "next_uuid": null
+  },
+  {
+    "uuid": "af301d69-211d-4154-9849-5f476d887ee9",
+    "fractal_path": "architecture/patterns/meta_daemon_orchestrator",
+    "timestamp": "2025-08-04T19:22:55.976826",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "pattern",
+      "meta",
+      "daemon",
+      "orchestrator"
+    ],
+    "previous_uuid": "6c400f23-540e-4e07-9d1e-7af3a7282088",
+    "next_uuid": null
+  },
+  {
+    "uuid": "685cc651-14e9-4948-912f-b0c4b8680836",
+    "fractal_path": "architecture/patterns/introspective_thread",
+    "timestamp": "2025-08-04T19:22:55.979253",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "pattern",
+      "introspective",
+      "thread"
+    ],
+    "previous_uuid": "af301d69-211d-4154-9849-5f476d887ee9",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c191c008-6a52-4854-a390-aaad32bec521",
+    "fractal_path": "architecture/layers/core_daemons_assistants",
+    "timestamp": "2025-08-04T19:22:55.981371",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "couches",
+      "core",
+      "daemons",
+      "assistants"
+    ],
+    "previous_uuid": "685cc651-14e9-4948-912f-b0c4b8680836",
+    "next_uuid": null
+  },
+  {
+    "uuid": "5e7101f0-4dad-42c0-8a47-07924c5f58db",
+    "fractal_path": "performance/analysis/temporal_index_bottleneck",
+    "timestamp": "2025-08-04T19:22:55.984242",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "analyse",
+      "goulot",
+      "temporal_index"
+    ],
+    "previous_uuid": "c191c008-6a52-4854-a390-aaad32bec521",
+    "next_uuid": null
+  },
+  {
+    "uuid": "598e23a6-9ea7-4281-9d46-5d034b5497af",
+    "fractal_path": "performance/optimization/cache_intelligent",
+    "timestamp": "2025-08-04T19:22:55.987081",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "optimisation",
+      "cache",
+      "intelligent"
+    ],
+    "previous_uuid": "5e7101f0-4dad-42c0-8a47-07924c5f58db",
+    "next_uuid": null
+  },
+  {
+    "uuid": "e77b6d8c-9c53-4d34-8877-187c106d905b",
+    "fractal_path": "performance/results/llm_reduction",
+    "timestamp": "2025-08-04T19:22:55.989670",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "performance",
+      "résultats",
+      "llm",
+      "réduction"
+    ],
+    "previous_uuid": "598e23a6-9ea7-4281-9d46-5d034b5497af",
+    "next_uuid": null
+  },
+  {
+    "uuid": "9899eed5-69c9-41b0-bf59-3bf65cf2de9a",
+    "fractal_path": "collaboration/lucie/archiviste_introspection",
+    "timestamp": "2025-08-04T19:22:55.992609",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "collaboration",
+      "lucie",
+      "archiviste",
+      "introspection"
+    ],
+    "previous_uuid": "e77b6d8c-9c53-4d34-8877-187c106d905b",
+    "next_uuid": null
+  },
+  {
+    "uuid": "4d35c51d-1431-46df-8570-9db5bc8475a9",
+    "fractal_path": "collaboration/alma/cache_implementation",
+    "timestamp": "2025-08-04T19:22:55.995243",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "collaboration",
+      "alma",
+      "cache",
+      "implémentation"
+    ],
+    "previous_uuid": "9899eed5-69c9-41b0-bf59-3bf65cf2de9a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "63e08929-849b-43f6-981c-adfc97bac71c",
+    "fractal_path": "collaboration/team/daemon_architecture",
+    "timestamp": "2025-08-04T19:22:55.997563",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "collaboration",
+      "équipe",
+      "daemon",
+      "architecture"
+    ],
+    "previous_uuid": "4d35c51d-1431-46df-8570-9db5bc8475a9",
+    "next_uuid": null
+  },
+  {
+    "uuid": "54cf4ad8-3d7b-4ec7-be31-24dbbe6a0db5",
+    "fractal_path": "config/neo4j/docker_setup",
+    "timestamp": "2025-08-04T19:22:56.000412",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "docker",
+      "setup"
+    ],
+    "previous_uuid": "63e08929-849b-43f6-981c-adfc97bac71c",
+    "next_uuid": null
+  },
+  {
+    "uuid": "27a35991-4363-4e7c-91cd-ccbd30a6aa1f",
+    "fractal_path": "config/neo4j/default_params",
+    "timestamp": "2025-08-04T19:22:56.002913",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "paramètres",
+      "défaut"
+    ],
+    "previous_uuid": "54cf4ad8-3d7b-4ec7-be31-24dbbe6a0db5",
+    "next_uuid": null
+  },
+  {
+    "uuid": "692d681a-9053-4c61-86db-d6e376f0df99",
+    "fractal_path": "config/neo4j/connection_info",
+    "timestamp": "2025-08-04T19:22:56.005435",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "config",
+      "neo4j",
+      "connexion",
+      "info"
+    ],
+    "previous_uuid": "27a35991-4363-4e7c-91cd-ccbd30a6aa1f",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7d2c4cd4-976c-4909-9fbc-3761588f7a7e",
+    "fractal_path": "concepts/cache_intelligent",
+    "timestamp": "2025-08-04T19:36:53.459386",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "intelligent",
+      "performance",
+      "optimisation"
+    ],
+    "previous_uuid": "692d681a-9053-4c61-86db-d6e376f0df99",
+    "next_uuid": null
+  },
+  {
+    "uuid": "60029c82-8842-46fc-8848-50b76d68b740",
+    "fractal_path": "concepts/architecture_fractale",
+    "timestamp": "2025-08-04T19:36:53.462492",
+    "intent": null,
+    "strata": "metaphysical",
+    "keywords": [
+      "architecture",
+      "fractale",
+      "strates",
+      "respiration"
+    ],
+    "previous_uuid": "7d2c4cd4-976c-4909-9fbc-3761588f7a7e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "b8f5d7e5-5849-4bbb-85e8-3373ede3d86a",
+    "fractal_path": "concepts/daemon_orchestrator",
+    "timestamp": "2025-08-04T19:36:53.469307",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "daemon",
+      "orchestrator",
+      "batch",
+      "processing"
+    ],
+    "previous_uuid": "60029c82-8842-46fc-8848-50b76d68b740",
+    "next_uuid": null
+  },
+  {
+    "uuid": "7035bd2e-7e50-4a3c-b521-82ce1e870e20",
+    "fractal_path": "events/2025-08-04/bug_fix_temporal_index",
+    "timestamp": "2025-08-04T19:36:53.471766",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "bug",
+      "fix",
+      "temporal_index",
+      "keyerror"
+    ],
+    "previous_uuid": "b8f5d7e5-5849-4bbb-85e8-3373ede3d86a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "6b5a695b-5f2f-43a0-8c79-089b8905bc61",
+    "fractal_path": "events/2025-08-03/cache_optimization",
+    "timestamp": "2025-08-04T19:36:53.475189",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "cache",
+      "optimisation",
+      "performance"
+    ],
+    "previous_uuid": "7035bd2e-7e50-4a3c-b521-82ce1e870e20",
+    "next_uuid": null
+  },
+  {
+    "uuid": "5933e195-32e2-4134-8009-1bb11907f96a",
+    "fractal_path": "events/2025-08-02/neo4j_setup",
+    "timestamp": "2025-08-04T19:36:53.478038",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "neo4j",
+      "docker",
+      "setup",
+      "configuration"
+    ],
+    "previous_uuid": "6b5a695b-5f2f-43a0-8c79-089b8905bc61",
+    "next_uuid": null
+  },
+  {
+    "uuid": "32b018c3-f5f9-4680-81ce-98d02d39e808",
+    "fractal_path": "mixed/2025-08-01/archiviste_introspection",
+    "timestamp": "2025-08-04T19:36:53.480651",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "archiviste",
+      "introspection",
+      "intelligent",
+      "développement"
+    ],
+    "previous_uuid": "5933e195-32e2-4134-8009-1bb11907f96a",
+    "next_uuid": null
+  },
+  {
+    "uuid": "8511fe59-14d5-4567-84dd-8f13f0437ec7",
+    "fractal_path": "test/fractal_node_1",
+    "timestamp": "2025-08-04T19:57:37.608877",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "test",
+      "fractal",
+      "node"
+    ],
+    "previous_uuid": "32b018c3-f5f9-4680-81ce-98d02d39e808",
+    "next_uuid": null
+  },
+  {
+    "uuid": "46419e00-97bc-4dbe-b354-1fce437d9822",
+    "fractal_path": "test/fractal_node_2",
+    "timestamp": "2025-08-04T19:57:37.612909",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "test",
+      "fractal",
+      "node"
+    ],
+    "previous_uuid": "8511fe59-14d5-4567-84dd-8f13f0437ec7",
+    "next_uuid": null
+  },
+  {
+    "uuid": "19ac0339-7d51-4ca3-b140-8c2571d813c8",
+    "fractal_path": "test/fractal_node_1",
+    "timestamp": "2025-08-04T20:00:34.956220",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "test",
+      "fractal",
+      "node"
+    ],
+    "previous_uuid": "46419e00-97bc-4dbe-b354-1fce437d9822",
+    "next_uuid": null
+  },
+  {
+    "uuid": "4ef90dcd-93f6-470f-a6e5-c7b9c996196c",
+    "fractal_path": "test/fractal_node_2",
+    "timestamp": "2025-08-04T20:00:34.960245",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "test",
+      "fractal",
+      "node"
+    ],
+    "previous_uuid": "19ac0339-7d51-4ca3-b140-8c2571d813c8",
+    "next_uuid": null
+  },
+  {
+    "uuid": "5a5325be-edcb-4040-8d17-157f538298be",
+    "fractal_path": "test/fractal_node_1",
+    "timestamp": "2025-08-04T20:05:59.290756",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [
+      "test",
+      "fractal",
+      "node"
+    ],
+    "previous_uuid": "4ef90dcd-93f6-470f-a6e5-c7b9c996196c",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c0588f69-9cc9-4172-8bf1-be242e60d1fb",
+    "fractal_path": "test/fractal_node_2",
+    "timestamp": "2025-08-04T20:05:59.293601",
+    "intent": null,
+    "strata": "somatic",
+    "keywords": [
+      "test",
+      "fractal",
+      "node"
+    ],
+    "previous_uuid": "5a5325be-edcb-4040-8d17-157f538298be",
+    "next_uuid": null
+  },
+  {
+    "uuid": "42de23e4-3924-4b50-b685-259fa7136e3c",
+    "fractal_path": "/memories/cognitive/e771c667-c732-47c5-be17-3112bbcdb2fa",
+    "timestamp": "2025-08-04T22:30:37.765718",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "c0588f69-9cc9-4172-8bf1-be242e60d1fb",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c490e46d-6080-425a-8033-92adf19ce038",
+    "fractal_path": "/memories/cognitive/dffe4089-2adc-4269-8c21-bb224166be51",
+    "timestamp": "2025-08-04T22:30:40.793605",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "42de23e4-3924-4b50-b685-259fa7136e3c",
+    "next_uuid": null
+  },
+  {
+    "uuid": "68e03255-38b1-4da7-9b96-6138afa3a882",
+    "fractal_path": "/memories/cognitive/10f53d31-f266-4013-beba-a69c85236b79",
+    "timestamp": "2025-08-04T22:30:43.571136",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "c490e46d-6080-425a-8033-92adf19ce038",
+    "next_uuid": null
+  },
+  {
+    "uuid": "f869a46b-bf9e-48c9-8254-2ae39e8a336e",
+    "fractal_path": "/memories/cognitive/c650ad72-9107-4a9b-9a91-c35e9c6858fd",
+    "timestamp": "2025-08-04T22:30:46.719172",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "68e03255-38b1-4da7-9b96-6138afa3a882",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c476ccc8-fd90-40bf-8d8b-d78cac41c0ab",
+    "fractal_path": "/memories/cognitive/7f983c2f-0330-440e-98a9-2185da36b387",
+    "timestamp": "2025-08-04T22:30:49.709331",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "f869a46b-bf9e-48c9-8254-2ae39e8a336e",
+    "next_uuid": null
+  },
+  {
+    "uuid": "aa32be11-eb16-4139-9c58-1187ee2c69ab",
+    "fractal_path": "/memories/cognitive/83a53d60-da75-4253-bb03-931f32262591",
+    "timestamp": "2025-08-04T22:30:52.776243",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "c476ccc8-fd90-40bf-8d8b-d78cac41c0ab",
+    "next_uuid": null
+  },
+  {
+    "uuid": "c36b432b-7a5b-4627-9838-54227ad24f9e",
+    "fractal_path": "/memories/cognitive/b265417f-8b62-4617-986a-c551bcb9d79a",
+    "timestamp": "2025-08-04T22:30:55.588635",
+    "intent": null,
+    "strata": "cognitive",
+    "keywords": [],
+    "previous_uuid": "aa32be11-eb16-4139-9c58-1187ee2c69ab",
+    "next_uuid": null
+  }
+]

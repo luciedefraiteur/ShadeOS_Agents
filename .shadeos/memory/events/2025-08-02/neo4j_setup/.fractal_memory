@@ -1,0 +1,30 @@
+{
+    "id": "efbbd0b6-81b2-46ec-98fb-f3636712b65e",
+    "timestamp": "2025-08-04T19:36:53.477859",
+    "content": "Configuration automatique de Neo4j avec Docker.",
+    "metadata": {
+        "summary": "Neo4j setup",
+        "keywords": [
+            "neo4j",
+            "docker",
+            "setup",
+            "configuration"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "neo4j",
+        "docker",
+        "setup",
+        "configuration"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

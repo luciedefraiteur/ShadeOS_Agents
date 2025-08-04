@@ -1,0 +1,21 @@
+{
+    "id": "63c510cc-34f0-4911-83bf-bc1660781c18",
+    "timestamp": "2025-08-04T22:30:40.793434",
+    "content": "\n            Exécution d'outil: code_analyzer\n            Succès: True\n            Temps d'exécution: 7.3e-05s\n            Arguments: {\n  \"file_path\": \".\"\n}\n            \nRésultat: {'file_path': '.', 'error': \"[Errno 21] Is a directory: '.'\", 'issues': [], 'suggestions': []}...",
+    "metadata": {
+        "path": "/memories/cognitive/dffe4089-2adc-4269-8c21-bb224166be51",
+        "summary": "\n            Exécution d'outil: code_analyzer\n            Succès: True\n            Temps d'exécution...",
+        "keywords": [],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

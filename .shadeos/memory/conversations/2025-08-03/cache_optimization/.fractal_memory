@@ -1,0 +1,30 @@
+{
+    "id": "0b9546c8-921c-449b-b69e-9c43769a6295",
+    "timestamp": "2025-08-04T19:22:55.951843",
+    "content": "Optimisation réussie : réduction de 60% des appels LLM grâce au cache intelligent. Performance améliorée significativement.",
+    "metadata": {
+        "summary": "Optimisation cache réussie",
+        "keywords": [
+            "optimisation",
+            "cache",
+            "performance",
+            "llm"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "optimisation",
+        "cache",
+        "performance",
+        "llm"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

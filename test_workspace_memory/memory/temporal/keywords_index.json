@@ -1,0 +1,45 @@
+{
+  "self": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_file.py"
+  ],
+  "test": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_file.py",
+    "workspace/non/existent/file.py"
+  ],
+  "return": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_file.py"
+  ],
+  "class": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_file.py"
+  ],
+  "workspace": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_file.py"
+  ],
+  "testworkspaceclass": [
+    "workspace/test_workspace_file.py",
+    "workspace/test_workspace_file.py"
+  ],
+  "development": [
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659"
+  ],
+  "flow": [
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659"
+  ],
+  "action": [
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659",
+    "development/flow/20250804_203659"
+  ],
+  "content": [
+    "workspace/non/existent/file.py"
+  ]
+}

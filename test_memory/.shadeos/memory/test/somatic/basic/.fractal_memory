@@ -1,0 +1,29 @@
+{
+    "id": "6781b93f-1c79-4799-bbb8-140f23a1313c",
+    "timestamp": "2025-08-04T20:21:46.930797",
+    "content": "Contenu somatique de base",
+    "metadata": {
+        "path": "test/somatic/basic",
+        "summary": "Test somatique",
+        "keywords": [
+            "test",
+            "somatic",
+            "basic"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "test",
+        "somatic",
+        "basic"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

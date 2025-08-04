@@ -1,0 +1,11 @@
+{
+  "project_name": "V9_Test",
+  "version": "1.0.0",
+  "description": "Projet de test pour V9 Auto-Feeding Thread",
+  "bugs_expected": 4,
+  "features": [
+    "calculation",
+    "validation",
+    "data_processing"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+    "id": "45266e4e-aed8-4d90-8b44-d1bad1ba4d11",
+    "timestamp": "2025-08-04T19:22:56.005305",
+    "content": "Informations connexion Neo4j : URI bolt://localhost:7687, timeout 60s, retry 3 tentatives.",
+    "metadata": {
+        "summary": "Informations connexion Neo4j",
+        "keywords": [
+            "config",
+            "neo4j",
+            "connexion",
+            "info"
+        ],
+        "strata": "somatic",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "somatic",
+    "keywords": [
+        "config",
+        "neo4j",
+        "connexion",
+        "info"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}

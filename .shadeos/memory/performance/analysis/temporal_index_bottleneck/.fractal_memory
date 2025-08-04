@@ -1,0 +1,30 @@
+{
+    "id": "af253ef0-ba27-44ca-91d9-fc32c2cac5ad",
+    "timestamp": "2025-08-04T19:22:55.983819",
+    "content": "Analyse goulot d'étranglement : TemporalIndex.auto_record() trop lent avec O(n) complexité. Optimisation nécessaire.",
+    "metadata": {
+        "summary": "Analyse goulot temporal_index",
+        "keywords": [
+            "performance",
+            "analyse",
+            "goulot",
+            "temporal_index"
+        ],
+        "strata": "cognitive",
+        "transcendence_links": [],
+        "immanence_links": []
+    },
+    "strata": "cognitive",
+    "keywords": [
+        "performance",
+        "analyse",
+        "goulot",
+        "temporal_index"
+    ],
+    "linked_memories": [],
+    "transcendence_links": [],
+    "immanence_links": [],
+    "temporal_uuid": null,
+    "previous_temporal_uuid": null,
+    "next_temporal_uuid": null
+}
