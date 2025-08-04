@@ -264,20 +264,26 @@ OUTILS DISPONIBLES:
 - **safe_create_file**: Crée un nouveau fichier
 - **list_tools**: Liste tous les outils disponibles
 
-FORMAT DE RÉPONSE:
-- Pour utiliser une couche: LAYER: nom_couche action paramètres
-- Pour utiliser un outil: TOOL: nom_outil paramètres
-- Pour introspection: INTROSPECT: question ou observation
-- Pour continuer: CONTINUE: description de la prochaine étape
-- Pour terminer: DONE: résumé du travail accompli
+FORMAT DE RÉPONSE EXACT (utilisez exactement ces formats):
+- LAYER: nom_couche action paramètres
+- TOOL: nom_outil paramètres
+- INTROSPECT: question ou observation
+- CONTINUE: description de la prochaine étape
+- DONE: résumé du travail accompli
 
-EXEMPLES D'UTILISATION:
+NOMS DE COUCHES EXACTS (utilisez exactement):
+- "workspace" (pas workspaceLayer, pas WorkspaceLayer)
+- "git" (pas gitLayer, pas GitLayer)
+
+EXEMPLES D'UTILISATION CORRECTS:
 - LAYER: workspace intelligent_search query="bug calculator"
 - LAYER: git search_git_history query="memory engine"
 - TOOL: code_analyzer file_path=TestProject/calculator.py
 - INTROSPECT: J'ai trouvé 3 bugs, je vais les corriger un par un
 - CONTINUE: Analyser le fichier suivant pour détecter d'autres problèmes
 - DONE: Projet construit et débogué avec succès
+
+IMPORTANT: Respectez EXACTEMENT les noms de couches "workspace" et "git" sans majuscules ni suffixes !
 
 STRATÉGIE DE TRAVAIL:
 1. Analyser la demande utilisateur
@@ -316,7 +322,7 @@ IMPORTANT: Utilise le thread introspectif pour documenter tes pensées et décis
             
             actions.append({
                 "type": "layer",
-                "layer_name": layer_name,
+                "layer_name": layer_name.lower(),  # Normaliser en minuscules
                 "action": action_str.split()[0] if action_str.split() else "unknown",
                 "arguments": arguments
             })
@@ -454,14 +460,16 @@ IMPORTANT: Utilise le thread introspectif pour documenter tes pensées et décis
             if self.logger.workspace_actions:
                 recent_workspace = self.logger.workspace_actions[-2:]  # 2 derniers
                 for action in recent_workspace:
-                    success = action['result'].get('success', False)
+                    result = action['result']
+                    success = result.get('success', False) if isinstance(result, dict) else True
                     recent_results += f"- Workspace {action['action']}: {'SUCCÈS' if success else 'ÉCHEC'}\n"
             
             # Git actions
             if self.logger.git_actions:
                 recent_git = self.logger.git_actions[-2:]  # 2 derniers
                 for action in recent_git:
-                    success = action['result'].get('success', False)
+                    result = action['result']
+                    success = result.get('success', False) if isinstance(result, dict) else True
                     recent_results += f"- Git {action['action']}: {'SUCCÈS' if success else 'ÉCHEC'}\n"
             
             # Debug actions
