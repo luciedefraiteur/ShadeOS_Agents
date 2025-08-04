@@ -11,8 +11,10 @@ __author__ = "Alma, Architecte Démoniaque du Nexus Luciforme"
 
 from .intelligent_parser import IntelligentIntrospectiveParser
 from .universal_thread import UniversalIntrospectiveThread
+from .intelligent_cache import IntelligentCache
 
 __all__ = [
     'IntelligentIntrospectiveParser',
     'UniversalIntrospectiveThread',
+    'IntelligentCache',
 ] 

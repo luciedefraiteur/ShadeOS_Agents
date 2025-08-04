@@ -14,6 +14,7 @@ from collections import deque
 
 from Core.LLMProviders import LLMProvider
 from .intelligent_parser import IntelligentIntrospectiveParser, IntrospectiveMessage
+from .intelligent_cache import IntelligentCache
 
 
 @dataclass
@@ -34,11 +35,18 @@ class UniversalIntrospectiveThread:
     """Thread introspectif universel pour toutes les entités"""
     
     def __init__(self, entity_id: str, entity_type: str, provider: LLMProvider, 
-                 max_history: int = 100):
+                 max_history: int = 100, enable_cache: bool = True):
         self.entity_id = entity_id
         self.entity_type = entity_type
         self.provider = provider
         self.parser = IntelligentIntrospectiveParser(provider)
+        
+        # Cache intelligent
+        self.enable_cache = enable_cache
+        if enable_cache:
+            self.cache = IntelligentCache(provider, max_cache_size=500)
+        else:
+            self.cache = None
         
         # Historique avec limite de taille
         self.thread_history = deque(maxlen=max_history)
@@ -60,16 +68,37 @@ class UniversalIntrospectiveThread:
     
     async def add_response(self, response: str, context: Optional[Dict[str, Any]] = None):
         """
-        Ajoute une réponse et l'analyse automatiquement
+        Ajoute une réponse et l'analyse automatiquement avec cache intelligent
         
         Args:
             response: Réponse de l'entité à analyser
             context: Contexte supplémentaire pour l'analyse
         """
-        # Analyse introspective de la réponse
+        # Vérification du cache intelligent
+        if self.enable_cache and self.cache:
+            cached_message = await self.cache.get_cached_analysis(
+                response, self.entity_id, self.entity_type, context
+            )
+            
+            if cached_message:
+                # Utilisation du résultat en cache
+                self.thread_history.append(cached_message)
+                self._update_metrics(cached_message)
+                await self._analyze_own_patterns()
+                
+                print(f"🧠 {self.entity_id} ({self.entity_type}): {cached_message.get_summary()} [CACHE]")
+                return
+        
+        # Analyse introspective de la réponse (pas en cache)
         introspective_message = await self.parser.parse_response(
             response, self.entity_id, self.entity_type, context
         )
+        
+        # Mise en cache du résultat
+        if self.enable_cache and self.cache:
+            await self.cache.cache_analysis(
+                response, introspective_message, self.entity_id, self.entity_type, context
+            )
         
         # Ajout à l'historique
         self.thread_history.append(introspective_message)
@@ -303,6 +332,14 @@ class UniversalIntrospectiveThread:
     
     def get_summary(self) -> str:
         """Génère un résumé du thread introspectif"""
+        cache_stats = ""
+        if self.enable_cache and self.cache:
+            stats = self.cache.get_cache_stats()
+            if "error" not in stats:
+                cache_stats = f"""
+💾 Cache: {stats['total_entries']} entrées, efficacité moyenne: {stats['average_effectiveness']:.2f}
+"""
+        
         return f"""
 🧠 Thread Introspectif de {self.entity_id} ({self.entity_type})
 📊 Messages: {self.metrics.total_messages}
@@ -313,5 +350,5 @@ class UniversalIntrospectiveThread:
 🎯 Décisions: {self.metrics.decision_count}
 💾 Appels mémoire: {len(self.memory_calls)}
 👁️ Auto-observations: {len(self.self_observations)}
-🕐 Dernière activité: {time.strftime('%H:%M:%S', time.localtime(self.metrics.last_activity))}
+🕐 Dernière activité: {time.strftime('%H:%M:%S', time.localtime(self.metrics.last_activity))}{cache_stats}
 """.strip() 
