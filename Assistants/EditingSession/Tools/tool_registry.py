@@ -13,7 +13,7 @@ import inspect
 from typing import Dict, Any, List, Optional, Callable
 from pathlib import Path
 
-from MemoryEngine.parsers.luciform_parser import parse_luciform
+from Core.Parsers.luciform_parser import parse_luciform
 from MemoryEngine.core.engine import MemoryEngine
 
 

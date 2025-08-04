@@ -23,7 +23,7 @@ class LocalProvider(LLMProvider):
         # Configuration Ollama spécifique
         self.model = config.get('model', 'qwen2.5:7b-instruct')
         self.ollama_host = config.get('ollama_host', 'http://localhost:11434')
-        self.ollama_binary = config.get('ollama_binary', 'ollama')
+        self.ollama_binary = config.get('ollama_binary', '/usr/local/bin/ollama')
         
         # Validation du modèle
         if not self.model:
@@ -137,7 +137,7 @@ class LocalProvider(LLMProvider):
                 command.extend(['--temperature', str(temperature)])
             
             # Estimation de la taille du prompt
-            prompt_size = self.estimate_prompt_size(prompt) if self.estimate_prompt_size else None
+            prompt_size = len(prompt) if self.estimate_prompt_size else None
             
             # Génération de la réponse
             response = await self._execute_with_timeout(
