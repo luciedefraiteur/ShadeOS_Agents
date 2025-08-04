@@ -38,6 +38,13 @@ Scripts de test et utilitaires
 - `test_lucie_simple.sh` : Scripts shell de test
 - `test_output.txt` : Fichiers de sortie de test
 
+### 🐛 TestProject/
+Projet de test avec bugs intentionnels pour valider les capacités de débogage
+- `calculator.py` : Calculatrice avec bugs dans toutes les opérations
+- `buggy_calculator.py` : Version alternative avec bugs
+- `corrupted_calculator.py` : Version corrompue pour tests avancés
+- `data_processor.py` : Processeur de données avec bugs intentionnels
+
 ## 🚀 Utilisation
 
 ```bash
