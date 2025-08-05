@@ -638,6 +638,7 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
             "ALMA_DECISION": DaemonRole.ALMA,
             "ALMA_ORDONNANCEMENT": DaemonRole.ALMA,
             "ALMA_SUMMARY": DaemonRole.ALMA,
+            "NEXT_STEPS": DaemonRole.ALMA,  # Ajout du type manquant
             
             # Bask'tur
             "BASK_ANALYSIS": DaemonRole.BASKTUR,
