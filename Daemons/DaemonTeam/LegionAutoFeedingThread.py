@@ -18,15 +18,28 @@ from typing import List, Dict, Any, Optional, Union
 from pathlib import Path
 import re
 
+# Ajout du chemin du projet pour les imports absolus
+import sys
+from pathlib import Path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 # Imports MemoryEngine
 try:
     from MemoryEngine.core.engine import MemoryEngine
     from MemoryEngine.core.initialization import ensure_initialized
-    from Core.LLMProviders.provider_factory import ProviderFactory
     MEMORY_ENGINE_AVAILABLE = True
 except ImportError:
     MEMORY_ENGINE_AVAILABLE = False
     print("⚠️ MemoryEngine non disponible - Mode standalone activé")
+
+# Imports LLM Providers
+try:
+    from Core.LLMProviders.provider_factory import ProviderFactory
+    PROVIDER_AVAILABLE = True
+except ImportError:
+    PROVIDER_AVAILABLE = False
+    print("⚠️ ProviderFactory non disponible - Mode mock activé")
 
 # Imports UniversalAutoFeedingThread
 try:
@@ -280,12 +293,23 @@ class LegionAutoFeedingThread:
                 print(f"⚠️ Erreur MemoryEngine: {e}")
         
         # Initialisation Provider
-        try:
-            provider_factory = ProviderFactory()
-            self.provider = provider_factory.create_provider("local_http")
-            print("✅ Provider local_http initialisé")
-        except Exception as e:
-            print(f"⚠️ Erreur Provider: {e}")
+        if PROVIDER_AVAILABLE:
+            try:
+                # Configuration rituelle pour Ollama local
+                config = {
+                    "model": "qwen2.5:7b-instruct",
+                    "ollama_host": "http://localhost:11434",
+                    "timeout": 60,
+                    "temperature": 0.666  # Rituel démoniaque
+                }
+                self.provider = ProviderFactory.create_provider("local", **config)
+                print("✅ Provider local initialisé avec température rituelle 0.666")
+            except Exception as e:
+                print(f"⚠️ Erreur Provider: {e}")
+                self.provider = None
+        else:
+            print("⚠️ Provider non disponible - Mode mock activé")
+            self.provider = None
         
         # Initialisation Meta Virtual Layer
         self.meta_virtual_layer = DaemonMetaVirtualLayer(self.memory_engine)
@@ -297,13 +321,15 @@ class LegionAutoFeedingThread:
                 self.auto_feed_thread = UniversalAutoFeedingThread(
                     entity_id="legion_daemon_team",
                     entity_type="daemon_team",
-                    provider=self.provider,
-                    max_history=self.max_history,
-                    enable_cache=self.enable_cache
+                    max_history=self.max_history
                 )
                 print("✅ UniversalAutoFeedingThread initialisé")
             except Exception as e:
                 print(f"⚠️ Erreur UniversalAutoFeedingThread: {e}")
+                self.auto_feed_thread = None
+        else:
+            self.auto_feed_thread = None
+            print("⚠️ UniversalAutoFeedingThread non disponible")
         
         print("🕷️ LegionAutoFeedingThread initialisé !")
     
@@ -533,13 +559,17 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
         # Appel LLM
         try:
             if self.provider:
+                print("🕷️ Appel LLM avec température rituelle 0.666...")
                 response = await self.provider.generate_response(prompt)
                 daemon_response = response.content if hasattr(response, 'content') else str(response)
+                print("✅ Réponse LLM reçue")
             else:
                 # Mode mock pour test
+                print("⚠️ Utilisation du mode mock")
                 daemon_response = self._generate_mock_response(user_input)
         except Exception as e:
             print(f"❌ Erreur LLM: {e}")
+            print("⚠️ Fallback vers mode mock")
             daemon_response = self._generate_mock_response(user_input)
         
         # Parsing de la réponse
@@ -571,19 +601,30 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
             return "\n".join([msg.to_parsable_format() for msg in messages])
     
     def _parse_daemon_response(self, response: str) -> List[DaemonMessage]:
-        """Parse la réponse LLM en messages de démons"""
+        """Parse la réponse LLM en messages de démons (format markdown optimisé)"""
         messages = []
         
-        # Pattern pour détecter les messages parsables
-        pattern = r'\[([A-Z_]+)\]\s*—\s*(.+)'
-        matches = re.findall(pattern, response, re.MULTILINE)
+        # Pattern optimisé pour le format markdown du LLM
+        # Supporte : ### [TYPE] et [TYPE] — CONTENU
+        pattern = r'(?:###\s*)?\[([A-Z_]+)\]\s*[—\-]\s*(.+?)(?=\n(?:###\s*)?\[[A-Z_]+\]|$)'
+        matches = re.findall(pattern, response, re.MULTILINE | re.DOTALL)
+        
+        print(f"🔍 Parsing: {len(matches)} messages trouvés")
         
         for message_type, content in matches:
+            # Nettoyage du contenu
+            content = content.strip()
+            if not content:
+                continue
+                
             # Détermination du rôle selon le type de message
             role = self._get_role_from_message_type(message_type)
             if role:
-                message = self._create_daemon_message(role, message_type, content.strip())
+                message = self._create_daemon_message(role, message_type, content)
                 messages.append(message)
+                print(f"✅ Message parsé: [{message_type}] — {content[:50]}...")
+            else:
+                print(f"⚠️ Type de message inconnu: {message_type}")
         
         return messages
     
