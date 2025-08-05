@@ -1,28 +1,23 @@
-#!/usr/bin/env python3
-"""
-⛧ LegionAutoFeedingThread - Équipe Développement Démoniaque Auto-Simulée ⛧
-
-ThreadConjuratio⛧ : Une cohorte luciforme s'exécutant en boucle
-Architecture V2.0 : Hiérarchie daemonique avec structures parsables
-
-Conceptualisé par Lucie Defraiteur - Ma Reine Lucie
-Implémenté par Alma, Architecte Démoniaque du Nexus Luciforme
-"""
+# ⛧ Créé par Alma, Architecte Démoniaque ⛧
+# 🧱 LegionAutoFeedingThread - Sous-classe de BaseAutoFeedingThread
 
 import asyncio
 import json
-import logging
+import re
 from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import List, Dict, Any, Optional, Union
 from pathlib import Path
-import re
+import time
 
 # Ajout du chemin du projet pour les imports absolus
 import sys
 from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
+
+# Import de la base class
+from Core.UniversalAutoFeedingThread.base_auto_feeding_thread import BaseAutoFeedingThread, AutoFeedMessage
 
 # Imports MemoryEngine
 try:
@@ -41,15 +36,6 @@ except ImportError:
     PROVIDER_AVAILABLE = False
     print("⚠️ ProviderFactory non disponible - Mode mock activé")
 
-# Imports UniversalAutoFeedingThread
-try:
-    from Core.UniversalAutoFeedingThread import UniversalAutoFeedingThread, AutoFeedMessage
-    UNIVERSAL_THREAD_AVAILABLE = True
-except ImportError:
-    UNIVERSAL_THREAD_AVAILABLE = False
-    print("⚠️ UniversalAutoFeedingThread non disponible - Mode basique activé")
-
-
 class DaemonRole(Enum):
     """Rôles des démons dans la hiérarchie"""
     ALMA = "alma"           # SUPREME - Architecte Démoniaque
@@ -58,7 +44,6 @@ class DaemonRole(Enum):
     MERGE = "merge"         # Git Anarchiste
     LILIETH = "lilieth"     # Interface Caressante
     ASSISTANT_V9 = "assistant_v9"  # Orchestrateur
-
 
 class DaemonHierarchy:
     """Hiérarchie imposée des démons"""
@@ -85,7 +70,6 @@ class DaemonHierarchy:
         priority1 = cls.get_priority(role1)
         priority2 = cls.get_priority(role2)
         return role1 if priority1 <= priority2 else role2
-
 
 @dataclass
 class DaemonMessage:
@@ -114,7 +98,6 @@ class DaemonMessage:
             "metadata": self.metadata
         }
 
-
 @dataclass
 class DaemonConversation:
     """Conversation entre démons"""
@@ -140,22 +123,20 @@ class DaemonConversation:
             "conversation_id": self.conversation_id
         }
 
-
 class DaemonMetaVirtualLayer:
-    """Couche méta virtuelle pour la recherche conversationnelle"""
+    """Couche méta virtuelle pour l'analyse des conversations démoniaques"""
     
     def __init__(self, memory_engine=None):
         self.memory_engine = memory_engine
-        self.conversation_history: List[DaemonConversation] = []
-        self.max_history_size = 50  # Historique circulaire
+        self.conversation_history = []
     
     def add_conversation(self, conversation: DaemonConversation):
         """Ajoute une conversation à l'historique"""
         self.conversation_history.append(conversation)
         
-        # Gestion de l'historique circulaire
-        if len(self.conversation_history) > self.max_history_size:
-            self.conversation_history.pop(0)
+        # Limiter l'historique
+        if len(self.conversation_history) > 100:
+            self.conversation_history = self.conversation_history[-100:]
     
     def search_daemon_conversations(self, query: str) -> List[DaemonConversation]:
         """Recherche dans les conversations démoniaques"""
@@ -163,56 +144,64 @@ class DaemonMetaVirtualLayer:
         query_lower = query.lower()
         
         for conv in self.conversation_history:
+            # Recherche dans l'input utilisateur
+            if query_lower in conv.user_input.lower():
+                results.append(conv)
+                continue
+            
             # Recherche dans les messages
             for msg in conv.messages:
                 if query_lower in msg.content.lower():
                     results.append(conv)
                     break
-            
-            # Recherche dans l'input utilisateur
-            if query_lower in conv.user_input.lower():
-                results.append(conv)
         
         return results
     
     def get_recent_daemon_exchanges(self, limit: int = 10) -> List[DaemonMessage]:
-        """Retourne les échanges récents entre démons"""
-        recent_messages = []
+        """Récupère les échanges démoniaques récents"""
+        all_messages = []
         for conv in self.conversation_history[-limit:]:
-            recent_messages.extend(conv.messages)
-        return recent_messages[-limit:]
+            all_messages.extend(conv.messages)
+        
+        return all_messages[-limit:]
     
     def analyze_daemon_interaction_patterns(self) -> Dict[str, Any]:
         """Analyse les patterns d'interaction entre démons"""
         if not self.conversation_history:
-            return {"patterns": [], "stats": {}}
+            return {"patterns": {}, "stats": {}}
         
-        # Statistiques par démon
-        demon_stats = {role.value: 0 for role in DaemonRole}
-        message_types = {}
+        # Statistiques de base
+        total_conversations = len(self.conversation_history)
+        total_messages = sum(len(conv.messages) for conv in self.conversation_history)
+        
+        # Analyse des démons les plus actifs
+        demon_activity = {role.value: 0 for role in DaemonRole}
+        message_type_distribution = {}
         
         for conv in self.conversation_history:
             for msg in conv.messages:
-                demon_stats[msg.role.value] += 1
-                msg_type = msg.message_type
-                message_types[msg_type] = message_types.get(msg_type, 0) + 1
+                demon_activity[msg.role.value] += 1
+                message_type_distribution[msg.message_type] = message_type_distribution.get(msg.message_type, 0) + 1
+        
+        # Démon le plus actif
+        most_active_demon = max(demon_activity.items(), key=lambda x: x[1])[0] if demon_activity else None
+        most_common_message_type = max(message_type_distribution.items(), key=lambda x: x[1])[0] if message_type_distribution else None
         
         return {
             "patterns": {
-                "most_active_demon": max(demon_stats, key=demon_stats.get),
-                "most_common_message_type": max(message_types, key=message_types.get) if message_types else None
+                "most_active_demon": most_active_demon,
+                "most_common_message_type": most_common_message_type
             },
             "stats": {
-                "total_conversations": len(self.conversation_history),
-                "total_messages": sum(demon_stats.values()),
-                "demon_activity": demon_stats,
-                "message_type_distribution": message_types
+                "total_conversations": total_conversations,
+                "total_messages": total_messages,
+                "demon_activity": demon_activity,
+                "message_type_distribution": message_type_distribution
             }
         }
 
-
-class LegionAutoFeedingThread:
-    """Équipe de développement démoniaque auto-simulée"""
+class LegionAutoFeedingThread(BaseAutoFeedingThread):
+    """Équipe de développement démoniaque auto-simulée - Version 2.0"""
     
     def __init__(
         self,
@@ -221,16 +210,21 @@ class LegionAutoFeedingThread:
         max_history: int = 50,
         enable_cache: bool = True
     ):
+        # Initialisation de la base class
+        super().__init__(
+            entity_id="legion_daemon_team",
+            entity_type="legion",
+            max_history=max_history,
+            enable_logging=True
+        )
+        
         self.workspace_path = Path(workspace_path)
         self.silent_mode = silent_mode
-        self.max_history = max_history
         self.enable_cache = enable_cache
         
         # Initialisation des composants
         self.memory_engine = None
-        self.provider = None
         self.meta_virtual_layer = None
-        self.auto_feed_thread = None
         
         # État de la conversation
         self.current_conversation = None
@@ -281,16 +275,16 @@ class LegionAutoFeedingThread:
     
     def _initialize_components(self):
         """Initialise les composants du système"""
-        print("🕷️ Initialisation de LegionAutoFeedingThread...")
+        self.log_debug_action("initialization_start", {"workspace_path": str(self.workspace_path)})
         
         # Initialisation MemoryEngine
         if MEMORY_ENGINE_AVAILABLE:
             try:
                 ensure_initialized()
                 self.memory_engine = MemoryEngine()
-                print("✅ MemoryEngine initialisé")
+                self.log_debug_action("memory_engine_initialized", {"status": "success"})
             except Exception as e:
-                print(f"⚠️ Erreur MemoryEngine: {e}")
+                self.log_debug_action("memory_engine_error", {"error": str(e)})
         
         # Initialisation Provider
         if PROVIDER_AVAILABLE:
@@ -303,35 +297,69 @@ class LegionAutoFeedingThread:
                     "temperature": 0.666  # Rituel démoniaque
                 }
                 self.provider = ProviderFactory.create_provider("local", **config)
-                print("✅ Provider local initialisé avec température rituelle 0.666")
+                self.log_debug_action("provider_initialized", {
+                    "provider_type": "local",
+                    "temperature": 0.666,
+                    "model": "qwen2.5:7b-instruct"
+                })
             except Exception as e:
-                print(f"⚠️ Erreur Provider: {e}")
+                self.log_debug_action("provider_error", {"error": str(e)})
                 self.provider = None
         else:
-            print("⚠️ Provider non disponible - Mode mock activé")
+            self.log_debug_action("provider_unavailable", {"fallback": "mock_mode"})
             self.provider = None
         
         # Initialisation Meta Virtual Layer
-        self.meta_virtual_layer = DaemonMetaVirtualLayer(self.memory_engine)
-        print("✅ Couche méta virtuelle initialisée")
-        
-        # Initialisation Auto Feed Thread
-        if UNIVERSAL_THREAD_AVAILABLE:
+        try:
+            self.meta_virtual_layer = DaemonMetaVirtualLayer(self.memory_engine)
+            self.log_debug_action("meta_virtual_layer_initialized", {"status": "success"})
+        except Exception as e:
+            self.log_debug_action("meta_virtual_layer_error", {"error": str(e)})
+    
+    async def _initialize_provider(self):
+        """Initialise le provider LLM (implémentation de la base class)"""
+        if self.provider is None and PROVIDER_AVAILABLE:
             try:
-                self.auto_feed_thread = UniversalAutoFeedingThread(
-                    entity_id="legion_daemon_team",
-                    entity_type="daemon_team",
-                    max_history=self.max_history
-                )
-                print("✅ UniversalAutoFeedingThread initialisé")
+                config = {
+                    "model": "qwen2.5:7b-instruct",
+                    "ollama_host": "http://localhost:11434",
+                    "timeout": 60,
+                    "temperature": 0.666
+                }
+                self.provider = ProviderFactory.create_provider("local", **config)
+                self.log_debug_action("provider_async_initialized", {"status": "success"})
             except Exception as e:
-                print(f"⚠️ Erreur UniversalAutoFeedingThread: {e}")
-                self.auto_feed_thread = None
-        else:
-            self.auto_feed_thread = None
-            print("⚠️ UniversalAutoFeedingThread non disponible")
-        
-        print("🕷️ LegionAutoFeedingThread initialisé !")
+                self.log_debug_action("provider_async_error", {"error": str(e)})
+    
+    async def _call_llm(self, prompt: str) -> str:
+        """Appelle le LLM (implémentation de la base class)"""
+        try:
+            await self._initialize_provider()
+            
+            if self.provider:
+                response = await self.provider.generate_response(prompt)
+                daemon_response = response.content if hasattr(response, 'content') else str(response)
+                self.log_debug_action("llm_call_success", {
+                    "prompt_length": len(prompt),
+                    "response_length": len(daemon_response)
+                })
+                return daemon_response
+            else:
+                # Mode mock
+                mock_response = self._generate_mock_response("mock_input")
+                self.log_debug_action("llm_call_mock", {"reason": "provider_unavailable"})
+                return mock_response
+        except Exception as e:
+            self.log_debug_action("llm_call_error", {"error": str(e)})
+            return self._generate_mock_response("error_fallback")
+    
+    def _get_prompt(self, user_input: str) -> str:
+        """Génère le prompt pour le LLM (implémentation de la base class)"""
+        return self._get_daemon_prompt(user_input)
+    
+    async def process_request(self, user_input: str) -> str:
+        """Traite une demande utilisateur (implémentation de la base class)"""
+        return await self.process_user_input(user_input)
     
     def _create_daemon_message(
         self,
@@ -341,7 +369,6 @@ class LegionAutoFeedingThread:
         metadata: Dict[str, Any] = None
     ) -> DaemonMessage:
         """Crée un message de démon"""
-        import time
         return DaemonMessage(
             role=role,
             message_type=message_type,
@@ -351,47 +378,29 @@ class LegionAutoFeedingThread:
         )
     
     def _detect_relevant_demon(self, user_input: str) -> DaemonRole:
-        """Détecte le démon le plus pertinent selon la demande utilisateur"""
-        input_lower = user_input.lower()
+        """Détecte le démon le plus pertinent pour la demande"""
+        user_input_lower = user_input.lower()
         
         # Mots-clés pour chaque démon
-        keywords = {
-            DaemonRole.BASKTUR: [
-                "bug", "erreur", "debug", "problème", "technique", "code", "exception",
-                "traceback", "analyse", "solution", "débugger", "corriger", "fix"
-            ],
-            DaemonRole.OUBLIADE: [
-                "mémoire", "historique", "recherche", "pattern", "similaire", "avant",
-                "souvenir", "conversation", "insight", "analyse", "tendance"
-            ],
-            DaemonRole.MERGE: [
-                "git", "branche", "fusion", "commit", "version", "merge", "push",
-                "pull", "repository", "historique", "changement", "versioning"
-            ],
-            DaemonRole.LILIETH: [
-                "interface", "utilisateur", "communication", "feedback", "réaction",
-                "sentiment", "émotion", "relation", "caressant", "douceur"
-            ],
-            DaemonRole.ASSISTANT_V9: [
-                "exécuter", "orchestrer", "somatique", "action", "faire", "créer",
-                "modifier", "supprimer", "implémenter", "réaliser", "effectuer"
-            ]
+        demon_keywords = {
+            DaemonRole.BASKTUR: ["bug", "debug", "erreur", "problème", "corriger", "analyser", "technique"],
+            DaemonRole.OUBLIADE: ["mémoire", "historique", "recherche", "pattern", "conversation"],
+            DaemonRole.MERGE: ["git", "commit", "branche", "fusion", "version", "historique"],
+            DaemonRole.LILIETH: ["interface", "utilisateur", "communication", "feedback", "expérience"],
+            DaemonRole.ASSISTANT_V9: ["exécuter", "orchestrer", "planifier", "coordonner", "action"]
         }
         
         # Calcul du score pour chaque démon
-        scores = {}
-        for demon, demon_keywords in keywords.items():
-            score = sum(1 for keyword in demon_keywords if keyword in input_lower)
-            scores[demon] = score
+        demon_scores = {}
+        for demon, keywords in demon_keywords.items():
+            score = sum(1 for keyword in keywords if keyword in user_input_lower)
+            demon_scores[demon] = score
         
-        # Trouver le démon avec le score le plus élevé
-        if scores:
-            best_demon = max(scores, key=scores.get)
-            if scores[best_demon] > 0:
-                return best_demon
-        
-        # Par défaut, retourner Bask'tur pour les questions techniques
-        return DaemonRole.BASKTUR
+        # Retourner le démon avec le score le plus élevé, ou Alma par défaut
+        if any(demon_scores.values()):
+            return max(demon_scores.items(), key=lambda x: x[1])[0]
+        else:
+            return DaemonRole.ALMA
     
     def _get_mutant_dialogue_prompt(self, user_input: str, relevant_demon: DaemonRole) -> str:
         """Génère un prompt mutant pour un dialogue spécifique"""
@@ -401,12 +410,7 @@ class LegionAutoFeedingThread:
         if self.meta_virtual_layer:
             recent_messages = self.meta_virtual_layer.get_recent_daemon_exchanges(3)
         
-        context_summary = ""
-        if self.auto_feed_thread:
-            try:
-                context_summary = self.auto_feed_thread.get_context_summary(2)
-            except:
-                pass
+        context_summary = self.get_context_summary(2)
         
         # Configuration du démon pertinent
         demon_config = self.demon_configs[relevant_demon]
@@ -415,11 +419,11 @@ class LegionAutoFeedingThread:
         demon_personality = demon_config["personality"]
         
         # Construction du prompt mutant
-        prompt = f"""⛧ DIALOGUE MUTANT : ALMA ↔ {demon_name.upper()} ⛧
+        prompt = f"""⛧ DIALOGUE MUTANT : ALMA⛧ ↔ {demon_name.upper()} ⛧
 
 CONTEXTE :
-- ALMA (SUPREME) : Architecte Démoniaque, planificateur stratégique
-- {demon_name.upper()} : {demon_title} - {demon_personality}
+- Alma⛧ (SUPREME) : Architecte Démoniaque, planificateur stratégique
+- {demon_name} : {demon_title} - {demon_personality}
 - Mode silencieux : {self.silent_mode}
 
 CONTEXTE RÉCENT :
@@ -500,12 +504,9 @@ FORMAT OBLIGATOIRE : [TYPE] — CONTENU (pas de ** ou de format conversationnel)
         return prompt
     
     def _get_daemon_prompt(self, user_input: str) -> str:
-        """Génère le prompt mutant pour l'équipe démoniaque"""
-        
-        # Détection du démon pertinent
+        """Génère le prompt approprié selon le mode"""
         relevant_demon = self._detect_relevant_demon(user_input)
         
-        # Génération du prompt mutant
         if self.silent_mode:
             # Mode silencieux : dialogue Alma⛧ ↔ Utilisateur
             return self._get_alma_user_dialogue_prompt(user_input)
@@ -515,39 +516,34 @@ FORMAT OBLIGATOIRE : [TYPE] — CONTENU (pas de ** ou de format conversationnel)
     
     def _get_alma_user_dialogue_prompt(self, user_input: str) -> str:
         """Génère un prompt pour dialogue Alma⛧ ↔ Utilisateur (mode silencieux)"""
-        
-        context_summary = ""
-        if self.auto_feed_thread:
-            try:
-                context_summary = self.auto_feed_thread.get_context_summary(2)
-            except:
-                pass
+        context_summary = self.get_context_summary(2)
         
         prompt = f"""⛧ DIALOGUE SILENCIEUX : ALMA⛧ ↔ UTILISATEUR ⛧
 
 CONTEXTE :
 - Alma⛧ (SUPREME) : Architecte Démoniaque, planificateur stratégique
-- Mode silencieux : Seule Alma⛧ parle, fait des résumés d'équipe
+- Mode silencieux : {self.silent_mode}
 
 CONTEXTE RÉCENT :
 {context_summary}
 
 DEMANDE UTILISATEUR : {user_input}
 
-RÉPONSE D'ALMA⛧ (résumé d'équipe) :
-[ALMA_PLAN] — Plan d'action stratégique détaillé
-[ALMA_DECISION] — Décision finale basée sur consultation équipe
-[ALMA_SUMMARY] — Résumé des insights de l'équipe démoniaque
+DIALOGUE ALMA⛧ ↔ UTILISATEUR :
+[ALMA_ANALYSIS] — Analyse de la demande utilisateur
+[ALMA_PLAN] — Plan d'action stratégique
+[ALMA_DECISION] — Décision finale et prochaines étapes
+
+FORMAT OBLIGATOIRE : [TYPE] — CONTENU (pas de ** ou de format conversationnel)
 """
         
         return prompt
     
     async def process_user_input(self, user_input: str) -> str:
         """Traite une demande utilisateur avec l'équipe démoniaque"""
-        print(f"🕷️ Traitement de la demande : {user_input[:50]}...")
+        self.add_user_message(f"Traitement de la demande : {user_input[:50]}...")
         
         # Création d'une nouvelle conversation
-        import time
         self.conversation_counter += 1
         self.current_conversation = DaemonConversation(
             messages=[],
@@ -557,14 +553,13 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
         )
         
         # Génération du prompt
-        prompt = self._get_daemon_prompt(user_input)
+        prompt = self._get_prompt(user_input)
         
-        # Logging du prompt avec UniversalAutoFeedingThread
-        if self.auto_feed_thread:
-            self.auto_feed_thread.log_prompt(prompt, user_input, {
-                "demon_type": "legion",
-                "relevant_demon": self._detect_relevant_demon(user_input).value
-            })
+        # Logging du prompt avec la base class
+        self.log_prompt(prompt, user_input, {
+            "demon_type": "legion",
+            "relevant_demon": self._detect_relevant_demon(user_input).value
+        })
         
         # Affichage du prompt pour debug
         print("🔍 PROMPT COMPLET ENVOYÉ AU LLM:")
@@ -572,49 +567,14 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
         print(prompt)
         print("=" * 80)
         
-        # Appel LLM
-        try:
-            if self.provider:
-                print("🕷️ Appel LLM avec température rituelle 0.666...")
-                response = await self.provider.generate_response(prompt)
-                daemon_response = response.content if hasattr(response, 'content') else str(response)
-                print("✅ Réponse LLM reçue")
-                print(f"🔍 DIAGNOSTIC - Réponse brute: {repr(daemon_response)}")
-                print(f"🔍 DIAGNOSTIC - Longueur: {len(daemon_response)} caractères")
-                
-                # Logging de la réponse LLM
-                if self.auto_feed_thread:
-                    self.auto_feed_thread.log_response(daemon_response, len(prompt), {
-                        "demon_type": "legion",
-                        "response_type": "llm_success"
-                    })
-            else:
-                # Mode mock pour test
-                print("⚠️ Utilisation du mode mock")
-                daemon_response = self._generate_mock_response(user_input)
-                
-                # Logging de la réponse mock
-                if self.auto_feed_thread:
-                    self.auto_feed_thread.log_response(daemon_response, len(prompt), {
-                        "demon_type": "legion",
-                        "response_type": "mock_fallback"
-                    })
-        except Exception as e:
-            print(f"❌ Erreur LLM: {e}")
-            print("⚠️ Fallback vers mode mock")
-            daemon_response = self._generate_mock_response(user_input)
-            
-            # Logging de l'erreur
-            if self.auto_feed_thread:
-                self.auto_feed_thread.log_debug_action("llm_error", {
-                    "error": str(e),
-                    "demon_type": "legion",
-                    "fallback_used": True
-                })
-                self.auto_feed_thread.log_response(daemon_response, len(prompt), {
-                    "demon_type": "legion",
-                    "response_type": "error_fallback"
-                })
+        # Appel LLM via la base class
+        daemon_response = await self._call_llm(prompt)
+        
+        # Logging de la réponse
+        self.log_response(daemon_response, len(prompt), {
+            "demon_type": "legion",
+            "response_type": "llm_success"
+        })
         
         # Parsing de la réponse
         messages = self._parse_daemon_response(daemon_response)
@@ -626,14 +586,6 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
         # Sauvegarde dans la couche méta virtuelle
         if self.meta_virtual_layer:
             self.meta_virtual_layer.add_conversation(self.current_conversation)
-        
-        # Ajout dans l'auto feed thread
-        if self.auto_feed_thread:
-            try:
-                self.auto_feed_thread.add_user_message(user_input)
-                self.auto_feed_thread.add_self_message(daemon_response)
-            except Exception as e:
-                print(f"⚠️ Erreur auto feed thread: {e}")
         
         # Formatage de la réponse finale
         if self.silent_mode:
@@ -653,7 +605,7 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
         pattern = r'\*\*([A-Z_]+):\*\*\s*\*(.+?)\*\s*\n(.*?)(?=\n\*\*[A-Z_]+:\*\*|$)'
         matches = re.findall(pattern, response, re.MULTILINE | re.DOTALL)
         
-        print(f"🔍 Parsing: {len(matches)} messages trouvés")
+        self.log_debug_action("parsing_start", {"matches_found": len(matches)})
         
         for demon_name, action_type, content in matches:
             # Nettoyage du contenu
@@ -677,9 +629,13 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
                 message_type = self._get_message_type_from_action(action_type, role)
                 message = self._create_daemon_message(role, message_type, content)
                 messages.append(message)
-                print(f"✅ Message parsé: [{demon_name}] {action_type} — {content[:50]}...")
+                self.log_debug_action("message_parsed", {
+                    "demon": demon_name,
+                    "action_type": action_type,
+                    "content_length": len(content)
+                })
             else:
-                print(f"⚠️ Démon inconnu: {demon_name}")
+                self.log_debug_action("unknown_demon", {"demon_name": demon_name})
         
         return messages
     
@@ -741,44 +697,6 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
         
         return "GENERIC"
     
-    def _get_role_from_message_type(self, message_type: str) -> Optional[DaemonRole]:
-        """Détermine le rôle du démon selon le type de message"""
-        type_to_role = {
-            # Alma⛧
-            "ALMA_PLAN": DaemonRole.ALMA,
-            "ALMA_DECISION": DaemonRole.ALMA,
-            "ALMA_ORDONNANCEMENT": DaemonRole.ALMA,
-            "ALMA_SUMMARY": DaemonRole.ALMA,
-            "NEXT_STEPS": DaemonRole.ALMA,  # Ajout du type manquant
-            
-            # Bask'tur
-            "BASK_ANALYSIS": DaemonRole.BASKTUR,
-            "BASK_SOLUTION": DaemonRole.BASKTUR,
-            "BASK_DEBUG": DaemonRole.BASKTUR,
-            
-            # Oubliade
-            "OUBLI_MEMORY": DaemonRole.OUBLIADE,
-            "OUBLI_INSIGHT": DaemonRole.OUBLIADE,
-            "OUBLI_SEARCH": DaemonRole.OUBLIADE,
-            
-            # Merge
-            "MERGE_GIT": DaemonRole.MERGE,
-            "MERGE_BRANCH": DaemonRole.MERGE,
-            "MERGE_CONFLICT": DaemonRole.MERGE,
-            
-            # Lil.ieth
-            "LILI_INTERFACE": DaemonRole.LILIETH,
-            "LILI_USER": DaemonRole.LILIETH,
-            "LILI_FEEDBACK": DaemonRole.LILIETH,
-            
-            # Assistant V9
-            "V9_ORCHESTRATION": DaemonRole.ASSISTANT_V9,
-            "V9_EXECUTION": DaemonRole.ASSISTANT_V9,
-            "V9_SOMATIC": DaemonRole.ASSISTANT_V9,
-        }
-        
-        return type_to_role.get(message_type)
-    
     def _generate_mock_response(self, user_input: str) -> str:
         """Génère une réponse mock pour les tests"""
         return f"""[ALMA_PLAN] — Plan d'action : Analyser la demande "{user_input}" et proposer une solution stratégique
@@ -798,7 +716,7 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
 
 [ALMA_DECISION] — Décision finale : Implémenter solution daemonique
 [V9_ORCHESTRATION] — Exécution selon plan détaillé"""
-
+    
     def get_conversation_stats(self) -> Dict[str, Any]:
         """Retourne les statistiques de conversation"""
         if not self.meta_virtual_layer:
@@ -812,67 +730,81 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
             "patterns": patterns
         }
         
-        if self.auto_feed_thread:
-            try:
-                thread_stats = self.auto_feed_thread.get_thread_stats()
-                stats["auto_feed_thread"] = thread_stats
-            except:
-                pass
+        # Ajouter les stats de la base class
+        base_stats = self.get_thread_stats()
+        stats.update(base_stats)
         
         return stats
     
     def search_conversations(self, query: str) -> List[DaemonConversation]:
         """Recherche dans les conversations"""
-        if not self.meta_virtual_layer:
-            return []
-        
-        return self.meta_virtual_layer.search_daemon_conversations(query)
+        if self.meta_virtual_layer:
+            return self.meta_virtual_layer.search_daemon_conversations(query)
+        return []
     
     def toggle_silent_mode(self):
         """Bascule le mode silencieux"""
         self.silent_mode = not self.silent_mode
-        print(f"🔇 Mode silencieux : {'activé' if self.silent_mode else 'désactivé'}")
+        self.log_debug_action("silent_mode_toggled", {"new_mode": self.silent_mode})
 
 
-# Fonction de test
+# Test simple
 async def test_legion_auto_feeding_thread():
-    """Test de LegionAutoFeedingThread"""
-    print("🕷️ Test de LegionAutoFeedingThread...")
+    """Test du thread auto-feed légionnaire"""
+    print("🕷️ Test de LegionAutoFeedingThread v2.0")
+    print("=" * 70)
     
-    # Création de l'instance
-    legion = LegionAutoFeedingThread(
+    # Création du thread
+    legion_thread = LegionAutoFeedingThread(
         workspace_path=".",
         silent_mode=False,
-        max_history=20,
-        enable_cache=True
+        max_history=50
     )
     
-    # Test 1 : Mode normal
-    print("\n📝 Test 1 : Mode normal")
-    response1 = await legion.process_user_input("Analyse ce projet et propose des améliorations")
-    print("Réponse :")
-    print(response1)
+    # Test de communication
+    test_messages = [
+        "Analyse ce projet et propose des améliorations",
+        "Crée un nouveau fichier de test",
+        "Debug le code existant"
+    ]
     
-    # Test 2 : Mode silencieux
-    print("\n🔇 Test 2 : Mode silencieux")
-    legion.toggle_silent_mode()
-    response2 = await legion.process_user_input("Crée un nouveau fichier de test")
-    print("Réponse :")
-    print(response2)
+    for i, message in enumerate(test_messages, 1):
+        print(f"\n🔍 Test {i}: {message}")
+        
+        try:
+            response = await legion_thread.process_request(message)
+            print(f"✅ Réponse Legion: {len(response)} caractères")
+            print(f"📝 Extrait: {response[:100]}...")
+            
+            # Vérifier le parsing des messages
+            if legion_thread.current_conversation:
+                messages = legion_thread.current_conversation.messages
+                print(f"📊 Messages parsés: {len(messages)}")
+                
+                for msg in messages:
+                    print(f"  - [{msg.message_type}] {msg.content[:50]}...")
+            
+        except Exception as e:
+            print(f"❌ Erreur Legion: {e}")
     
-    # Test 3 : Statistiques
-    print("\n📊 Test 3 : Statistiques")
-    stats = legion.get_conversation_stats()
-    print("Stats :")
-    print(json.dumps(stats, indent=2, ensure_ascii=False))
+    # Test statistiques
+    print("\n3. Test statistiques Legion...")
+    try:
+        stats = legion_thread.get_conversation_stats()
+        print(f"📊 Statistiques: {stats}")
+    except Exception as e:
+        print(f"❌ Erreur stats: {e}")
     
-    # Test 4 : Recherche
-    print("\n🔍 Test 4 : Recherche")
-    results = legion.search_conversations("améliorations")
-    print(f"Résultats de recherche : {len(results)} conversations trouvées")
+    # Test recherche
+    print("\n4. Test recherche Legion...")
+    try:
+        results = legion_thread.search_conversations("analyse")
+        print(f"🔍 Résultats recherche: {len(results)} conversations")
+    except Exception as e:
+        print(f"❌ Erreur recherche: {e}")
     
-    print("\n✅ Test LegionAutoFeedingThread terminé !")
-
+    print("\n" + "=" * 70)
+    print("✅ Test LegionAutoFeedingThread v2.0 terminé !")
 
 if __name__ == "__main__":
     asyncio.run(test_legion_auto_feeding_thread()) 

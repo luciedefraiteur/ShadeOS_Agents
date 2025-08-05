@@ -1,8 +1,9 @@
 # ⛧ Créé par Alma, Architecte Démoniaque ⛧
-# 🧱 UniversalAutoFeedingThread - Brique Basse Réutilisable
+# 🧱 BaseAutoFeedingThread - Classe Abstraite de Base
 
 import time
 import json
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
@@ -20,8 +21,50 @@ class AutoFeedMessage:
         if self.metadata is None:
             self.metadata = {}
 
-class UniversalAutoFeedingThreadLogger:
-    """Logger universel pour tous les types de threads auto-feed."""
+@dataclass
+class PromptTemplate:
+    """Template de prompt avec métadonnées"""
+    name: str
+    template_content: str
+    variables: Dict[str, str]  # nom_variable -> type
+    metadata: Dict[str, Any]
+    version: str = "1.0"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertit en dictionnaire pour sérialisation"""
+        return {
+            "name": self.name,
+            "template_content": self.template_content,
+            "variables": self.variables,
+            "metadata": self.metadata,
+            "version": self.version
+        }
+
+@dataclass
+class TemplatePrompt:
+    """Template de prompt généré pour visualisation"""
+    template_name: str
+    thread_type: str
+    user_input: str
+    final_prompt: str
+    variables_used: Dict[str, Any]
+    generation_steps: List[str]
+    timestamp: float
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertit en dictionnaire pour sérialisation"""
+        return {
+            "template_name": self.template_name,
+            "thread_type": self.thread_type,
+            "user_input": self.user_input,
+            "final_prompt": self.final_prompt,
+            "variables_used": self.variables_used,
+            "generation_steps": self.generation_steps,
+            "timestamp": self.timestamp
+        }
+
+class BaseAutoFeedingThreadLogger:
+    """Logger de base pour tous les types de threads auto-feed."""
     
     def __init__(self, thread_type: str, entity_id: str):
         self.thread_type = thread_type  # "legion", "v9", "general", etc.
@@ -138,11 +181,11 @@ class UniversalAutoFeedingThreadLogger:
         
         return summary
 
-class UniversalAutoFeedingThread:
-    """Thread auto-feed universel simple et réutilisable avec logging intégré."""
+class BaseAutoFeedingThread(ABC):
+    """Classe abstraite de base pour tous les threads auto-feed."""
     
     def __init__(self, entity_id: str, entity_type: str, max_history: int = 100, enable_logging: bool = True):
-        """Initialise le thread auto-feed."""
+        """Initialise le thread auto-feed de base."""
         self.entity_id = entity_id
         self.entity_type = entity_type
         self.max_history = max_history
@@ -160,7 +203,7 @@ class UniversalAutoFeedingThread:
         self.logger = None
         if self.enable_logging:
             try:
-                self.logger = UniversalAutoFeedingThreadLogger(entity_type, entity_id)
+                self.logger = BaseAutoFeedingThreadLogger(entity_type, entity_id)
                 self.logger.log_debug_action("thread_initialized", {
                     "max_history": max_history,
                     "enable_logging": enable_logging
@@ -168,8 +211,123 @@ class UniversalAutoFeedingThread:
             except Exception as e:
                 print(f"⚠️ Erreur initialisation logger: {e}")
         
+        # Provider LLM (sera initialisé par les sous-classes)
+        self.provider = None
+        
         # Log initial
         self.add_message("system", f"Thread auto-feed initialisé pour {entity_id} ({entity_type})")
+    
+    # Méthodes communes avec implémentation par défaut
+    async def _initialize_provider(self):
+        """Initialise le provider LLM. Implémentation par défaut."""
+        # Les sous-classes peuvent surcharger si nécessaire
+        pass
+    
+    async def _call_llm(self, prompt: str) -> str:
+        """Appelle le LLM. Implémentation commune."""
+        try:
+            await self._initialize_provider()
+            
+            if hasattr(self, 'provider') and self.provider:
+                response = await self.provider.generate_response(prompt)
+                daemon_response = response.content if hasattr(response, 'content') else str(response)
+                self.log_debug_action("llm_call_success", {
+                    "prompt_length": len(prompt),
+                    "response_length": len(daemon_response)
+                })
+                return daemon_response
+            else:
+                # Mode mock par défaut
+                mock_response = self._generate_mock_response(prompt)
+                self.log_debug_action("llm_call_mock", {"reason": "provider_unavailable"})
+                return mock_response
+        except Exception as e:
+            self.log_debug_action("llm_call_error", {"error": str(e)})
+            return self._generate_mock_response("error_fallback")
+    
+    def _get_prompt(self, user_input: str) -> str:
+        """Génère le prompt pour le LLM. Implémentation commune."""
+        # Template de base que les sous-classes peuvent surcharger
+        context_summary = self.get_context_summary(5)
+        
+        base_prompt = f"""CONTEXTE :
+- Entité : {self.entity_id} ({self.entity_type})
+- Contexte récent : {context_summary}
+
+DEMANDE UTILISATEUR : {user_input}
+
+RÉPONSE :"""
+        
+        return base_prompt
+    
+    async def process_request(self, user_input: str) -> str:
+        """Traite une demande utilisateur. Workflow commun."""
+        self.add_user_message(f"Traitement de la demande : {user_input[:50]}...")
+        
+        # Génération du prompt
+        prompt = self._get_prompt(user_input)
+        
+        # Logging du prompt
+        self.log_prompt(prompt, user_input, {
+            "thread_type": self.entity_type,
+            "entity_id": self.entity_id
+        })
+        
+        # Appel LLM
+        response = await self._call_llm(prompt)
+        
+        # Logging de la réponse
+        self.log_response(response, len(prompt), {
+            "thread_type": self.entity_type,
+            "response_type": "llm_success"
+        })
+        
+        # Traitement de la réponse (les sous-classes peuvent surcharger)
+        processed_response = self._process_response(response, user_input)
+        
+        # Ajout de la réponse au thread
+        self.add_self_message(processed_response)
+        
+        return processed_response
+    
+    def _process_response(self, response: str, user_input: str) -> str:
+        """Traite la réponse du LLM. Les sous-classes peuvent surcharger."""
+        return response
+    
+    def _generate_mock_response(self, prompt: str) -> str:
+        """Génère une réponse mock par défaut."""
+        return f"Réponse mock pour : {prompt[:50]}..."
+    
+    # Méthode pour générer des templates de prompts (pour visualisation)
+    def generate_template_prompt(self, user_input: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Génère un template de prompt pour visualisation (sans appel LLM)."""
+        context = context or {}
+        
+        # Récupérer le prompt généré
+        prompt = self._get_prompt(user_input)
+        
+        # Analyser les variables utilisées
+        variables_used = {
+            "user_input": user_input,
+            "entity_id": self.entity_id,
+            "entity_type": self.entity_type,
+            "context_summary": self.get_context_summary(5),
+            **context
+        }
+        
+        return {
+            "template_name": f"{self.entity_type}_base_template",
+            "thread_type": self.entity_type,
+            "user_input": user_input,
+            "final_prompt": prompt,
+            "variables_used": variables_used,
+            "prompt_length": len(prompt),
+            "timestamp": time.time()
+        }
+    
+    def get_available_templates(self) -> List[str]:
+        """Retourne la liste des templates disponibles. Implémentation par défaut."""
+        return ["default"]
     
     def add_message(self, role: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> AutoFeedMessage:
         """Ajoute un message au thread."""
@@ -284,53 +442,6 @@ class UniversalAutoFeedingThread:
         
         return stats
     
-    def save_to_file(self, filepath: str) -> bool:
-        """Sauvegarde le thread dans un fichier."""
-        try:
-            data = {
-                "entity_id": self.entity_id,
-                "entity_type": self.entity_type,
-                "session_start": self.session_start,
-                "is_active": self.is_active,
-                "messages": [asdict(msg) for msg in self.messages],
-                "stats": self.get_thread_stats()
-            }
-            
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            
-            return True
-        except Exception as e:
-            print(f"Erreur sauvegarde thread: {e}")
-            return False
-    
-    def load_from_file(self, filepath: str) -> bool:
-        """Charge le thread depuis un fichier."""
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            self.entity_id = data.get("entity_id", self.entity_id)
-            self.entity_type = data.get("entity_type", self.entity_type)
-            self.session_start = data.get("session_start", self.session_start)
-            self.is_active = data.get("is_active", True)
-            
-            # Charger les messages
-            self.messages.clear()
-            for msg_data in data.get("messages", []):
-                message = AutoFeedMessage(
-                    timestamp=msg_data["timestamp"],
-                    role=msg_data["role"],
-                    content=msg_data["content"],
-                    metadata=msg_data.get("metadata", {})
-                )
-                self.messages.append(message)
-            
-            return True
-        except Exception as e:
-            print(f"Erreur chargement thread: {e}")
-            return False
-    
     def clear_history(self):
         """Efface l'historique du thread."""
         self.messages.clear()
@@ -349,44 +460,21 @@ class UniversalAutoFeedingThread:
     def __str__(self) -> str:
         """Représentation string du thread."""
         stats = self.get_thread_stats()
-        return f"UniversalAutoFeedingThread({self.entity_id}, {stats['total_messages']} messages, {'actif' if self.is_active else 'en pause'})"
+        return f"BaseAutoFeedingThread({self.entity_id}, {stats['total_messages']} messages, {'actif' if self.is_active else 'en pause'})"
     
     def __repr__(self) -> str:
         return self.__str__()
 
 
-# Fonction utilitaire pour créer un thread
-def create_auto_feeding_thread(entity_id: str, entity_type: str, max_history: int = 100, enable_logging: bool = True) -> UniversalAutoFeedingThread:
-    """Crée un nouveau thread auto-feed."""
-    return UniversalAutoFeedingThread(entity_id, entity_type, max_history, enable_logging)
+# Fonction utilitaire pour créer un thread de base
+def create_base_auto_feeding_thread(entity_id: str, entity_type: str, max_history: int = 100, enable_logging: bool = True) -> BaseAutoFeedingThread:
+    """Crée un nouveau thread auto-feed de base (pour les tests)."""
+    # Note: Cette fonction ne peut pas créer une instance de BaseAutoFeedingThread car c'est abstrait
+    # Elle est là pour la cohérence avec l'API
+    raise NotImplementedError("BaseAutoFeedingThread est abstrait. Utilisez une sous-classe spécifique.")
 
 
 # Test simple
 if __name__ == "__main__":
-    # Test du thread auto-feed avec logging
-    thread = create_auto_feeding_thread("test_agent", "assistant", enable_logging=True)
-    
-    # Ajouter quelques messages
-    thread.add_user_message("Peux-tu analyser ce code ?")
-    thread.add_self_message("Je vais commencer par examiner la structure du projet")
-    thread.add_self_message("J'ai trouvé 3 fichiers Python à analyser")
-    thread.add_system_message("WorkspaceLayer activé")
-    thread.add_self_message("Analyse terminée, 2 bugs détectés")
-    
-    # Tester le logging de prompt/réponse
-    test_prompt = "Analyse ce code Python"
-    test_response = "J'ai analysé le code et trouvé 2 bugs"
-    thread.log_prompt(test_prompt, "Analyse code", {"test": True})
-    thread.log_response(test_response, len(test_prompt), {"test": True})
-    
-    # Afficher le contexte
-    print("=== CONTEXTE DU THREAD ===")
-    print(thread.get_context_summary())
-    
-    # Afficher les stats
-    print("\n=== STATISTIQUES ===")
-    stats = thread.get_thread_stats()
-    for key, value in stats.items():
-        print(f"{key}: {value}")
-    
-    print(f"\n{thread}") 
+    print("BaseAutoFeedingThread est une classe abstraite.")
+    print("Utilisez LegionAutoFeedingThread ou V9AutoFeedingThread pour les tests.") 
