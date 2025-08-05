@@ -188,6 +188,57 @@ class ToolRegistry:
             "read_file_content": lambda *args, **kwargs: {"success": True, "tool": "read_file_content", "args": kwargs},
         }
         
+        # Ajouter les outils ProcessManager
+        try:
+            from Core.ProcessManager.execute_command import execute_command_async, ExecutionMode
+            from Core.Config.secure_env_manager import get_secure_env_manager
+            
+            env_manager = get_secure_env_manager()
+            
+            async def execute_command_async_wrapper(command: str, **kwargs):
+                """Wrapper async pour execute_command_async"""
+                try:
+                    # Adapter la commande selon OS/Shell
+                    adapted_command = env_manager.get_shell_command(command)
+                    
+                    # Vérifier si c'est une commande git (interdite)
+                    if command.strip().startswith('git '):
+                        return {
+                            "success": False, 
+                            "error": "🚨 COMMANDE GIT INTERDITE - Seul Alma peut faire des opérations git",
+                            "tool": "execute_command_async"
+                        }
+                    
+                    result = await execute_command_async(command=adapted_command, **kwargs)
+                    return {
+                        "success": result.success,
+                        "stdout": result.stdout,
+                        "stderr": result.stderr,
+                        "return_code": result.return_code,
+                        "execution_time": result.execution_time,
+                        "tool": "execute_command_async"
+                    }
+                except Exception as e:
+                    return {
+                        "success": False,
+                        "error": str(e),
+                        "tool": "execute_command_async"
+                    }
+            
+            # Ajouter les outils ProcessManager
+            process_manager_functions = {
+                "execute_command_async": execute_command_async_wrapper,
+                "get_active_processes": lambda: {"success": True, "tool": "get_active_processes", "message": "ProcessManager tools disponibles"},
+            }
+            
+            functions.update(process_manager_functions)
+            print("✅ Outils ProcessManager chargés avec sécurisation git")
+            
+        except ImportError as e:
+            print(f"⚠️ ProcessManager non disponible: {e}")
+        except Exception as e:
+            print(f"⚠️ Erreur chargement ProcessManager: {e}")
+        
         # Ajouter les fonctions de fallback seulement si elles ne sont pas déjà chargées
         for name, func in fallback_functions.items():
             if name not in functions:
