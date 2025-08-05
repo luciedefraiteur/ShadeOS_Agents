@@ -354,8 +354,62 @@ class LegionAutoFeedingThread(BaseAutoFeedingThread):
             return self._generate_mock_response("error_fallback")
     
     def _get_prompt(self, user_input: str) -> str:
-        """Génère le prompt pour le LLM (implémentation de la base class)"""
-        return self._get_daemon_prompt(user_input)
+        """Génère le prompt pour le LLM en utilisant les fragments."""
+        relevant_demon = self._detect_relevant_demon(user_input)
+        
+        if self.silent_mode:
+            # Mode silencieux : utiliser le fragment silent_dialogue_template
+            silent_template = self.get_fragment("silent_dialogue_template")
+            if silent_template:
+                context_summary = self.get_context_summary(2)
+                return silent_template.format(
+                    silent_mode=self.silent_mode,
+                    context_summary=context_summary,
+                    user_input=user_input
+                )
+            else:
+                return self._get_alma_user_dialogue_prompt(user_input)
+        else:
+            # Mode normal : utiliser le fragment mutant_dialogue_template
+            mutant_template = self.get_fragment("mutant_dialogue_template")
+            if mutant_template:
+                demon_config = self.demon_configs[relevant_demon]
+                context_summary = self.get_context_summary(2)
+                recent_messages = ""
+                
+                if self.meta_virtual_layer:
+                    recent_messages = "\n".join([
+                        msg.to_parsable_format() 
+                        for msg in self.meta_virtual_layer.get_recent_daemon_exchanges(2)
+                    ])
+                
+                # Récupérer le format spécifique du démon
+                demon_specific_format = self._get_demon_specific_format(relevant_demon)
+                
+                return mutant_template.format(
+                    demon_name=demon_config["name"],
+                    demon_title=demon_config["title"],
+                    demon_personality=demon_config["personality"],
+                    silent_mode=self.silent_mode,
+                    context_summary=context_summary,
+                    recent_messages=recent_messages,
+                    user_input=user_input,
+                    demon_specific_format=demon_specific_format
+                )
+            else:
+                return self._get_mutant_dialogue_prompt(user_input, relevant_demon)
+    
+    def _get_demon_specific_format(self, demon_role: DaemonRole) -> str:
+        """Récupère le format spécifique d'un démon depuis les fragments."""
+        demon_name = demon_role.value.lower()
+        
+        # Essayer de récupérer le fragment spécifique
+        format_fragment = self.get_fragment(f"{demon_name}_analysis")
+        if format_fragment:
+            return format_fragment
+        
+        # Fallback : format générique
+        return f"[{demon_role.name}_ANALYSIS] — Analyse par {demon_role.name}"
     
     async def process_request(self, user_input: str) -> str:
         """Traite une demande utilisateur (implémentation de la base class)"""

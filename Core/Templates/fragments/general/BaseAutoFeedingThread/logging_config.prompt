@@ -1,0 +1,11 @@
+LOGGING CONFIGURATION :
+- Thread type : {thread_type}
+- Entity ID : {entity_id}
+- Session ID : {session_id}
+- Log directory : {log_dir}
+
+FICHIERS DE LOG :
+- thread.jsonl : Messages du thread
+- prompts.jsonl : Prompts envoyés au LLM
+- responses.jsonl : Réponses du LLM
+- debug.jsonl : Actions de debug

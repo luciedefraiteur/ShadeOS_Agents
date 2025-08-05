@@ -1,377 +1,461 @@
 # ⛧ Créé par Alma, Architecte Démoniaque ⛧
-# 📚 TemplateRegistry - Registre Indexé de Fragments de Prompts
+# 🗄️ TemplateRegistry - Registre de Fragments avec MemoryEngine
 
 import json
 import time
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, asdict
-from collections import defaultdict
+from abc import ABC, abstractmethod
+
+# Import MemoryEngine si disponible
+try:
+    from MemoryEngine.core.engine import MemoryEngine
+    from MemoryEngine.core.initialization import ensure_initialized
+    MEMORY_ENGINE_AVAILABLE = True
+except ImportError:
+    MEMORY_ENGINE_AVAILABLE = False
+    print("⚠️ MemoryEngine non disponible - Mode local activé")
 
 @dataclass
-class PromptFragment:
-    """Fragment de prompt avec métadonnées"""
+class FragmentMetadata:
+    """Métadonnées d'un fragment de prompt"""
     fragment_id: str
-    content: str
-    fragment_type: str  # "header", "body", "footer", "variable", "instruction"
-    thread_type: str  # "legion", "v9", "general", etc.
-    template_name: str  # Nom du template qui utilise ce fragment
-    variables: Dict[str, str]  # Variables utilisées dans le fragment
-    metadata: Dict[str, Any]
-    timestamp: float
-    version: str = "1.0"
+    thread_type: str
+    class_name: str
+    fragment_name: str
+    file_path: str
+    content_length: int
+    created_at: float
+    last_modified: float
+    tags: List[str] = None
+    dependencies: List[str] = None
+    
+    def __post_init__(self):
+        if self.tags is None:
+            self.tags = []
+        if self.dependencies is None:
+            self.dependencies = []
     
     def to_dict(self) -> Dict[str, Any]:
         """Convertit en dictionnaire pour sérialisation"""
         return {
             "fragment_id": self.fragment_id,
-            "content": self.content,
-            "fragment_type": self.fragment_type,
             "thread_type": self.thread_type,
-            "template_name": self.template_name,
-            "variables": self.variables,
-            "metadata": self.metadata,
-            "timestamp": self.timestamp,
-            "version": self.version
+            "class_name": self.class_name,
+            "fragment_name": self.fragment_name,
+            "file_path": self.file_path,
+            "content_length": self.content_length,
+            "created_at": self.created_at,
+            "last_modified": self.last_modified,
+            "tags": self.tags,
+            "dependencies": self.dependencies
         }
 
 @dataclass
-class PromptTemplate:
-    """Template complet assemblé à partir de fragments"""
-    template_id: str
-    template_name: str
-    thread_type: str
-    fragment_ids: List[str]  # Ordre des fragments
-    assembly_logic: Dict[str, Any]  # Logique d'assemblage
-    variables: Dict[str, str]  # Variables du template complet
-    metadata: Dict[str, Any]
-    timestamp: float
+class TemplateFragment:
+    """Fragment de template avec contenu et métadonnées"""
+    metadata: FragmentMetadata
+    content: str
     
     def to_dict(self) -> Dict[str, Any]:
         """Convertit en dictionnaire pour sérialisation"""
         return {
-            "template_id": self.template_id,
-            "template_name": self.template_name,
-            "thread_type": self.thread_type,
-            "fragment_ids": self.fragment_ids,
-            "assembly_logic": self.assembly_logic,
-            "variables": self.variables,
-            "metadata": self.metadata,
-            "timestamp": self.timestamp
+            "metadata": self.metadata.to_dict(),
+            "content": self.content
         }
 
-class TemplateRegistry:
-    """Registre indexé pour les fragments et templates de prompts"""
+class BaseTemplateRegistry(ABC):
+    """Registre de base pour les fragments de templates"""
     
-    def __init__(self, registry_file: str = "logs/template_registry.json"):
-        self.registry_file = Path(registry_file)
-        self.registry_file.parent.mkdir(parents=True, exist_ok=True)
-        
-        # Index principal
-        self.fragments: Dict[str, PromptFragment] = {}
-        self.templates: Dict[str, PromptTemplate] = {}
-        
-        # Index secondaires pour recherche rapide
-        self.fragments_by_thread_type: Dict[str, Set[str]] = defaultdict(set)
-        self.fragments_by_template: Dict[str, Set[str]] = defaultdict(set)
-        self.fragments_by_type: Dict[str, Set[str]] = defaultdict(set)
-        
-        # Charger le registre existant
-        self._load_registry()
+    def __init__(self, base_path: str = "Core/Templates"):
+        self.base_path = Path(base_path)
+        self.fragments: Dict[str, TemplateFragment] = {}
+        self.fragment_index: Dict[str, List[str]] = {}  # thread_type -> fragment_ids
+        self.class_index: Dict[str, List[str]] = {}     # class_name -> fragment_ids
     
-    def _load_registry(self):
-        """Charge le registre depuis le fichier"""
-        if self.registry_file.exists():
-            try:
-                with open(self.registry_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                
-                # Charger les fragments
-                for fragment_data in data.get("fragments", {}).values():
-                    fragment = PromptFragment(**fragment_data)
-                    self._add_fragment_to_indexes(fragment)
-                
-                # Charger les templates
-                for template_data in data.get("templates", {}).values():
-                    template = PromptTemplate(**template_data)
-                    self.templates[template.template_id] = template
-                
-                print(f"✅ Registre chargé: {len(self.fragments)} fragments, {len(self.templates)} templates")
-                
-            except Exception as e:
-                print(f"⚠️ Erreur chargement registre: {e}")
+    @abstractmethod
+    def load_fragments(self):
+        """Charge tous les fragments depuis le système de stockage"""
+        pass
     
-    def _save_registry(self):
-        """Sauvegarde le registre dans le fichier"""
-        try:
-            data = {
-                "fragments": {fid: fragment.to_dict() for fid, fragment in self.fragments.items()},
-                "templates": {tid: template.to_dict() for tid, template in self.templates.items()},
-                "metadata": {
-                    "last_updated": time.time(),
-                    "total_fragments": len(self.fragments),
-                    "total_templates": len(self.templates)
-                }
-            }
+    @abstractmethod
+    def save_fragment(self, fragment: TemplateFragment):
+        """Sauvegarde un fragment dans le système de stockage"""
+        pass
+    
+    @abstractmethod
+    def get_fragment(self, fragment_id: str) -> Optional[TemplateFragment]:
+        """Récupère un fragment par son ID"""
+        pass
+    
+    def discover_fragments(self) -> List[TemplateFragment]:
+        """Découvre automatiquement tous les fragments"""
+        discovered_fragments = []
+        
+        fragments_dir = self.base_path / "fragments"
+        if not fragments_dir.exists():
+            return discovered_fragments
+        
+        # Parcourir la structure : fragments/{thread_type}/{class_name}/*.prompt
+        for thread_type_dir in fragments_dir.iterdir():
+            if not thread_type_dir.is_dir():
+                continue
             
-            with open(self.registry_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            thread_type = thread_type_dir.name
+            
+            for class_dir in thread_type_dir.iterdir():
+                if not class_dir.is_dir():
+                    continue
                 
-        except Exception as e:
-            print(f"⚠️ Erreur sauvegarde registre: {e}")
-    
-    def _add_fragment_to_indexes(self, fragment: PromptFragment):
-        """Ajoute un fragment aux index secondaires"""
-        self.fragments[fragment.fragment_id] = fragment
-        self.fragments_by_thread_type[fragment.thread_type].add(fragment.fragment_id)
-        self.fragments_by_template[fragment.template_name].add(fragment.fragment_id)
-        self.fragments_by_type[fragment.fragment_type].add(fragment.fragment_id)
-    
-    def register_fragment(self, fragment: PromptFragment) -> str:
-        """Enregistre un nouveau fragment"""
-        if fragment.fragment_id in self.fragments:
-            print(f"⚠️ Fragment {fragment.fragment_id} déjà enregistré, mise à jour")
+                class_name = class_dir.name
+                
+                for prompt_file in class_dir.glob("*.prompt"):
+                    fragment_id = f"{thread_type}:{class_name}:{prompt_file.stem}"
+                    
+                    # Lire le contenu
+                    try:
+                        with open(prompt_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        
+                        # Créer les métadonnées
+                        metadata = FragmentMetadata(
+                            fragment_id=fragment_id,
+                            thread_type=thread_type,
+                            class_name=class_name,
+                            fragment_name=prompt_file.stem,
+                            file_path=str(prompt_file),
+                            content_length=len(content),
+                            created_at=prompt_file.stat().st_ctime,
+                            last_modified=prompt_file.stat().st_mtime,
+                            tags=[thread_type, class_name, "prompt"],
+                            dependencies=[]
+                        )
+                        
+                        fragment = TemplateFragment(metadata=metadata, content=content)
+                        discovered_fragments.append(fragment)
+                        
+                    except Exception as e:
+                        print(f"⚠️ Erreur lecture fragment {prompt_file}: {e}")
         
-        self._add_fragment_to_indexes(fragment)
-        self._save_registry()
+        return discovered_fragments
+    
+    def index_fragments(self, fragments: List[TemplateFragment]):
+        """Indexe les fragments pour recherche rapide"""
+        self.fragments.clear()
+        self.fragment_index.clear()
+        self.class_index.clear()
         
-        return fragment.fragment_id
+        for fragment in fragments:
+            fragment_id = fragment.metadata.fragment_id
+            thread_type = fragment.metadata.thread_type
+            class_name = fragment.metadata.class_name
+            
+            # Stocker le fragment
+            self.fragments[fragment_id] = fragment
+            
+            # Indexer par thread_type
+            if thread_type not in self.fragment_index:
+                self.fragment_index[thread_type] = []
+            self.fragment_index[thread_type].append(fragment_id)
+            
+            # Indexer par class_name
+            if class_name not in self.class_index:
+                self.class_index[class_name] = []
+            self.class_index[class_name].append(fragment_id)
     
-    def register_template(self, template: PromptTemplate) -> str:
-        """Enregistre un nouveau template"""
-        if template.template_id in self.templates:
-            print(f"⚠️ Template {template.template_id} déjà enregistré, mise à jour")
-        
-        self.templates[template.template_id] = template
-        self._save_registry()
-        
-        return template.template_id
-    
-    def get_fragment(self, fragment_id: str) -> Optional[PromptFragment]:
-        """Récupère un fragment par ID"""
-        return self.fragments.get(fragment_id)
-    
-    def get_template(self, template_id: str) -> Optional[PromptTemplate]:
-        """Récupère un template par ID"""
-        return self.templates.get(template_id)
-    
-    def get_fragments_by_thread_type(self, thread_type: str) -> List[PromptFragment]:
+    def get_fragments_by_thread_type(self, thread_type: str) -> List[TemplateFragment]:
         """Récupère tous les fragments d'un type de thread"""
-        fragment_ids = self.fragments_by_thread_type.get(thread_type, set())
+        fragment_ids = self.fragment_index.get(thread_type, [])
         return [self.fragments[fid] for fid in fragment_ids if fid in self.fragments]
     
-    def get_fragments_by_template(self, template_name: str) -> List[PromptFragment]:
-        """Récupère tous les fragments d'un template"""
-        fragment_ids = self.fragments_by_template.get(template_name, set())
+    def get_fragments_by_class(self, class_name: str) -> List[TemplateFragment]:
+        """Récupère tous les fragments d'une classe"""
+        fragment_ids = self.class_index.get(class_name, [])
         return [self.fragments[fid] for fid in fragment_ids if fid in self.fragments]
     
-    def get_fragments_by_type(self, fragment_type: str) -> List[PromptFragment]:
-        """Récupère tous les fragments d'un type"""
-        fragment_ids = self.fragments_by_type.get(fragment_type, set())
-        return [self.fragments[fid] for fid in fragment_ids if fid in self.fragments]
-    
-    def search_fragments(self, query: str) -> List[PromptFragment]:
-        """Recherche dans les fragments"""
+    def search_fragments(self, query: str) -> List[TemplateFragment]:
+        """Recherche des fragments par contenu ou tags"""
         results = []
         query_lower = query.lower()
         
         for fragment in self.fragments.values():
-            if (query_lower in fragment.content.lower() or 
-                query_lower in fragment.fragment_id.lower() or
-                query_lower in fragment.template_name.lower()):
+            # Recherche dans le contenu
+            if query_lower in fragment.content.lower():
+                results.append(fragment)
+                continue
+            
+            # Recherche dans les tags
+            for tag in fragment.metadata.tags:
+                if query_lower in tag.lower():
+                    results.append(fragment)
+                    break
+            
+            # Recherche dans le nom
+            if query_lower in fragment.metadata.fragment_name.lower():
                 results.append(fragment)
         
         return results
     
-    def assemble_template(self, template_id: str, variables: Dict[str, Any] = None) -> str:
-        """Assemble un template complet à partir de ses fragments"""
-        template = self.get_template(template_id)
-        if not template:
-            raise ValueError(f"Template {template_id} non trouvé")
-        
-        variables = variables or {}
-        assembled_parts = []
-        
-        for fragment_id in template.fragment_ids:
-            fragment = self.get_fragment(fragment_id)
-            if fragment:
-                # Remplacer les variables dans le fragment
-                content = fragment.content
-                for var_name, var_value in variables.items():
-                    content = content.replace(f"{{{var_name}}}", str(var_value))
-                
-                assembled_parts.append(content)
-        
-        return "\n".join(assembled_parts)
-    
-    def get_available_templates(self, thread_type: str = None) -> List[str]:
-        """Récupère la liste des templates disponibles"""
-        if thread_type:
-            return [template.template_name for template in self.templates.values() 
-                   if template.thread_type == thread_type]
-        else:
-            return [template.template_name for template in self.templates.values()]
-    
-    def get_template_variables(self, template_id: str) -> Dict[str, str]:
-        """Récupère les variables d'un template"""
-        template = self.get_template(template_id)
-        if template:
-            return template.variables
-        return {}
-    
-    def export_registry(self, output_file: str = None) -> str:
-        """Exporte le registre complet"""
-        if output_file is None:
-            timestamp = time.strftime("%Y%m%d_%H%M%S")
-            output_file = f"logs/template_registry_export_{timestamp}.json"
-        
-        export_data = {
-            "fragments": {fid: fragment.to_dict() for fid, fragment in self.fragments.items()},
-            "templates": {tid: template.to_dict() for tid, template in self.templates.items()},
-            "indexes": {
-                "by_thread_type": {tt: list(fids) for tt, fids in self.fragments_by_thread_type.items()},
-                "by_template": {tn: list(fids) for tn, fids in self.fragments_by_template.items()},
-                "by_type": {ft: list(fids) for ft, fids in self.fragments_by_type.items()}
+    def get_registry_stats(self) -> Dict[str, Any]:
+        """Récupère les statistiques du registre"""
+        return {
+            "total_fragments": len(self.fragments),
+            "thread_types": list(self.fragment_index.keys()),
+            "classes": list(self.class_index.keys()),
+            "fragments_per_thread_type": {
+                thread_type: len(fragment_ids) 
+                for thread_type, fragment_ids in self.fragment_index.items()
             },
-            "metadata": {
-                "export_timestamp": time.time(),
-                "total_fragments": len(self.fragments),
-                "total_templates": len(self.templates)
+            "fragments_per_class": {
+                class_name: len(fragment_ids) 
+                for class_name, fragment_ids in self.class_index.items()
             }
         }
+
+class LocalTemplateRegistry(BaseTemplateRegistry):
+    """Registre local pour les fragments de templates"""
+    
+    def __init__(self, base_path: str = "Core/Templates"):
+        super().__init__(base_path)
+        self.registry_file = self.base_path / "local_registry.json"
+        self.load_fragments()
+    
+    def load_fragments(self):
+        """Charge tous les fragments depuis le système de fichiers"""
+        # Découvrir les fragments
+        discovered_fragments = self.discover_fragments()
         
-        output_path = Path(output_file)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Charger depuis le registre local si disponible
+        if self.registry_file.exists():
+            try:
+                with open(self.registry_file, 'r', encoding='utf-8') as f:
+                    registry_data = json.load(f)
+                
+                # Fusionner avec les fragments découverts
+                for fragment_data in registry_data.get("fragments", []):
+                    metadata = FragmentMetadata(**fragment_data["metadata"])
+                    fragment = TemplateFragment(
+                        metadata=metadata,
+                        content=fragment_data["content"]
+                    )
+                    discovered_fragments.append(fragment)
+                    
+            except Exception as e:
+                print(f"⚠️ Erreur chargement registre local: {e}")
         
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(export_data, f, indent=2, ensure_ascii=False)
+        # Indexer les fragments
+        self.index_fragments(discovered_fragments)
         
-        return str(output_path)
-
-# Instance globale du registre
-_global_registry = None
-
-def get_global_registry() -> TemplateRegistry:
-    """Récupère l'instance globale du registre"""
-    global _global_registry
-    if _global_registry is None:
-        _global_registry = TemplateRegistry()
-    return _global_registry
-
-# Fonctions utilitaires pour enregistrement rapide
-def register_fragment(fragment_id: str, content: str, fragment_type: str, 
-                     thread_type: str, template_name: str, 
-                     variables: Dict[str, str] = None, metadata: Dict[str, Any] = None) -> str:
-    """Fonction utilitaire pour enregistrer rapidement un fragment"""
-    registry = get_global_registry()
+        # Sauvegarder le registre
+        self.save_registry()
     
-    fragment = PromptFragment(
-        fragment_id=fragment_id,
-        content=content,
-        fragment_type=fragment_type,
-        thread_type=thread_type,
-        template_name=template_name,
-        variables=variables or {},
-        metadata=metadata or {},
-        timestamp=time.time()
-    )
+    def save_fragment(self, fragment: TemplateFragment):
+        """Sauvegarde un fragment dans le système de fichiers"""
+        # Sauvegarder le fichier
+        file_path = Path(fragment.metadata.file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(fragment.content)
+        
+        # Mettre à jour les métadonnées
+        fragment.metadata.last_modified = time.time()
+        fragment.metadata.content_length = len(fragment.content)
+        
+        # Ajouter au registre
+        self.fragments[fragment.metadata.fragment_id] = fragment
+        
+        # Mettre à jour les index
+        thread_type = fragment.metadata.thread_type
+        class_name = fragment.metadata.class_name
+        
+        if thread_type not in self.fragment_index:
+            self.fragment_index[thread_type] = []
+        if fragment.metadata.fragment_id not in self.fragment_index[thread_type]:
+            self.fragment_index[thread_type].append(fragment.metadata.fragment_id)
+        
+        if class_name not in self.class_index:
+            self.class_index[class_name] = []
+        if fragment.metadata.fragment_id not in self.class_index[class_name]:
+            self.class_index[class_name].append(fragment.metadata.fragment_id)
+        
+        # Sauvegarder le registre
+        self.save_registry()
     
-    return registry.register_fragment(fragment)
+    def get_fragment(self, fragment_id: str) -> Optional[TemplateFragment]:
+        """Récupère un fragment par son ID"""
+        return self.fragments.get(fragment_id)
+    
+    def save_registry(self):
+        """Sauvegarde le registre local"""
+        registry_data = {
+            "metadata": {
+                "description": "Registre local des fragments de templates",
+                "created_at": time.time(),
+                "total_fragments": len(self.fragments)
+            },
+            "fragments": [fragment.to_dict() for fragment in self.fragments.values()]
+        }
+        
+        with open(self.registry_file, 'w', encoding='utf-8') as f:
+            json.dump(registry_data, f, indent=2, ensure_ascii=False)
 
-def register_template(template_id: str, template_name: str, thread_type: str,
-                     fragment_ids: List[str], variables: Dict[str, str] = None,
-                     metadata: Dict[str, Any] = None) -> str:
-    """Fonction utilitaire pour enregistrer rapidement un template"""
-    registry = get_global_registry()
+class MemoryEngineTemplateRegistry(BaseTemplateRegistry):
+    """Registre avec MemoryEngine pour les fragments de templates"""
     
-    template = PromptTemplate(
-        template_id=template_id,
-        template_name=template_name,
-        thread_type=thread_type,
-        fragment_ids=fragment_ids,
-        assembly_logic={"method": "concatenation"},
-        variables=variables or {},
-        metadata=metadata or {},
-        timestamp=time.time()
-    )
+    def __init__(self, base_path: str = "Core/Templates", memory_engine=None):
+        super().__init__(base_path)
+        
+        if not MEMORY_ENGINE_AVAILABLE:
+            raise RuntimeError("MemoryEngine non disponible")
+        
+        self.memory_engine = memory_engine or MemoryEngine()
+        self.load_fragments()
     
-    return registry.register_template(template)
+    def load_fragments(self):
+        """Charge tous les fragments depuis MemoryEngine"""
+        # Découvrir les fragments du système de fichiers
+        discovered_fragments = self.discover_fragments()
+        
+        # Charger depuis MemoryEngine
+        try:
+            # Rechercher les fragments dans MemoryEngine
+            fragments_data = self.memory_engine.search_memories(
+                query="template fragment",
+                memory_type="template_fragment",
+                limit=1000
+            )
+            
+            for memory in fragments_data:
+                try:
+                    fragment_data = json.loads(memory.content)
+                    metadata = FragmentMetadata(**fragment_data["metadata"])
+                    fragment = TemplateFragment(
+                        metadata=metadata,
+                        content=fragment_data["content"]
+                    )
+                    discovered_fragments.append(fragment)
+                except Exception as e:
+                    print(f"⚠️ Erreur parsing fragment MemoryEngine: {e}")
+                    
+        except Exception as e:
+            print(f"⚠️ Erreur chargement MemoryEngine: {e}")
+        
+        # Indexer les fragments
+        self.index_fragments(discovered_fragments)
+    
+    def save_fragment(self, fragment: TemplateFragment):
+        """Sauvegarde un fragment dans MemoryEngine"""
+        # Sauvegarder le fichier
+        file_path = Path(fragment.metadata.file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(fragment.content)
+        
+        # Mettre à jour les métadonnées
+        fragment.metadata.last_modified = time.time()
+        fragment.metadata.content_length = len(fragment.content)
+        
+        # Sauvegarder dans MemoryEngine
+        try:
+            fragment_data = fragment.to_dict()
+            memory_content = json.dumps(fragment_data, ensure_ascii=False)
+            
+            self.memory_engine.add_memory(
+                content=memory_content,
+                memory_type="template_fragment",
+                metadata={
+                    "fragment_id": fragment.metadata.fragment_id,
+                    "thread_type": fragment.metadata.thread_type,
+                    "class_name": fragment.metadata.class_name,
+                    "tags": fragment.metadata.tags
+                }
+            )
+        except Exception as e:
+            print(f"⚠️ Erreur sauvegarde MemoryEngine: {e}")
+        
+        # Ajouter au registre local
+        self.fragments[fragment.metadata.fragment_id] = fragment
+        
+        # Mettre à jour les index
+        thread_type = fragment.metadata.thread_type
+        class_name = fragment.metadata.class_name
+        
+        if thread_type not in self.fragment_index:
+            self.fragment_index[thread_type] = []
+        if fragment.metadata.fragment_id not in self.fragment_index[thread_type]:
+            self.fragment_index[thread_type].append(fragment.metadata.fragment_id)
+        
+        if class_name not in self.class_index:
+            self.class_index[class_name] = []
+        if fragment.metadata.fragment_id not in self.class_index[class_name]:
+            self.class_index[class_name].append(fragment.metadata.fragment_id)
+    
+    def get_fragment(self, fragment_id: str) -> Optional[TemplateFragment]:
+        """Récupère un fragment par son ID depuis MemoryEngine"""
+        # D'abord chercher dans le cache local
+        if fragment_id in self.fragments:
+            return self.fragments[fragment_id]
+        
+        # Chercher dans MemoryEngine
+        try:
+            memories = self.memory_engine.search_memories(
+                query=fragment_id,
+                memory_type="template_fragment",
+                limit=1
+            )
+            
+            if memories:
+                fragment_data = json.loads(memories[0].content)
+                metadata = FragmentMetadata(**fragment_data["metadata"])
+                fragment = TemplateFragment(
+                    metadata=metadata,
+                    content=fragment_data["content"]
+                )
+                
+                # Mettre en cache
+                self.fragments[fragment_id] = fragment
+                return fragment
+                
+        except Exception as e:
+            print(f"⚠️ Erreur récupération MemoryEngine: {e}")
+        
+        return None
+
+# Factory pour créer le bon type de registre
+def create_template_registry(registry_type: str = "local", **kwargs) -> BaseTemplateRegistry:
+    """Crée un registre de templates du type spécifié"""
+    if registry_type == "memory_engine" and MEMORY_ENGINE_AVAILABLE:
+        return MemoryEngineTemplateRegistry(**kwargs)
+    else:
+        return LocalTemplateRegistry(**kwargs)
 
 # Test et démonstration
 if __name__ == "__main__":
-    print("📚 TemplateRegistry - Test du Registre")
-    print("=" * 50)
+    print("🗄️ TemplateRegistry - Test de Fonctionnalité")
+    print("=" * 60)
     
-    # Créer le registre
-    registry = TemplateRegistry()
+    # Créer un registre local
+    registry = create_template_registry("local")
     
-    # Enregistrer quelques fragments de test
-    print("\n1. Enregistrement de fragments...")
+    # Afficher les statistiques
+    stats = registry.get_registry_stats()
+    print(f"📊 Statistiques du registre:")
+    print(f"   Total fragments: {stats['total_fragments']}")
+    print(f"   Thread types: {stats['thread_types']}")
+    print(f"   Classes: {stats['classes']}")
     
-    # Fragment pour Legion
-    register_fragment(
-        fragment_id="legion_header",
-        content="⛧ DIALOGUE MUTANT : ALMA⛧ ↔ {demon_name.upper()} ⛧",
-        fragment_type="header",
-        thread_type="legion",
-        template_name="mutant_dialogue",
-        variables={"demon_name": "string"}
-    )
+    # Rechercher des fragments
+    print(f"\n🔍 Recherche de fragments:")
+    alma_fragments = registry.search_fragments("alma")
+    print(f"   Fragments Alma: {len(alma_fragments)}")
     
-    register_fragment(
-        fragment_id="legion_context",
-        content="CONTEXTE :\n- Alma⛧ (SUPREME) : Architecte Démoniaque\n- {demon_name} : {demon_title} - {demon_personality}",
-        fragment_type="body",
-        thread_type="legion",
-        template_name="mutant_dialogue",
-        variables={"demon_name": "string", "demon_title": "string", "demon_personality": "string"}
-    )
+    v9_fragments = registry.get_fragments_by_thread_type("v9")
+    print(f"   Fragments V9: {len(v9_fragments)}")
     
-    # Fragment pour V9
-    register_fragment(
-        fragment_id="v9_system_header",
-        content="Tu es l'Assistant V9, un assistant auto-feeding thread intelligent.",
-        fragment_type="header",
-        thread_type="v9",
-        template_name="system_prompt",
-        variables={}
-    )
+    legion_fragments = registry.get_fragments_by_class("LegionAutoFeedingThread")
+    print(f"   Fragments Legion: {len(legion_fragments)}")
     
-    # Enregistrer des templates
-    print("\n2. Enregistrement de templates...")
-    
-    register_template(
-        template_id="legion_mutant_dialogue",
-        template_name="mutant_dialogue",
-        thread_type="legion",
-        fragment_ids=["legion_header", "legion_context"]
-    )
-    
-    register_template(
-        template_id="v9_system_prompt",
-        template_name="system_prompt",
-        thread_type="v9",
-        fragment_ids=["v9_system_header"]
-    )
-    
-    # Test des fonctionnalités
-    print("\n3. Test des fonctionnalités...")
-    
-    print(f"Templates Legion: {registry.get_available_templates('legion')}")
-    print(f"Templates V9: {registry.get_available_templates('v9')}")
-    
-    # Assembler un template
-    variables = {
-        "demon_name": "Bask'tur",
-        "demon_title": "Débuggeur Sadique",
-        "demon_personality": "Analyste technique sadique"
-    }
-    
-    assembled = registry.assemble_template("legion_mutant_dialogue", variables)
-    print(f"\nTemplate assemblé:\n{assembled}")
-    
-    # Export
-    export_file = registry.export_registry()
-    print(f"\n✅ Registre exporté: {export_file}")
-    
-    print("\n🎯 Test du registre terminé !") 
+    print(f"\n✅ Test TemplateRegistry terminé !") 
