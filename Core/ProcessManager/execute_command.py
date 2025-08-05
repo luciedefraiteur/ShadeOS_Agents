@@ -504,8 +504,19 @@ class CommandExecutor:
 _executor = CommandExecutor()
 
 def execute_command(*args, **kwargs) -> ExecutionResult:
-    """Interface simplifiée pour l'exécution de commandes."""
+    """Interface simplifiée pour l'exécution de commandes (synchrone)."""
     return _executor.execute_command(*args, **kwargs)
+
+async def execute_command_async(*args, **kwargs) -> ExecutionResult:
+    """Interface asynchrone pour l'exécution de commandes."""
+    # Pour l'instant, on utilise la version synchrone dans un thread
+    import asyncio
+    loop = asyncio.get_event_loop()
+    
+    def _execute_sync():
+        return _executor.execute_command(*args, **kwargs)
+    
+    return await loop.run_in_executor(None, _execute_sync)
 
 def get_active_processes() -> Dict[int, Dict[str, Any]]:
     """Retourne les processus actifs."""
