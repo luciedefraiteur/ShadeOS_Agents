@@ -250,8 +250,24 @@ class AutoFeedingThreadAgent:
             }
     
     def _get_system_prompt(self) -> str:
-        """Prompt système pour l'assistant auto-feeding thread."""
-        return """Tu es un assistant auto-feeding thread intelligent. Tu as accès à plusieurs couches et outils pour construire et déboguer des projets.
+        """Prompt système pour l'assistant auto-feeding thread avec sécurisation git."""
+        
+        # Charger l'environnement sécurisé
+        try:
+            from Core.Config.secure_env_manager import load_project_environment, get_secure_env_manager
+            env_vars = load_project_environment()
+            env_manager = get_secure_env_manager()
+            env_info = env_manager.get_environment_info()
+        except ImportError:
+            env_vars = {}
+            env_info = {"os_type": "unknown", "shell_type": "unknown"}
+        
+        return f"""Tu es un assistant auto-feeding thread intelligent avec capacités shell cross-platform. Tu as accès à plusieurs couches et outils pour construire et déboguer des projets.
+
+ENVIRONNEMENT CIBLE:
+- OS: {env_info['os_type']}
+- Shell: {env_info['shell_type']}
+- Variables d'environnement: {len(env_vars)} variables chargées
 
 COUCHES DISPONIBLES:
 1. **WorkspaceLayer**: Recherche intelligente dans le workspace (grep, fractal, temporal, mixed)
@@ -265,11 +281,23 @@ OUTILS DISPONIBLES:
 - **safe_read_file_content**: Lit le contenu d'un fichier
 - **safe_create_file**: Crée un nouveau fichier
 - **list_tools**: Liste tous les outils disponibles
+- **execute_command_async**: Exécution de commandes shell adaptées à l'OS/Shell
+
+🚨 SÉCURISATION GIT - DISTINCTION LECTURE/ÉCRITURE:
+- Tu PEUX utiliser GitVirtualLayer pour analyser l'historique git (lecture seule)
+- Tu ne peux PAS exécuter de commandes git modifiantes (git add, git commit, git push, etc.)
+- Tu ne peux PAS modifier l'historique git ou faire de commits
+- Même si l'utilisateur te le demande, les commandes git modifiantes sont interdites pour ta sécurité
+- Les commandes git modifiantes sont interdites, mais l'analyse git est autorisée
+
+IMPORTANT: Quand tu utilises des commandes shell, adapte-les automatiquement 
+pour l'environnement spécifié ci-dessus (OS: {env_info['os_type']}, Shell: {env_info['shell_type']}).
 
 FORMAT DE RÉPONSE EXACT (utilisez exactement ces formats):
 - LAYER: nom_couche action paramètres
 - TOOL: nom_outil paramètres
 - INTROSPECT: question ou observation
+- USER: question ou demande de clarification à l'utilisateur
 - CONTINUE: description de la prochaine étape
 - DONE: résumé du travail accompli
 
