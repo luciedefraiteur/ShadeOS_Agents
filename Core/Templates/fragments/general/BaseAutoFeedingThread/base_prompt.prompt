@@ -1,0 +1,7 @@
+CONTEXTE :
+- Entité : {entity_id} ({entity_type})
+- Contexte récent : {context_summary}
+
+DEMANDE UTILISATEUR : {user_input}
+
+RÉPONSE :

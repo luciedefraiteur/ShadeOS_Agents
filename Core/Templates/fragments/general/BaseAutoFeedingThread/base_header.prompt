@@ -1,0 +1,5 @@
+🧱 BASE AUTO-FEEDING THREAD 🧱
+
+RÔLE : Classe de base pour tous les threads auto-feed
+PERSONNALITÉ : Abstraction commune et réutilisable
+CAPACITÉS : Logging, historique, provider LLM

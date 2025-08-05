@@ -21,28 +21,17 @@ class AutoFeedMessage:
         if self.metadata is None:
             self.metadata = {}
 
-@dataclass
-class PromptTemplate:
-    """Template de prompt avec métadonnées"""
-    name: str
-    template_content: str
-    variables: Dict[str, str]  # nom_variable -> type
-    metadata: Dict[str, Any]
-    version: str = "1.0"
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convertit en dictionnaire pour sérialisation"""
-        return {
-            "name": self.name,
-            "template_content": self.template_content,
-            "variables": self.variables,
-            "metadata": self.metadata,
-            "version": self.version
-        }
+# Import du TemplateRegistry
+try:
+    from .template_registry import create_template_registry, TemplateFragment
+    TEMPLATE_REGISTRY_AVAILABLE = True
+except ImportError:
+    TEMPLATE_REGISTRY_AVAILABLE = False
+    print("⚠️ TemplateRegistry non disponible - Mode standalone activé")
 
 @dataclass
-class TemplatePrompt:
-    """Template de prompt généré pour visualisation"""
+class GeneratedTemplate:
+    """Template généré pour visualisation"""
     template_name: str
     thread_type: str
     user_input: str
@@ -214,6 +203,19 @@ class BaseAutoFeedingThread(ABC):
         # Provider LLM (sera initialisé par les sous-classes)
         self.provider = None
         
+        # Template Registry
+        self.template_registry = None
+        if TEMPLATE_REGISTRY_AVAILABLE:
+            try:
+                self.template_registry = create_template_registry("local")
+                self.log_debug_action("template_registry_initialized", {"status": "success"})
+            except Exception as e:
+                self.log_debug_action("template_registry_error", {"error": str(e)})
+        
+        # Fragments chargés
+        self.loaded_fragments = {}
+        self._initialize_templates()
+        
         # Log initial
         self.add_message("system", f"Thread auto-feed initialisé pour {entity_id} ({entity_type})")
     
@@ -298,15 +300,56 @@ RÉPONSE :"""
         """Génère une réponse mock par défaut."""
         return f"Réponse mock pour : {prompt[:50]}..."
     
-    # Méthode pour générer des templates de prompts (pour visualisation)
-    def generate_template_prompt(self, user_input: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    def _initialize_templates(self):
+        """Initialise les templates pour cette classe. Les sous-classes peuvent surcharger."""
+        if self.template_registry:
+            try:
+                # Charger les fragments pour cette classe
+                class_fragments = self.template_registry.get_fragments_by_class(self.__class__.__name__)
+                for fragment in class_fragments:
+                    self.loaded_fragments[fragment.metadata.fragment_name] = fragment
+                
+                self.log_debug_action("templates_initialized", {
+                    "class_name": self.__class__.__name__,
+                    "fragments_loaded": len(self.loaded_fragments)
+                })
+            except Exception as e:
+                self.log_debug_action("templates_initialization_error", {"error": str(e)})
+    
+    def get_fragment(self, fragment_name: str) -> Optional[str]:
+        """Récupère un fragment par son nom."""
+        if fragment_name in self.loaded_fragments:
+            return self.loaded_fragments[fragment_name].content
+        return None
+    
+    def get_available_templates(self) -> List[str]:
+        """Retourne la liste des templates disponibles."""
+        if self.template_registry:
+            try:
+                class_fragments = self.template_registry.get_fragments_by_class(self.__class__.__name__)
+                return [f.metadata.fragment_name for f in class_fragments]
+            except Exception as e:
+                self.log_debug_action("get_templates_error", {"error": str(e)})
+        return ["default"]
+    
+    def generate_template_prompt(self, user_input: str, template_name: str = "default", context: Dict[str, Any] = None) -> GeneratedTemplate:
         """Génère un template de prompt pour visualisation (sans appel LLM)."""
         context = context or {}
+        generation_steps = []
         
-        # Récupérer le prompt généré
-        prompt = self._get_prompt(user_input)
+        # Étape 1: Sélection du template
+        generation_steps.append(f"1. Template sélectionné: {template_name}")
         
-        # Analyser les variables utilisées
+        # Étape 2: Récupération du fragment
+        fragment_content = self.get_fragment(template_name)
+        if fragment_content:
+            generation_steps.append(f"2. Fragment trouvé: {template_name}")
+            template_content = fragment_content
+        else:
+            generation_steps.append(f"2. Fragment non trouvé, utilisation du template de base")
+            template_content = self._get_prompt(user_input)
+        
+        # Étape 3: Préparation des variables
         variables_used = {
             "user_input": user_input,
             "entity_id": self.entity_id,
@@ -314,20 +357,28 @@ RÉPONSE :"""
             "context_summary": self.get_context_summary(5),
             **context
         }
+        generation_steps.append(f"3. Variables préparées: {list(variables_used.keys())}")
         
-        return {
-            "template_name": f"{self.entity_type}_base_template",
-            "thread_type": self.entity_type,
-            "user_input": user_input,
-            "final_prompt": prompt,
-            "variables_used": variables_used,
-            "prompt_length": len(prompt),
-            "timestamp": time.time()
-        }
-    
-    def get_available_templates(self) -> List[str]:
-        """Retourne la liste des templates disponibles. Implémentation par défaut."""
-        return ["default"]
+        # Étape 4: Génération du prompt final
+        try:
+            final_prompt = template_content.format(**variables_used)
+            generation_steps.append(f"4. Prompt généré avec succès")
+        except KeyError as e:
+            generation_steps.append(f"4. Erreur de formatage: variable manquante {e}")
+            final_prompt = template_content
+        except Exception as e:
+            generation_steps.append(f"4. Erreur de génération: {e}")
+            final_prompt = template_content
+        
+        return GeneratedTemplate(
+            template_name=template_name,
+            thread_type=self.entity_type,
+            user_input=user_input,
+            final_prompt=final_prompt,
+            variables_used=variables_used,
+            generation_steps=generation_steps,
+            timestamp=time.time()
+        )
     
     def add_message(self, role: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> AutoFeedMessage:
         """Ajoute un message au thread."""
