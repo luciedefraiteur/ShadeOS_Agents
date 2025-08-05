@@ -563,6 +563,8 @@ RÉPONSE D'ALMA⛧ (résumé d'équipe) :
                 response = await self.provider.generate_response(prompt)
                 daemon_response = response.content if hasattr(response, 'content') else str(response)
                 print("✅ Réponse LLM reçue")
+                print(f"🔍 DIAGNOSTIC - Réponse brute: {repr(daemon_response)}")
+                print(f"🔍 DIAGNOSTIC - Longueur: {len(daemon_response)} caractères")
             else:
                 # Mode mock pour test
                 print("⚠️ Utilisation du mode mock")
