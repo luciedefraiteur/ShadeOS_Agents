@@ -46,13 +46,59 @@ class SimpleImportAnalyzerLogger:
         self.log_format = log_format
         self.session_id = f"analysis_{int(time.time())}"
         self.start_time = time.time()
+        self.analysis_data = {
+            'files_analyzed': [],
+            'imports_found': {},
+            'cycles_detected': [],
+            'stats': {}
+        }
         
         # Créer le répertoire de logs si nécessaire
         if log_directory:
             Path(log_directory).mkdir(parents=True, exist_ok=True)
-            self.log_file = Path(log_directory) / "imports_analysis.log"
+            # Créer le sous-répertoire imports_analysis
+            imports_analysis_dir = Path(log_directory) / "imports_analysis"
+            imports_analysis_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Fichier de log JSON
+            self.log_file = imports_analysis_dir / "imports_analysis.log"
+            
+            # Fichier de rapport Markdown
+            self.md_file = imports_analysis_dir / "imports_analysis_report.md"
+            
+            # Initialiser le fichier Markdown
+            self._init_md_report()
         else:
             self.log_file = None
+            self.md_file = None
+    
+    def _init_md_report(self):
+        """Initialise le rapport Markdown avec l'en-tête."""
+        if self.md_file:
+            with open(self.md_file, 'w', encoding='utf-8') as f:
+                f.write(f"""# 📊 Rapport d'Analyse d'Imports
+
+**Session ID:** `{self.session_id}`  
+**Date:** {datetime.fromtimestamp(self.start_time).strftime('%Y-%m-%d %H:%M:%S')}  
+**Format:** Analyse des dépendances Python avec détection de cycles intelligente
+
+---
+
+## 🎯 Résumé Exécutif
+
+*Ce rapport détaille l'analyse des imports Python dans le projet, incluant les dépendances locales, les cycles détectés et les statistiques d'analyse.*
+
+---
+
+## 📁 Fichiers Analysés
+
+""")
+    
+    def _write_md_section(self, content: str):
+        """Écrit une section dans le fichier Markdown."""
+        if self.md_file:
+            with open(self.md_file, 'a', encoding='utf-8') as f:
+                f.write(content + "\n")
     
     def _write_log(self, level: str, message: str, data: Dict = None):
         """Écrit un log dans le fichier."""
@@ -164,15 +210,156 @@ class SimpleImportAnalyzerLogger:
         if error:
             print(f"   Détails: {error}")
     
-    def log_warning(self, message: str):
+    def log_warning(self, message: str, **kwargs):
         """Log un avertissement."""
         self._write_log("WARNING", message, {"type": "warning"})
         print(f"⚠️ {message}")
+        if 'file' in kwargs:
+            self._add_file_to_md_report(kwargs['file'], [], 0) # No imports for warning, depth 0
+        elif 'cycle' in kwargs:
+            self._add_cycle_to_md_report(kwargs['cycle'])
     
-    def log_info(self, message: str):
-        """Log une information."""
-        self._write_log("INFO", message, {"type": "info"})
-        print(f"ℹ️ {message}")
+    def log_info(self, message: str, **kwargs):
+        """Log un message d'information."""
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        log_entry = {
+            'timestamp': timestamp,
+            'level': 'INFO',
+            'message': message,
+            'session_id': self.session_id,
+            **kwargs
+        }
+        
+        if self.log_file:
+            with open(self.log_file, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
+        
+        # Ajouter au rapport Markdown si c'est un message d'analyse
+        if 'file' in kwargs:
+            self._add_file_to_md_report(kwargs['file'], kwargs.get('imports', []), kwargs.get('depth', 0))
+        elif 'cycle' in kwargs:
+            self._add_cycle_to_md_report(kwargs['cycle'])
+    
+    def _add_file_to_md_report(self, file_path: str, imports: List[str], depth: int):
+        """Ajoute un fichier analysé au rapport Markdown."""
+        indent = "  " * depth
+        file_name = Path(file_path).name
+        
+        section = f"""
+### {indent}📄 {file_name}
+
+**Chemin:** `{file_path}`  
+**Profondeur:** {depth}
+
+**Imports trouvés ({len(imports)}):**
+"""
+        
+        if imports:
+            for imp in imports:
+                section += f"- `{imp}`\n"
+        else:
+            section += "- *Aucun import local trouvé*\n"
+        
+        self._write_md_section(section)
+    
+    def _add_cycle_to_md_report(self, cycle: List[str]):
+        """Ajoute un cycle détecté au rapport Markdown."""
+        section = f"""
+### ⚠️ Cycle Détecté
+
+**Fichiers impliqués:**
+"""
+        for i, file_path in enumerate(cycle, 1):
+            file_name = Path(file_path).name
+            section += f"{i}. `{file_path}` ({file_name})\n"
+        
+        self._write_md_section(section)
+    
+    def log_debug(self, message: str, **kwargs):
+        """Log un message de debug."""
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        log_entry = {
+            'timestamp': timestamp,
+            'level': 'DEBUG',
+            'message': message,
+            'session_id': self.session_id,
+            **kwargs
+        }
+        
+        if self.log_file:
+            with open(self.log_file, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
+    
+    def log_structured(self, level: str, message: str, **kwargs):
+        """Log un message structuré."""
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        log_entry = {
+            'timestamp': timestamp,
+            'level': level.upper(),
+            'message': message,
+            'session_id': self.session_id,
+            **kwargs
+        }
+        
+        if self.log_file:
+            with open(self.log_file, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
+    
+    def finalize_report(self, stats: Dict):
+        """Finalise le rapport Markdown avec les statistiques."""
+        if not self.md_file:
+            return
+        
+        end_time = time.time()
+        duration = end_time - self.start_time
+        
+        summary = f"""
+---
+
+## 📈 Statistiques d'Analyse
+
+**Durée totale:** {duration:.2f} secondes  
+**Fichiers analysés:** {stats.get('files_analyzed', 0)}  
+**Imports locaux trouvés:** {stats.get('local_imports', 0)}  
+**Cycles détectés:** {stats.get('cycles_detected', 0)}  
+**Profondeur maximale:** {stats.get('max_depth', 0)}
+
+### 🔍 Détails par Type d'Import
+
+"""
+        
+        import_types = stats.get('import_types', {})
+        for import_type, count in import_types.items():
+            summary += f"- **{import_type}:** {count}\n"
+        
+        summary += f"""
+---
+
+## 🎯 Recommandations
+
+"""
+        
+        if stats.get('cycles_detected', 0) > 0:
+            summary += """
+### ⚠️ Cycles Détectés
+Des cycles de dépendances ont été détectés. Considérez:
+- Refactoriser les imports circulaires
+- Utiliser des imports conditionnels
+- Séparer les responsabilités des modules
+"""
+        else:
+            summary += """
+### ✅ Aucun Cycle Détecté
+La structure des imports est saine, aucune action requise.
+"""
+        
+        summary += f"""
+---
+
+*Rapport généré automatiquement le {datetime.now().strftime('%Y-%m-%d à %H:%M:%S')}*
+"""
+        
+        self._write_md_section(summary)
 
 
 class DependencyGraph:
@@ -574,6 +761,79 @@ class PartitioningImportAnalyzer:
         
         return self.all_dependencies, unused_files if not local_only else set()
 
+    def analyze_imports(self, files_to_analyze: List[str]) -> Dict:
+        """Analyse les imports des fichiers donnés avec détection de cycles intelligente."""
+        self.logger.log_info("🚀 Début de l'analyse d'imports", 
+                           files_count=len(files_to_analyze),
+                           files=files_to_analyze)
+        
+        start_time = time.time()
+        all_dependencies = set()
+        import_types = defaultdict(int)
+        max_depth = 0
+        
+        for file_path in files_to_analyze:
+            if file_path in self.visited:
+                continue
+                
+            self.logger.log_info(f"📁 Analyse de {file_path}", file=file_path, depth=0)
+            
+            # Analyser les imports du fichier
+            imports = self.extract_imports_with_partitioner(file_path)
+            
+            if imports:
+                self.logger.log_info(f"✅ Imports trouvés dans {file_path}", 
+                                   file=file_path, 
+                                   imports=imports,
+                                   depth=0)
+                
+                # Compter les types d'imports
+                for imp in imports:
+                    if imp.startswith('.'):
+                        import_types['relative'] += 1
+                    elif imp.startswith('Core.') or imp.startswith('Assistants.') or imp.startswith('UnitTests.'):
+                        import_types['local'] += 1
+                    else:
+                        import_types['external'] += 1
+                
+                all_dependencies.update(imports)
+            else:
+                self.logger.log_info(f"📄 Aucun import local trouvé dans {file_path}", 
+                                   file=file_path, 
+                                   imports=[],
+                                   depth=0)
+        
+        # Détecter les cycles
+        cycles = self.dependency_graph.detect_cycles()
+        for cycle in cycles:
+            self.logger.log_warning(f"⚠️ Cycle détecté: {' -> '.join(cycle)}", cycle=cycle)
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Statistiques finales
+        stats = {
+            'files_analyzed': len(self.visited),
+            'local_imports': len(all_dependencies),
+            'cycles_detected': len(cycles),
+            'max_depth': max_depth,
+            'duration': duration,
+            'import_types': dict(import_types)
+        }
+        
+        self.logger.log_info("🎯 Analyse terminée", 
+                           stats=stats,
+                           duration=duration)
+        
+        # Finaliser le rapport Markdown
+        self.logger.finalize_report(stats)
+        
+        return {
+            'dependencies': list(all_dependencies),
+            'cycles': cycles,
+            'stats': stats
+        }
+
 def main():
     """Fonction principale du script d'analyse d'imports."""
     parser = argparse.ArgumentParser(description='Analyseur d\'imports avec partitioner')
@@ -588,10 +848,20 @@ def main():
     
     args = parser.parse_args()
     
+    # Définir les variables
+    log_directory = args.log_directory
+    files_to_analyze = [
+        'Assistants/EditingSession/partitioning/ast_partitioners.py',
+        'Assistants/EditingSession/partitioning/partition_schemas.py',
+        'Assistants/EditingSession/partitioning/__init__.py',
+        'Core/LoggingProviders/import_analyzer_logging_provider.py',
+        'UnitTests/partitioning_import_analyzer.py'
+    ]
+    
     # Configurer le logger simple
     if args.log_output:
         logger = SimpleImportAnalyzerLogger(
-            log_directory=args.log_directory,
+            log_directory=log_directory,
             log_format=args.log_format
         )
     else:
@@ -606,45 +876,38 @@ def main():
     print("=" * 60)
     
     # Analyser les dépendances
-    analyzer.analyze_autofeeding_dependencies(
-        local_only=args.local_only,
-        verbose=args.verbose,
-        debug=args.debug
-    )
+    print(f"🔍 Analyse des imports de {len(files_to_analyze)} fichiers...")
+    
+    # Utiliser la nouvelle méthode d'analyse
+    result = analyzer.analyze_imports(files_to_analyze)
     
     # Afficher les résultats
-    cycles = analyzer.dependency_graph.detect_cycles()
-    stats = analyzer.dependency_graph.get_dependency_stats()
+    print(f"\n📊 Résultats de l'analyse:")
+    print(f"   Fichiers analysés: {result['stats']['files_analyzed']}")
+    print(f"   Imports locaux trouvés: {result['stats']['local_imports']}")
+    print(f"   Cycles détectés: {result['stats']['cycles_detected']}")
+    print(f"   Durée: {result['stats']['duration']:.2f}s")
     
-    if cycles:
-        print(f'\n🔄 CYCLES DÉTECTÉS: {len(cycles)}')
-        for i, cycle in enumerate(cycles, 1):
-            print(f'  Cycle {i}: {" -> ".join(cycle)}')
+    if result['dependencies']:
+        print(f"\n📦 Imports locaux trouvés:")
+        for dep in sorted(result['dependencies']):
+            print(f"   - {dep}")
+    
+    if result['cycles']:
+        print(f"\n⚠️ Cycles détectés:")
+        for cycle in result['cycles']:
+            print(f"   {' -> '.join(cycle)}")
     else:
-        print('\n✅ Aucun cycle détecté')
+        print(f"\n✅ Aucun cycle détecté - structure saine!")
     
-    print(f'\n📊 STATISTIQUES DU GRAPHE:')
-    print(f'  Fichiers analysés: {stats["total_files"]}')
-    print(f'  Dépendances totales: {stats["total_dependencies"]}')
-    print(f'  Cycles détectés: {len(cycles)}')
+    if args.show_cycles and result['cycles']:
+        print(f"\n🔍 Détails des cycles:")
+        for i, cycle in enumerate(result['cycles'], 1):
+            print(f"   Cycle {i}: {' -> '.join(cycle)}")
     
-    if stats['top_files']:
-        print(f'\n📈 TOP 5 FICHIERS AVEC LE PLUS DE DÉPENDANCES:')
-        for file, count in stats['top_files'][:5]:
-            print(f'  {file}: {count} dépendances')
-    
-    print(f'\n📊 TOTAL FICHIERS AVEC IMPORTS LOCAUX: {len(analyzer.visited)}')
-    
-    print('\n🎯 ANALYSE TERMINÉE !')
-    print(f'📊 Fichiers avec imports locaux: {len(analyzer.visited)}')
-    
-    # Afficher le rapport final
-    print('\n📊 RAPPORT D\'ANALYSE:')
-    print(f'  Session ID: {logger.session_id}')
-    total_time = time.time() - logger.start_time
-    print(f'  Temps total: {total_time:.2f}s')
-    print(f'  Fichiers analysés: {len(analyzer.visited)}')
-    print(f'  Imports résolus: {stats["total_dependencies"]}')
+    print(f"\n�� Rapport détaillé généré dans: {log_directory}/imports_analysis/")
+    print(f"   - Log JSON: imports_analysis.log")
+    print(f"   - Rapport Markdown: imports_analysis_report.md")
 
 if __name__ == '__main__':
     main() 
