@@ -63,6 +63,10 @@ class ImportAnalyzerLoggingProvider(BaseLoggingProvider):
             'start_time': time.time()
         }
     
+    def _get_timestamp(self) -> str:
+        """Retourne un timestamp formaté."""
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     def log_info(self, message: str, **metadata) -> None:
         """Log un message d'information."""
         info_data = {
@@ -107,7 +111,7 @@ class ImportAnalyzerLoggingProvider(BaseLoggingProvider):
         }
         analysis_data.update(metadata)
         
-        self.log_structured(analysis_data)
+        self.log_info(json.dumps(analysis_data, indent=2))
         self.log_info(f"🚀 Début analyse session {self.analysis_session_id}")
         self.log_info(f"📁 Fichiers de départ: {len(start_files)}")
     
@@ -121,32 +125,29 @@ class ImportAnalyzerLoggingProvider(BaseLoggingProvider):
         }
         file_data.update(metadata)
         
-        self.log_structured(file_data)
+        self.log_info(json.dumps(file_data, indent=2))
         indent = '  ' * depth
         self.log_info(f"{indent}📁 Analyse: {file_path}")
     
     def log_import_resolution(self, 
                             import_name: str, 
-                            file_path: str,
+                            current_file: str,
                             resolved_path: Optional[str],
                             resolution_time: float,
                             **metadata) -> None:
         """Log la résolution d'un import."""
-        self.stats['imports_resolved'] += 1
-        self.stats['resolution_time'] += resolution_time
-        
         resolution_data = {
             'type': 'import_resolution',
             'import_name': import_name,
-            'source_file': file_path,
+            'current_file': current_file,
             'resolved_path': resolved_path,
             'resolution_time': resolution_time,
-            'success': resolved_path is not None,
-            'session_id': self.analysis_session_id
+            'session_id': self.analysis_session_id,
+            'success': resolved_path is not None
         }
         resolution_data.update(metadata)
         
-        self.log_structured(resolution_data)
+        self.log_info(json.dumps(resolution_data, indent=2))
         
         if self.log_resolution_details:
             if resolved_path:
@@ -167,20 +168,13 @@ class ImportAnalyzerLoggingProvider(BaseLoggingProvider):
             'local_imports': local_imports,
             'standard_imports': standard_imports,
             'third_party_imports': third_party_imports,
-            'local_count': len(local_imports),
-            'standard_count': len(standard_imports),
-            'third_party_count': len(third_party_imports),
-            'total_count': len(local_imports) + len(standard_imports) + len(third_party_imports),
-            'session_id': self.analysis_session_id
+            'session_id': self.analysis_session_id,
+            'total_imports': len(local_imports) + len(standard_imports) + len(third_party_imports)
         }
         summary_data.update(metadata)
         
-        self.log_structured(summary_data)
-        
-        # Mettre à jour les statistiques globales
-        # self.stats['local_imports'] += len(local_imports) # This line was removed as per the new_code
-        # self.stats['standard_imports'] += len(standard_imports) # This line was removed as per the new_code
-        # self.stats['third_party_imports'] += len(third_party_imports) # This line was removed as per the new_code
+        self.log_info(json.dumps(summary_data, indent=2))
+        self.log_info(f"📊 Résumé {file_path}: {len(local_imports)} locaux, {len(standard_imports)} standard, {len(third_party_imports)} tiers")
     
     def log_file_analysis_complete(self, 
                                  file_path: str,
@@ -188,54 +182,36 @@ class ImportAnalyzerLoggingProvider(BaseLoggingProvider):
                                  total_imports: int,
                                  **metadata) -> None:
         """Log la fin de l'analyse d'un fichier."""
-        self.stats['files_analyzed'] += 1
-        
-        completion_data = {
+        complete_data = {
             'type': 'file_analysis_complete',
             'file_path': file_path,
             'resolved_count': resolved_count,
             'total_imports': total_imports,
-            'success_rate': (resolved_count / total_imports * 100) if total_imports > 0 else 0,
-            'session_id': self.analysis_session_id
+            'session_id': self.analysis_session_id,
+            'resolution_rate': resolved_count / total_imports if total_imports > 0 else 0.0
         }
-        completion_data.update(metadata)
+        complete_data.update(metadata)
         
-        self.log_structured(completion_data)
-        self.log_info(f"  📦 Résolus: {resolved_count}/{total_imports}")
+        self.log_info(json.dumps(complete_data, indent=2))
+        self.log_info(f"  📦 {file_path}: {resolved_count}/{total_imports} résolus")
     
     def log_recursive_analysis_complete(self, 
                                       all_dependencies: Set[str],
                                       unused_files: Set[str],
                                       **metadata) -> None:
         """Log la fin de l'analyse récursive."""
-        total_time = time.time() - self.stats['start_time']
-        
-        completion_data = {
+        complete_data = {
             'type': 'recursive_analysis_complete',
-            'session_id': self.analysis_session_id,
-            'total_time': total_time,
-            'files_analyzed': self.stats['files_analyzed'],
-            'imports_resolved': self.stats['imports_resolved'],
-            'local_imports': self.stats['local_imports'],
-            'standard_imports': self.stats['standard_imports'],
-            'third_party_imports': self.stats['third_party_imports'],
             'all_dependencies': list(all_dependencies),
             'unused_files': list(unused_files),
-            'dependency_count': len(all_dependencies),
-            'unused_count': len(unused_files)
+            'session_id': self.analysis_session_id,
+            'total_dependencies': len(all_dependencies),
+            'total_unused': len(unused_files)
         }
-        completion_data.update(metadata)
+        complete_data.update(metadata)
         
-        self.log_structured(completion_data)
-        
-        # Log des statistiques finales
-        self.log_info(f"🎯 ANALYSE TERMINÉE !")
-        self.log_info(f"📊 Dépendances: {len(all_dependencies)}")
-        self.log_info(f"🗑️ Non utilisés: {len(unused_files)}")
-        self.log_info(f"⏱️ Temps total: {total_time:.2f}s")
-        
-        if self.log_performance_metrics:
-            self.log_performance_metrics()
+        self.log_info(json.dumps(complete_data, indent=2))
+        self.log_info(f"🎯 Analyse terminée: {len(all_dependencies)} dépendances, {len(unused_files)} non utilisés")
     
     def log_performance_metrics(self) -> None:
         """Log les métriques de performance."""

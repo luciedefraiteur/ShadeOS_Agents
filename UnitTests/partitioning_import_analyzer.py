@@ -184,7 +184,7 @@ class PartitioningImportAnalyzer:
                 # Fallback vers les méthodes de base
                 self.logging_provider.log_error(f"Erreur dans {method_name}: {e}")
         else:
-            # Fallback vers les méthodes de base
+            # Fallback vers les méthodes de base seulement si la méthode spécialisée n'existe pas
             if method_name == 'log_file_analysis_start':
                 self.logging_provider.log_info(f"📁 Analyse: {args[0] if args else 'Unknown'}")
             elif method_name == 'log_import_resolution':
@@ -206,7 +206,7 @@ class PartitioningImportAnalyzer:
             elif method_name == 'log_recursive_analysis_complete':
                 all_dependencies, unused_files = args[:2]
                 self.logging_provider.log_info(f"🎯 Analyse terminée: {len(all_dependencies)} dépendances, {len(unused_files)} non utilisés")
-        
+    
     def extract_imports_with_partitioner(self, file_path: str) -> List[str]:
         """Extrait tous les imports d'un fichier Python avec le partitioner."""
         try:
