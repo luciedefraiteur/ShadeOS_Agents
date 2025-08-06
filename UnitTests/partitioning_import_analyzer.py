@@ -474,12 +474,14 @@ class PartitioningImportAnalyzer:
             self.logger = SimpleImportAnalyzerLogger()
             # TODO: Adapter pour utiliser le provider si nécessaire
     
-    def _get_import_resolver(self):
+    def _get_import_resolver(self, current_file: str = None):
         """Retourne l'ImportResolver, en le créant si nécessaire."""
         if self.import_resolver is None:
             try:
                 from partitioning.import_resolver import ImportResolver
-                self.import_resolver = ImportResolver(project_root=self.project_root)
+                # Utiliser le fichier actuel ou un fichier par défaut
+                default_file = current_file or 'UnitTests/partitioning_import_analyzer.py'
+                self.import_resolver = ImportResolver(project_root=self.project_root, current_file=default_file)
             except ImportError as e:
                 self.logger.log_error(f"Impossible d'importer ImportResolver: {e}")
                 return None
@@ -576,7 +578,7 @@ class PartitioningImportAnalyzer:
     def find_file_for_import(self, import_name: str, current_file: str) -> Optional[str]:
         """Trouve le fichier correspondant à un import en utilisant l'ImportResolver."""
         try:
-            resolver = self._get_import_resolver()
+            resolver = self._get_import_resolver(current_file)
             if resolver is None:
                 return None
                 
@@ -692,8 +694,15 @@ class PartitioningImportAnalyzer:
             'Core/UniversalAutoFeedingThread/universal_auto_feeding_thread.py'
         ]
         
+        # Filtrer seulement les fichiers qui existent
+        existing_files = [f for f in autofeeding_files if os.path.exists(f)]
+        if not existing_files:
+            self.logger.log_warning("Aucun fichier d'auto-feeding thread trouvé")
+            print("⚠️ Aucun fichier d'auto-feeding thread trouvé")
+            return set(), set()
+        
         # Log du début d'analyse
-        self._safe_log('log_analysis_start', autofeeding_files)
+        self._safe_log('log_analysis_start', existing_files)
         
         if local_only:
             print('🎯 Analyse RÉCURSIVE - IMPORTS LOCAUX SEULEMENT...')
@@ -702,15 +711,31 @@ class PartitioningImportAnalyzer:
         print('🔄 Détection de cycles intelligente activée')
         print('=' * 80)
         
-        for file_path in autofeeding_files:
-            if os.path.exists(file_path):
-                if not local_only:
-                    print(f'\n📁 DÉPART: {file_path}')
-                    print('-' * 60)
-                self.analyze_file_recursively(file_path, local_only=local_only, verbose=verbose, debug=debug)
+        for file_path in existing_files:
+            if not local_only:
+                print(f'\n📁 DÉPART: {file_path}')
+                print('-' * 60)
+            
+            # Log du début d'analyse du fichier
+            self.logger.log_info(f"📁 Analyse de {file_path}", file=file_path, depth=0)
+            
+            # Analyser les imports du fichier
+            imports = self.extract_imports_with_partitioner(file_path)
+            
+            # Log des imports trouvés
+            if imports:
+                self.logger.log_info(f"✅ Imports trouvés dans {file_path}", 
+                                   file=file_path, 
+                                   imports=imports,
+                                   depth=0)
             else:
-                self.logger.log_warning(f'Fichier non trouvé: {file_path}')
-                print(f'⚠️ Fichier non trouvé: {file_path}')
+                self.logger.log_info(f"📄 Aucun import local trouvé dans {file_path}", 
+                                   file=file_path, 
+                                   imports=[],
+                                   depth=0)
+            
+            # Analyser récursivement
+            self.analyze_file_recursively(file_path, local_only=local_only, verbose=verbose, debug=debug)
         
         # Analyser les cycles détectés
         cycles = self.dependency_graph.detect_cycles()
@@ -758,6 +783,17 @@ class PartitioningImportAnalyzer:
         # Log de la fin d'analyse
         unused_files = set() if local_only else unused_files
         self._safe_log('log_recursive_analysis_complete', self.all_dependencies, unused_files)
+        
+        # Finaliser le rapport Markdown
+        final_stats = {
+            'files_analyzed': stats['total_files'],
+            'local_imports': len(self.all_dependencies),
+            'cycles_detected': len(cycles),
+            'max_depth': stats.get('max_depth', 0),
+            'duration': 0,  # Pas de durée calculée dans cette méthode
+            'import_types': {}  # Pas de types d'imports calculés dans cette méthode
+        }
+        self.logger.finalize_report(final_stats)
         
         return self.all_dependencies, unused_files if not local_only else set()
 
@@ -851,11 +887,11 @@ def main():
     # Définir les variables
     log_directory = args.log_directory
     files_to_analyze = [
-        'Assistants/EditingSession/partitioning/ast_partitioners.py',
-        'Assistants/EditingSession/partitioning/partition_schemas.py',
-        'Assistants/EditingSession/partitioning/__init__.py',
-        'Core/LoggingProviders/import_analyzer_logging_provider.py',
-        'UnitTests/partitioning_import_analyzer.py'
+        'Assistants/Generalist/V9_AutoFeedingThreadAgent.py',
+        'Daemons/DaemonTeam/LegionAutoFeedingThread.py',
+        'Daemons/DaemonTeam/LegionAutoFeedingThread_v2.py',
+        'Core/UniversalAutoFeedingThread/base_auto_feeding_thread.py',
+        'Core/UniversalAutoFeedingThread/universal_auto_feeding_thread.py'
     ]
     
     # Configurer le logger simple
@@ -876,20 +912,20 @@ def main():
     print("=" * 60)
     
     # Analyser les dépendances
-    print(f"🔍 Analyse des imports de {len(files_to_analyze)} fichiers...")
+    print(f"🔍 Analyse des auto-feeding threads...")
     
-    # Utiliser la nouvelle méthode d'analyse
+    # Utiliser la méthode générique avec la liste des fichiers d'auto-feeding threads
     result = analyzer.analyze_imports(files_to_analyze)
     
     # Afficher les résultats
-    print(f"\n📊 Résultats de l'analyse:")
+    print(f"\n📊 Résultats de l'analyse des auto-feeding threads:")
     print(f"   Fichiers analysés: {result['stats']['files_analyzed']}")
     print(f"   Imports locaux trouvés: {result['stats']['local_imports']}")
     print(f"   Cycles détectés: {result['stats']['cycles_detected']}")
     print(f"   Durée: {result['stats']['duration']:.2f}s")
     
     if result['dependencies']:
-        print(f"\n📦 Imports locaux trouvés:")
+        print(f"\n📦 Dépendances trouvées:")
         for dep in sorted(result['dependencies']):
             print(f"   - {dep}")
     
@@ -905,7 +941,7 @@ def main():
         for i, cycle in enumerate(result['cycles'], 1):
             print(f"   Cycle {i}: {' -> '.join(cycle)}")
     
-    print(f"\n�� Rapport détaillé généré dans: {log_directory}/imports_analysis/")
+    print(f"\n📝 Rapport détaillé généré dans: {log_directory}/imports_analysis/")
     print(f"   - Log JSON: imports_analysis.log")
     print(f"   - Rapport Markdown: imports_analysis_report.md")
 
