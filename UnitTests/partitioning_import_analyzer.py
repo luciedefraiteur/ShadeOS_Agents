@@ -49,9 +49,10 @@ except ImportError as e:
 class SimpleImportAnalyzerLogger:
     """Logger simple et direct pour l'analyse d'imports, sans dépendances complexes."""
     
-    def __init__(self, log_directory: Optional[str] = None, log_format: str = "json"):
+    def __init__(self, log_directory: Optional[str] = None, log_format: str = "json", project_root: str = "."):
         self.log_directory = log_directory
         self.log_format = log_format
+        self.project_root = project_root
         self.session_id = f"analysis_{int(time.time())}"
         self.start_time = time.time()
         self.analysis_data = {
@@ -317,6 +318,22 @@ class SimpleImportAnalyzerLogger:
         files_section = "\n".join(files_list)
         self._write_md_section(files_section)
         
+        # Section de l'arbre ASCII structurel
+        tree_section = """
+
+---
+
+## 🌳 Arbre Structurel des Fichiers
+
+*Représentation visuelle de la hiérarchie des fichiers analysés :*
+
+"""
+        self._write_md_section(tree_section)
+        
+        # Générer l'arbre ASCII structurel relatif
+        ascii_tree = self._generate_ascii_tree()
+        self._write_md_section(ascii_tree)
+        
         # Section des imports
         imports_section = """
 
@@ -450,6 +467,73 @@ La structure des imports est saine, aucune action requise.
         # Écrire tout le rapport d'un coup
         with open(self.md_file, 'w', encoding='utf-8') as f:
             f.write("\n".join(self.md_sections))
+
+    def _generate_ascii_tree(self) -> str:
+        """Génère un arbre ASCII structurel relatif des fichiers analysés."""
+        from collections import defaultdict
+        
+        # Créer une structure d'arbre hiérarchique
+        tree = defaultdict(lambda: defaultdict(set))
+        
+        for file_path in self.files_data.keys():
+            # Convertir en chemin relatif depuis la racine du projet
+            try:
+                rel_path = os.path.relpath(file_path, self.project_root)
+            except ValueError:
+                # Si le fichier n'est pas dans le projet, garder le chemin complet
+                rel_path = file_path
+            
+            # Séparer le chemin en parties
+            parts = rel_path.split(os.sep)
+            
+            if len(parts) == 1:
+                # Fichier à la racine
+                tree['.']['files'].add(parts[0])
+            elif len(parts) == 2:
+                # Fichier dans un sous-dossier direct
+                tree[parts[0]]['files'].add(parts[1])
+            else:
+                # Fichier dans un sous-dossier profond
+                current_level = tree[parts[0]]
+                for i in range(1, len(parts) - 1):
+                    if parts[i] not in current_level:
+                        current_level[parts[i]] = defaultdict(set)
+                    current_level = current_level[parts[i]]
+                current_level['files'].add(parts[-1])
+        
+        # Générer l'arbre ASCII
+        tree_lines = []
+        tree_lines.append("```")
+        
+        def add_directory(dir_name, content, prefix="", is_last=True):
+            if dir_name == '.':
+                tree_lines.append(".")
+            else:
+                tree_lines.append(f"{prefix}📁 {dir_name}/")
+            
+            # Ajouter les sous-dossiers
+            subdirs = [(k, v) for k, v in content.items() if k != 'files']
+            for i, (subdir_name, subdir_content) in enumerate(sorted(subdirs)):
+                is_subdir_last = (i == len(subdirs) - 1) and not content.get('files')
+                sub_prefix = "└── " if is_subdir_last else "├── "
+                new_prefix = prefix + ("    " if is_subdir_last else "│   ")
+                add_directory(subdir_name, subdir_content, new_prefix, is_subdir_last)
+            
+            # Ajouter les fichiers
+            files = sorted(content.get('files', []))
+            for i, file_name in enumerate(files):
+                is_file_last = (i == len(files) - 1)
+                file_prefix = "└── " if is_file_last else "├── "
+                tree_lines.append(f"{prefix}{file_prefix}📄 {file_name}")
+        
+        # Traiter les dossiers principaux
+        main_dirs = sorted(tree.keys())
+        for i, dir_name in enumerate(main_dirs):
+            is_last = (i == len(main_dirs) - 1)
+            add_directory(dir_name, tree[dir_name], "", is_last)
+        
+        tree_lines.append("```")
+        return "\n".join(tree_lines)
 
 
 class DependencyGraph:
@@ -1271,10 +1355,11 @@ def main():
     if args.log_output:
         logger = SimpleImportAnalyzerLogger(
             log_directory=log_directory,
-            log_format=args.log_format
+            log_format=args.log_format,
+            project_root=os.getcwd()
         )
     else:
-        logger = SimpleImportAnalyzerLogger()
+        logger = SimpleImportAnalyzerLogger(project_root=os.getcwd())
     
     # Créer l'analyseur avec le logger simple
     analyzer = PartitioningImportAnalyzer(logging_provider=logger)
