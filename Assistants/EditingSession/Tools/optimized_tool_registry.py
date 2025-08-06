@@ -19,6 +19,8 @@ from pathlib import Path
 from Core.Parsers.luciform_parser import parse_luciform
 from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
 from Core.Partitioner.import_analysis_cache import get_import_optimizer
+from Core.Partitioner.resilient_import_analyzer import get_resilient_import_analyzer
+from Core.Partitioner.broken_dependency_handler import get_broken_dependency_handler
 
 
 class OptimizedToolRegistry:
@@ -32,6 +34,12 @@ class OptimizedToolRegistry:
         
         # Optimiseur d'analyse d'imports
         self.import_optimizer = get_import_optimizer(memory_engine)
+        
+        # Analyseur résilient pour les dépendances brisées
+        self.resilient_analyzer = get_resilient_import_analyzer(memory_engine)
+        
+        # Gestionnaire de dépendances brisées
+        self.broken_handler = get_broken_dependency_handler()
         
         # Configuration des triggers d'analyse
         self.analysis_triggers = {
@@ -345,17 +353,27 @@ class OptimizedToolRegistry:
         return [self.get_tool_for_openai(tool_id) for tool_id in self.tools.keys()]
     
     async def invoke_tool(self, tool_id: str, **kwargs) -> Dict[str, Any]:
-        """Invocation d'outil avec optimisation d'analyse d'imports."""
+        """Invocation d'outil avec optimisation d'analyse d'imports et gestion des dépendances brisées."""
         
         # Vérifier si on doit analyser les imports
         if self._should_analyze_imports(tool_id, kwargs):
             file_path = kwargs.get('file_path')
             if file_path:
-                # Analyse optimisée
-                fractal_nodes = await self.import_optimizer.get_or_analyze_imports(file_path)
-                
-                # Mise à jour de la mémoire temporelle
-                await self._update_temporal_memory_with_imports(fractal_nodes, file_path)
+                try:
+                    # Analyse résiliente avec gestion des dépendances brisées
+                    analysis_result = await self.resilient_analyzer.analyze_imports_resilient(file_path)
+                    
+                    # Vérifier si on est en mode dégradé
+                    if self.broken_handler.is_in_degraded_mode(file_path):
+                        logger.warning(f"⚠️ Analyse en mode dégradé pour {file_path}")
+                    
+                    # Mise à jour de la mémoire temporelle
+                    if analysis_result.get('success', False):
+                        await self._update_temporal_memory_with_imports(analysis_result.get('result', {}), file_path)
+                    
+                except Exception as e:
+                    logger.error(f"❌ Erreur d'analyse pour {file_path}: {e}")
+                    # Continuer sans analyse plutôt que de faire échouer l'outil
         
         # Exécution normale de l'outil
         result = self._execute_tool(tool_id, **kwargs)
