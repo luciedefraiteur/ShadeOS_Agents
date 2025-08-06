@@ -99,9 +99,9 @@ class SimpleImportAnalyzerLogger:
 
 ---
 
-## 📋 Liste Simple des Imports (Style "ls récursif")
+## 📁 Liste Simple des Fichiers Parcourus
 
-*Liste simplifiée de tous les imports locaux trouvés, organisés par fichier :*
+*Liste complète de tous les fichiers analysés (style "ls récursif") :*
 
 """
             self.md_sections.append(header)
@@ -308,7 +308,28 @@ class SimpleImportAnalyzerLogger:
         # Initialiser l'en-tête
         self._init_md_report()
         
-        # Générer la liste simple à partir du dictionnaire
+        # Générer la liste simple des fichiers parcourus
+        files_list = []
+        for file_path in sorted(self.files_data.keys()):
+            files_list.append(f"`{file_path}`")
+        
+        # Ajouter la liste simple des fichiers
+        files_section = "\n".join(files_list)
+        self._write_md_section(files_section)
+        
+        # Section des imports
+        imports_section = """
+
+---
+
+## 📋 Liste Simple des Imports (Style "ls récursif")
+
+*Liste simplifiée de tous les imports locaux trouvés, organisés par fichier :*
+
+"""
+        self._write_md_section(imports_section)
+        
+        # Générer la liste simple des imports à partir du dictionnaire
         simple_entries = []
         for file_path, file_data in sorted(self.files_data.items()):
             simple_entry = f"**{file_path}** (profondeur {file_data['depth']}):"
@@ -319,7 +340,7 @@ class SimpleImportAnalyzerLogger:
                 simple_entry += "\n  - *Aucun import local*"
             simple_entries.append(simple_entry)
         
-        # Ajouter la liste simple
+        # Ajouter la liste simple des imports
         simple_section = "\n\n".join(simple_entries)
         self._write_md_section(simple_section)
         
