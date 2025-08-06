@@ -37,6 +37,14 @@ except ImportError as e:
     print(f"❌ Erreur import providers: {e}")
     sys.exit(1)
 
+# Importer l'ImportResolver existant
+try:
+    from Assistants.EditingSession.partitioning.import_resolver import ImportResolver
+    print("✅ ImportResolver importé avec succès!")
+except ImportError as e:
+    print(f"⚠️ Erreur import ImportResolver: {e}")
+    ImportResolver = None
+
 
 class SimpleImportAnalyzerLogger:
     """Logger simple et direct pour l'analyse d'imports, sans dépendances complexes."""
@@ -53,6 +61,11 @@ class SimpleImportAnalyzerLogger:
             'stats': {}
         }
         
+        # Pré-construction du rapport markdown en mémoire
+        self.md_sections = []
+        self.files_data = {}  # Dictionnaire pour éviter les doublons: {file_path: {depth, imports}}
+        self.cycles_detected = []
+        
         # Créer le répertoire de logs si nécessaire
         if log_directory:
             Path(log_directory).mkdir(parents=True, exist_ok=True)
@@ -65,9 +78,6 @@ class SimpleImportAnalyzerLogger:
             
             # Fichier de rapport Markdown
             self.md_file = imports_analysis_dir / "imports_analysis_report.md"
-            
-            # Initialiser le fichier Markdown
-            self._init_md_report()
         else:
             self.log_file = None
             self.md_file = None
@@ -75,8 +85,7 @@ class SimpleImportAnalyzerLogger:
     def _init_md_report(self):
         """Initialise le rapport Markdown avec l'en-tête."""
         if self.md_file:
-            with open(self.md_file, 'w', encoding='utf-8') as f:
-                f.write(f"""# 📊 Rapport d'Analyse d'Imports
+            header = f"""# 📊 Rapport d'Analyse d'Imports
 
 **Session ID:** `{self.session_id}`  
 **Date:** {datetime.fromtimestamp(self.start_time).strftime('%Y-%m-%d %H:%M:%S')}  
@@ -90,15 +99,16 @@ class SimpleImportAnalyzerLogger:
 
 ---
 
-## 📁 Fichiers Analysés
+## 📋 Liste Simple des Imports (Style "ls récursif")
 
-""")
+*Liste simplifiée de tous les imports locaux trouvés, organisés par fichier :*
+
+"""
+            self.md_sections.append(header)
     
     def _write_md_section(self, content: str):
-        """Écrit une section dans le fichier Markdown."""
-        if self.md_file:
-            with open(self.md_file, 'a', encoding='utf-8') as f:
-                f.write(content + "\n")
+        """Ajoute une section au rapport markdown en mémoire."""
+        self.md_sections.append(content)
     
     def _write_log(self, level: str, message: str, data: Dict = None):
         """Écrit un log dans le fichier."""
@@ -214,10 +224,8 @@ class SimpleImportAnalyzerLogger:
         """Log un avertissement."""
         self._write_log("WARNING", message, {"type": "warning"})
         print(f"⚠️ {message}")
-        if 'file' in kwargs:
-            self._add_file_to_md_report(kwargs['file'], [], 0) # No imports for warning, depth 0
-        elif 'cycle' in kwargs:
-            self._add_cycle_to_md_report(kwargs['cycle'])
+        if 'cycle' in kwargs:
+            self.cycles_detected.append(kwargs['cycle'])
     
     def log_info(self, message: str, **kwargs):
         """Log un message d'information."""
@@ -238,42 +246,29 @@ class SimpleImportAnalyzerLogger:
         if 'file' in kwargs:
             self._add_file_to_md_report(kwargs['file'], kwargs.get('imports', []), kwargs.get('depth', 0))
         elif 'cycle' in kwargs:
-            self._add_cycle_to_md_report(kwargs['cycle'])
+            self.cycles_detected.append(kwargs['cycle'])
     
     def _add_file_to_md_report(self, file_path: str, imports: List[str], depth: int):
-        """Ajoute un fichier analysé au rapport Markdown."""
-        indent = "  " * depth
-        file_name = Path(file_path).name
-        
-        section = f"""
-### {indent}📄 {file_name}
-
-**Chemin:** `{file_path}`  
-**Profondeur:** {depth}
-
-**Imports trouvés ({len(imports)}):**
-"""
-        
-        if imports:
-            for imp in imports:
-                section += f"- `{imp}`\n"
+        """Ajoute un fichier analysé au rapport Markdown (en mémoire)."""
+        # Stocker dans le dictionnaire pour éviter les doublons
+        if file_path not in self.files_data:
+            self.files_data[file_path] = {
+                'depth': depth,
+                'imports': imports
+            }
         else:
-            section += "- *Aucun import local trouvé*\n"
-        
-        self._write_md_section(section)
+            # Si le fichier est déjà présent, mettre à jour la profondeur et les imports
+            # Garder la profondeur la plus élevée (plus de détails)
+            if depth > self.files_data[file_path]['depth']:
+                self.files_data[file_path]['depth'] = depth
+            # Fusionner les imports (éviter les doublons)
+            existing_imports = set(self.files_data[file_path]['imports'])
+            new_imports = set(imports)
+            self.files_data[file_path]['imports'] = list(existing_imports | new_imports)
     
     def _add_cycle_to_md_report(self, cycle: List[str]):
-        """Ajoute un cycle détecté au rapport Markdown."""
-        section = f"""
-### ⚠️ Cycle Détecté
-
-**Fichiers impliqués:**
-"""
-        for i, file_path in enumerate(cycle, 1):
-            file_name = Path(file_path).name
-            section += f"{i}. `{file_path}` ({file_name})\n"
-        
-        self._write_md_section(section)
+        """Ajoute un cycle détecté au rapport Markdown (en mémoire)."""
+        self.cycles_detected.append(cycle)
     
     def log_debug(self, message: str, **kwargs):
         """Log un message de debug."""
@@ -306,10 +301,80 @@ class SimpleImportAnalyzerLogger:
                 f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
     
     def finalize_report(self, stats: Dict):
-        """Finalise le rapport Markdown avec les statistiques."""
+        """Finalise le rapport Markdown en écrivant tout le contenu pré-construit."""
         if not self.md_file:
             return
         
+        # Initialiser l'en-tête
+        self._init_md_report()
+        
+        # Générer la liste simple à partir du dictionnaire
+        simple_entries = []
+        for file_path, file_data in sorted(self.files_data.items()):
+            simple_entry = f"**{file_path}** (profondeur {file_data['depth']}):"
+            if file_data['imports']:
+                for imp in sorted(file_data['imports']):
+                    simple_entry += f"\n  - `{imp}`"
+            else:
+                simple_entry += "\n  - *Aucun import local*"
+            simple_entries.append(simple_entry)
+        
+        # Ajouter la liste simple
+        simple_section = "\n\n".join(simple_entries)
+        self._write_md_section(simple_section)
+        
+        # Section détaillée
+        detailed_section = """
+
+---
+
+## 📁 Analyse Détaillée par Fichier
+
+"""
+        self._write_md_section(detailed_section)
+        
+        # Ajouter chaque fichier avec ses détails
+        for file_path, file_data in sorted(self.files_data.items()):
+            indent = "  " * file_data['depth']
+            section = f"""
+### {indent}📄 {Path(file_path).name}
+
+**Chemin:** `{file_path}`  
+**Profondeur:** {file_data['depth']}
+
+**Imports trouvés ({len(file_data['imports'])}):**
+"""
+            
+            if file_data['imports']:
+                for imp in sorted(file_data['imports']):
+                    section += f"- `{imp}`\n"
+            else:
+                section += "- *Aucun import local trouvé*\n"
+            
+            self._write_md_section(section)
+        
+        # Section des cycles
+        if self.cycles_detected:
+            cycles_section = """
+
+---
+
+## ⚠️ Cycles Détectés
+
+"""
+            for i, cycle in enumerate(self.cycles_detected, 1):
+                cycles_section += f"""
+### Cycle {i}
+
+**Fichiers impliqués:**
+"""
+                for j, file_path in enumerate(cycle, 1):
+                    file_name = Path(file_path).name
+                    cycles_section += f"{j}. `{file_path}` ({file_name})\n"
+            
+            self._write_md_section(cycles_section)
+        
+        # Statistiques finales
         end_time = time.time()
         duration = end_time - self.start_time
         
@@ -360,6 +425,10 @@ La structure des imports est saine, aucune action requise.
 """
         
         self._write_md_section(summary)
+        
+        # Écrire tout le rapport d'un coup
+        with open(self.md_file, 'w', encoding='utf-8') as f:
+            f.write("\n".join(self.md_sections))
 
 
 class DependencyGraph:
@@ -479,8 +548,8 @@ class PartitioningImportAnalyzer:
         
         # Initialiser le partitioner
         try:
-            from Core.Parsers.partitioner import Partitioner
-            self.partitioner = Partitioner()
+            from Assistants.EditingSession.partitioning import PythonASTPartitioner
+            self.partitioner = PythonASTPartitioner()
             print("✅ Partitioner importé avec succès!")
         except ImportError as e:
             print(f"⚠️ Erreur import partitioner: {e}")
@@ -490,7 +559,7 @@ class PartitioningImportAnalyzer:
         """Retourne l'ImportResolver, en le créant si nécessaire."""
         if self.import_resolver is None:
             try:
-                from partitioning.import_resolver import ImportResolver
+                from Assistants.EditingSession.partitioning.import_resolver import ImportResolver
                 # Ne pas passer current_file au constructeur car il ne l'accepte pas
                 self.import_resolver = ImportResolver(project_root=self.project_root)
             except ImportError as e:
@@ -532,64 +601,38 @@ class PartitioningImportAnalyzer:
                 self.logger.log_info(f"🎯 Analyse terminée: {len(all_dependencies)} dépendances, {len(unused_files)} non utilisés")
     
     def extract_imports_with_partitioner(self, file_path: str, use_import_resolver: bool = True) -> List[str]:
-        """Extrait tous les imports d'un fichier Python avec le partitioner ou une méthode simplifiée."""
+        """Extrait les imports d'un fichier en utilisant le partitioner ou la méthode simple."""
         try:
-            # Si l'ImportResolver est désactivé, utiliser une méthode simplifiée
+            # Si le partitioner n'est pas disponible, utiliser la méthode simple
+            if self.partitioner is None:
+                return self._extract_imports_simple(file_path)
+            
+            # Si use_import_resolver est False, utiliser la méthode simple
             if not use_import_resolver:
                 return self._extract_imports_simple(file_path)
             
-            # Sinon, utiliser le partitioner (qui utilise l'ImportResolver)
+            # Utiliser le partitioner si disponible
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # Parser avec le partitioner
-            tree = self.partitioner.parse_content(content, file_path)
-            
-            # Analyser les imports
-            import_analysis = self.partitioner.extract_import_analysis(tree)
-            
-            # Utiliser la nouvelle liste unifiée
-            if 'all_imports' in import_analysis:
-                return import_analysis['all_imports']
-            
-            # Fallback sur l'ancienne méthode si pas de all_imports
-            all_imports = []
-            
-            # Imports de la bibliothèque standard
-            for import_info in import_analysis.get('standard_library', []):
-                if isinstance(import_info, str):
-                    all_imports.append(import_info)
-                elif isinstance(import_info, dict):
-                    module = import_info['module']
-                    for name in import_info['names']:
-                        all_imports.append(f"{module}.{name}")
-            
-            # Imports tiers
-            for import_info in import_analysis.get('third_party', []):
-                if isinstance(import_info, str):
-                    all_imports.append(import_info)
-                elif isinstance(import_info, dict):
-                    module = import_info['module']
-                    for name in import_info['names']:
-                        all_imports.append(f"{module}.{name}")
-            
-            # Imports relatifs
-            for import_info in import_analysis.get('relative_imports', []):
-                module = import_info['module']
-                level = import_info['level']
-                for name in import_info['names']:
-                    # Construire l'import relatif
-                    dots = '.' * level
-                    if module:
-                        all_imports.append(f"{dots}{module}.{name}")
-                    else:
-                        all_imports.append(f"{dots}{name}")
-            
-            return all_imports
-            
+            # Utiliser le partitioner pour extraire les imports
+            result = self.partitioner.parse_content(content)
+            if result and hasattr(result, 'imports'):
+                imports = []
+                for imp in result.imports:
+                    if hasattr(imp, 'name'):
+                        imports.append(imp.name)
+                    elif isinstance(imp, str):
+                        imports.append(imp)
+                return imports
+            else:
+                # Fallback vers la méthode simple si le partitioner échoue
+                return self._extract_imports_simple(file_path)
+                
         except Exception as e:
             self.logger.log_error(f'Erreur partitioner {file_path}: {e}')
-            return []
+            # Fallback vers la méthode simple en cas d'erreur
+            return self._extract_imports_simple(file_path)
     
     def _extract_imports_simple(self, file_path: str) -> List[str]:
         """Extrait les imports d'un fichier Python avec une méthode simple (sans ImportResolver)."""
@@ -632,7 +675,7 @@ class PartitioningImportAnalyzer:
             return []
     
     def find_file_for_import(self, import_name: str, current_file: str, use_import_resolver: bool = True) -> Optional[str]:
-        """Trouve le fichier correspondant à un import en utilisant l'ImportResolver en premier avec vérification locale."""
+        """Trouve le fichier correspondant à un import en utilisant l'ImportResolver existant."""
         try:
             # Vérifier si c'est un import de bibliothèque standard
             if self._is_standard_library_import(import_name):
@@ -642,13 +685,18 @@ class PartitioningImportAnalyzer:
             if not self._is_local_import(import_name):
                 return None  # Ne pas résoudre les imports non locaux
             
-            # ÉTAPE 1: Essayer l'ImportResolver en premier (plus intelligent)
-            if use_import_resolver:
-                resolved_path = self._resolve_import_with_resolver(import_name, current_file)
+            # Utiliser l'ImportResolver existant si disponible et activé
+            if use_import_resolver and ImportResolver is not None:
+                # Créer une instance d'ImportResolver si pas encore fait
+                if not hasattr(self, '_import_resolver_instance'):
+                    self._import_resolver_instance = ImportResolver(project_root=self.project_root)
+                
+                # Utiliser la méthode resolve_import de l'ImportResolver
+                resolved_path = self._import_resolver_instance.resolve_import(import_name, current_file)
                 if resolved_path and os.path.exists(resolved_path):
                     return resolved_path
             
-            # ÉTAPE 2: Fallback vers la logique simple
+            # Fallback vers la logique simple si ImportResolver non disponible ou désactivé
             return self._resolve_import_simple(import_name, current_file)
             
         except Exception as e:
@@ -683,90 +731,141 @@ class PartitioningImportAnalyzer:
         return False
     
     def _resolve_import_simple(self, import_name: str, current_file: str) -> Optional[str]:
-        """Résolution simple et rapide des imports locaux (fallback)."""
+        """Résout un import de manière simple sans ImportResolver."""
         try:
             if import_name.startswith('.'):
                 # Import relatif
-                current_dir = os.path.dirname(current_file)
-                relative_path = import_name.replace('.', '/').lstrip('/')
-                if relative_path.endswith('.py'):
-                    candidate = os.path.join(current_dir, relative_path)
+                current_dir = os.path.dirname(os.path.abspath(current_file))
+                
+                # Compter les .. au début (chaque .. = remonter d'un niveau)
+                dots_count = len(import_name) - len(import_name.lstrip('.'))
+                # Remonter du bon nombre de niveaux (diviser par 2 car .. = 2 caractères)
+                for _ in range(dots_count // 2):
+                    current_dir = os.path.dirname(current_dir)
+                
+                # Convertir le reste en chemin
+                rest = import_name[dots_count:].replace('.', '/')
+                
+                # Essayer d'abord le fichier .py direct
+                if rest.endswith('.py'):
+                    candidate = os.path.normpath(os.path.join(current_dir, rest))
                 else:
-                    candidate = os.path.join(current_dir, relative_path + '.py')
+                    candidate = os.path.normpath(os.path.join(current_dir, rest + '.py'))
+                
                 if os.path.exists(candidate):
                     return candidate
-                # Essayer avec __init__.py
-                candidate = os.path.join(current_dir, relative_path, '__init__.py')
+                
+                # Si pas trouvé, essayer avec __init__.py
+                candidate = os.path.normpath(os.path.join(current_dir, rest, '__init__.py'))
                 if os.path.exists(candidate):
                     return candidate
+                
+                # Si c'est un import de classe (ex: ..backends.storage_backends.FileSystemBackend)
+                # Essayer de trouver le module contenant la classe
+                parts = rest.split('/')
+                if len(parts) > 1:
+                    # Prendre tout sauf la dernière partie comme module
+                    module_path = '/'.join(parts[:-1])
+                    module_file = os.path.normpath(os.path.join(current_dir, module_path + '.py'))
+                    if os.path.exists(module_file):
+                        return module_file
+                    
+                    # Essayer avec __init__.py
+                    module_init = os.path.normpath(os.path.join(current_dir, module_path, '__init__.py'))
+                    if os.path.exists(module_init):
+                        return module_init
+                
+                return None
             else:
-                # Import absolu local
-                if import_name.startswith(('Core.', 'Assistants.', 'MemoryEngine.', 'UnitTests.')):
-                    # Convertir le nom d'import en chemin de fichier
-                    parts = import_name.split('.')
-                    if len(parts) >= 2:
-                        # Construire le chemin
-                        module_path = '/'.join(parts[:-1])  # Exclure la dernière partie (classe/fonction)
-                        class_name = parts[-1]
-                        
-                        # Essayer différents patterns
-                        candidates = [
-                            f"{module_path}.py",
-                            f"{module_path}/{class_name}.py",
-                            f"{module_path}/__init__.py"
-                        ]
-                        
-                        for candidate in candidates:
-                            full_path = os.path.join(self.project_root, candidate)
-                            if os.path.exists(full_path):
-                                return full_path
-            return None
+                # Import absolu - essayer de trouver dans le projet
+                project_root = self.project_root
+                
+                # Essayer avec .py
+                candidate = os.path.join(project_root, import_name.replace('.', '/') + '.py')
+                if os.path.exists(candidate):
+                    return candidate
+                
+                # Essayer avec __init__.py
+                candidate = os.path.join(project_root, import_name.replace('.', '/'), '__init__.py')
+                if os.path.exists(candidate):
+                    return candidate
+                
+                # Si c'est un import de classe (ex: MemoryEngine.core.engine.MemoryEngine)
+                # Essayer de trouver le module contenant la classe
+                parts = import_name.split('.')
+                if len(parts) > 1:
+                    # Prendre tout sauf la dernière partie comme module
+                    module_path = '/'.join(parts[:-1])
+                    module_file = os.path.join(project_root, module_path + '.py')
+                    if os.path.exists(module_file):
+                        return module_file
+                    
+                    # Essayer avec __init__.py
+                    module_init = os.path.join(project_root, module_path, '__init__.py')
+                    if os.path.exists(module_init):
+                        return module_init
+                
+                return None
+                
         except Exception as e:
-            self.logger.log_error(f'Erreur résolution simple {import_name}: {e}')
+            print(f"❌ Erreur résolution import {import_name}: {e}")
             return None
     
     def _resolve_import_with_resolver(self, import_name: str, current_file: str) -> Optional[str]:
         """Résolution avec l'ImportResolver en mode sécurisé."""
         try:
-            resolver = self._get_import_resolver()
-            if resolver is None:
-                return None
+            import importlib.util
+            import sys
             
-            # Timeout pour éviter les blocages
-            import signal
-            
-            def timeout_handler(signum, frame):
-                raise TimeoutError(f"Timeout résolution import {import_name}")
-            
-            # Définir un timeout de 2 secondes
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(2)
+            # Sauvegarder l'état actuel de sys.path
+            old_sys_path = list(sys.path)
             
             try:
-                result = resolver.resolve_import(import_name, current_file)
-                signal.alarm(0)  # Annuler l'alarme
+                # Ajouter le project_root temporairement
+                project_root_str = str(self.project_root)
+                if project_root_str not in sys.path:
+                    sys.path.insert(0, project_root_str)
                 
-                # Vérifier que le résultat est bien dans notre projet
-                if result and os.path.exists(result):
-                    # Vérifier que le fichier résolu est dans notre projet
-                    if result.startswith(self.project_root):
-                        return result
-                    else:
-                        # Le fichier résolu n'est pas dans notre projet
-                        return None
+                # Ajouter le dossier parent du fichier courant
+                current_dir = os.path.dirname(os.path.abspath(current_file))
+                if current_dir not in sys.path:
+                    sys.path.insert(0, current_dir)
                 
-                return result
-            except TimeoutError:
-                self.logger.log_warning(f"Timeout ImportResolver pour {import_name}")
-                return None
-            except Exception as e:
-                signal.alarm(0)  # Annuler l'alarme
-                self.logger.log_error(f'Erreur ImportResolver pour {import_name}: {e}')
-                return None
+                # Pour les imports relatifs, construire le nom de module
+                if import_name.startswith('.'):
+                    # Compter les .. au début
+                    dots_count = len(import_name) - len(import_name.lstrip('.'))
+                    # Remonter du bon nombre de niveaux
+                    current_dir_path = os.path.dirname(os.path.abspath(current_file))
+                    for _ in range(dots_count // 2):
+                        current_dir_path = os.path.dirname(current_dir_path)
+                    
+                    # Convertir le reste en nom de module
+                    rest = import_name[dots_count:].replace('.', '/')
+                    module_name = rest.replace('/', '.')
+                    
+                    # Ajouter le dossier calculé à sys.path
+                    if current_dir_path not in sys.path:
+                        sys.path.insert(0, current_dir_path)
+                else:
+                    # Import absolu
+                    module_name = import_name
+                
+                # Utiliser importlib pour résoudre
+                spec = importlib.util.find_spec(module_name)
+                if spec and spec.origin:
+                    # Vérifier si c'est un fichier local
+                    if spec.origin.startswith(str(self.project_root)):
+                        return spec.origin
+                
+            finally:
+                # Restaurer sys.path
+                sys.path = old_sys_path
                 
         except Exception as e:
-            self.logger.log_error(f'Erreur résolution ImportResolver {import_name}: {e}')
-            return None
+            self.logger.log_error(f'Erreur résolution avec resolver {import_name}: {e}')
+        
+        return None
     
     def _is_standard_library_import(self, import_name: str) -> bool:
         """Vérifie si un import fait partie de la bibliothèque standard."""
