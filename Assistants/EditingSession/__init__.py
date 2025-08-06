@@ -8,7 +8,7 @@ et localisation précise des modifications.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
-from .partitioning import (
+from Core.Partitioner import (
     # Schémas de données
     PartitionLocation,
     PartitionBlock,
