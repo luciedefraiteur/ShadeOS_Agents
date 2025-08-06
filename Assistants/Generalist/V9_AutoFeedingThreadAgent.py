@@ -15,9 +15,10 @@ from dataclasses import dataclass
 # Ajouter le répertoire racine au PYTHONPATH
 sys.path.insert(0, os.path.abspath('.'))
 
-from MemoryEngine.core.engine import MemoryEngine
-from MemoryEngine.core.workspace_layer import WorkspaceLayer
-from MemoryEngine.core.git_virtual_layer import GitVirtualLayer
+# Migration vers TemporalFractalMemoryEngine
+from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
+from TemporalFractalMemoryEngine.core.temporal_workspace_layer import WorkspaceTemporalLayer
+from TemporalFractalMemoryEngine.core.temporal_components import GitTemporalLayer
 from Core.UniversalAutoFeedingThread import UniversalAutoFeedingThread
 from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
 from LLMProviders import ProviderFactory, LLMProvider
@@ -130,7 +131,7 @@ class AutoFeedingThreadLogger:
 class AutoFeedingThreadAgent:
     """Assistant auto-feeding thread avec construction + debug."""
     
-    def __init__(self, memory_engine: MemoryEngine, tool_registry: ToolRegistry, 
+    def __init__(self, memory_engine: TemporalEngine, tool_registry: ToolRegistry, 
                  provider_type: str = "local", model: str = "qwen2.5:7b-instruct", 
                  workspace_path: str = ".", **provider_config):
         """Initialise l'assistant auto-feeding thread."""
@@ -196,8 +197,8 @@ class AutoFeedingThreadAgent:
                     raise Exception(f"Provider {self.provider_type} invalide: {validation.error}")
                 
                 # Initialiser les couches avec le provider
-                self.workspace_layer = WorkspaceLayer(self.memory_engine, self.provider, self.workspace_path)
-                self.git_layer = GitVirtualLayer(self.memory_engine, self.workspace_path)
+                self.workspace_layer = WorkspaceTemporalLayer(self.memory_engine, self.provider, self.workspace_path)
+                self.git_layer = GitTemporalLayer(self.memory_engine, self.workspace_path)
                 
                 self.logger.log_thread_message(ThreadMessage(
                     timestamp=time.time(),
@@ -801,7 +802,7 @@ async def test_auto_feeding_thread_agent():
     print("=" * 70)
     
     # Initialiser
-    memory_engine = MemoryEngine()
+    memory_engine = TemporalEngine()
     tool_registry = ToolRegistry(memory_engine)
     tool_registry.initialize()
     

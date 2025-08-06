@@ -24,14 +24,14 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-# Imports MemoryEngine
+# Imports TemporalFractalMemoryEngine
 try:
-    from MemoryEngine.core.engine import MemoryEngine
-    from MemoryEngine.core.initialization import ensure_initialized
+    from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
+    from TemporalFractalMemoryEngine.core.initialization import ensure_initialized
     MEMORY_ENGINE_AVAILABLE = True
 except ImportError:
     MEMORY_ENGINE_AVAILABLE = False
-    print("⚠️ MemoryEngine non disponible - Mode standalone activé")
+    print("⚠️ TemporalFractalTemporalFractalMemoryEngine non disponible - Mode standalone activé")
 
 # Imports LLM Providers
 try:
@@ -287,7 +287,7 @@ class LegionAutoFeedingThread:
         if MEMORY_ENGINE_AVAILABLE:
             try:
                 ensure_initialized()
-                self.memory_engine = MemoryEngine()
+                self.memory_engine = TemporalEngine()
                 print("✅ MemoryEngine initialisé")
             except Exception as e:
                 print(f"⚠️ Erreur MemoryEngine: {e}")
