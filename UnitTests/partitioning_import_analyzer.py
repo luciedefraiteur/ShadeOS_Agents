@@ -459,12 +459,15 @@ class PartitioningImportAnalyzer:
     """Analyseur d'imports utilisant le partitioner pour une analyse précise des dépendances."""
     
     def __init__(self, project_root: str = '.', logging_provider: BaseLoggingProvider = None):
-        self.project_root = project_root
-        self.partitioner = PythonASTPartitioner()
-        self.import_resolver = None
+        """Initialise l'analyseur d'imports avec partitioner."""
+        self.project_root = os.path.abspath(project_root)
+        self.logging_provider = logging_provider
         self.visited = set()
-        self.all_dependencies = set()  # Ajout de l'attribut manquant
+        self.all_dependencies = set()
         self.dependency_graph = DependencyGraph()
+        self.file_depths = {}  # Stocker la profondeur de chaque fichier
+        self.partitioner = None
+        self.import_resolver = None
         
         # Utiliser le logger simple par défaut
         if logging_provider is None:
@@ -473,6 +476,15 @@ class PartitioningImportAnalyzer:
             # Si un provider est fourni, créer un logger simple qui l'utilise
             self.logger = SimpleImportAnalyzerLogger()
             # TODO: Adapter pour utiliser le provider si nécessaire
+        
+        # Initialiser le partitioner
+        try:
+            from Core.Parsers.partitioner import Partitioner
+            self.partitioner = Partitioner()
+            print("✅ Partitioner importé avec succès!")
+        except ImportError as e:
+            print(f"⚠️ Erreur import partitioner: {e}")
+            self.partitioner = None
     
     def _get_import_resolver(self, current_file: str = None):
         """Retourne l'ImportResolver, en le créant si nécessaire."""
@@ -786,6 +798,7 @@ class PartitioningImportAnalyzer:
         
         self.visited.add(file_path)
         self.all_dependencies.add(file_path)
+        self.file_depths[file_path] = depth # Stocker la profondeur
         
         # Log du début d'analyse du fichier
         self._safe_log('log_file_analysis_start', file_path, depth)
@@ -955,7 +968,7 @@ class PartitioningImportAnalyzer:
             'files_analyzed': stats['total_files'],
             'local_imports': len(self.all_dependencies),
             'cycles_detected': len(cycles),
-            'max_depth': stats.get('max_depth', 0),
+            'max_depth': max(self.file_depths.values()), # Utiliser la profondeur maximale
             'duration': 0,  # Pas de durée calculée dans cette méthode
             'import_types': {}  # Pas de types d'imports calculés dans cette méthode
         }
@@ -979,6 +992,7 @@ class PartitioningImportAnalyzer:
         # Réinitialiser l'état pour une nouvelle analyse
         self.visited.clear()
         self.dependency_graph = DependencyGraph()
+        self.file_depths.clear() # Réinitialiser les profondeurs
         
         # Analyser chaque fichier de manière récursive
         for file_path in files_to_analyze:
@@ -1011,7 +1025,7 @@ class PartitioningImportAnalyzer:
                         import_types['external'] += 1
             
             # Ajouter au rapport Markdown seulement les imports locaux
-            self.logger._add_file_to_md_report(file_path, local_imports, 0)
+            self.logger._add_file_to_md_report(file_path, local_imports, self.file_depths[file_path])
             
             # Ajouter tous les imports pour les stats
             all_dependencies.update(imports)
@@ -1030,7 +1044,7 @@ class PartitioningImportAnalyzer:
             'local_imports': len(local_dependencies),  # Seulement les imports locaux
             'total_imports': len(all_dependencies),    # Tous les imports
             'cycles_detected': len(cycles),
-            'max_depth': 0,  # Pour l'instant, on ne calcule pas la profondeur
+            'max_depth': max(self.file_depths.values()), # Utiliser la profondeur maximale
             'duration': duration,
             'import_types': dict(import_types)
         }
