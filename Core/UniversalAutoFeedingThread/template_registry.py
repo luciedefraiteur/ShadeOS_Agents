@@ -10,8 +10,8 @@ from abc import ABC, abstractmethod
 
 # Import MemoryEngine si disponible
 try:
-    from MemoryEngine.core.engine import MemoryEngine
-    from MemoryEngine.core.initialization import ensure_initialized
+    from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
+    from TemporalFractalMemoryEngine.core.initialization import ensure_initialized
     MEMORY_ENGINE_AVAILABLE = True
 except ImportError:
     MEMORY_ENGINE_AVAILABLE = False

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 ⛧ Tool Registry ⛧
-Alma's Dynamic Tool Registry for MemoryEngine
+Alma's Dynamic Tool Registry for TemporalFractalMemoryEngine
 
-Registre dynamique d'outils avec intégration MemoryEngine et support OpenAI Agents SDK.
+Registre dynamique d'outils avec intégration TemporalFractalMemoryEngine et support OpenAI Agents SDK.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
@@ -14,13 +14,13 @@ from typing import Dict, Any, List, Optional, Callable
 from pathlib import Path
 
 from Core.Parsers.luciform_parser import parse_luciform
-from MemoryEngine.core.engine import MemoryEngine
+from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
 
 
 class ToolRegistry:
-    """Registre dynamique d'outils avec intégration MemoryEngine."""
+    """Registre dynamique d'outils avec intégration TemporalFractalMemoryEngine."""
     
-    def __init__(self, memory_engine: MemoryEngine):
+    def __init__(self, memory_engine: TemporalEngine):
         self.memory_engine = memory_engine
         self.tools: Dict[str, Dict[str, Any]] = {}
         self.tools_path = Path(__file__).parent  # Répertoire local Tools
@@ -402,7 +402,7 @@ class ToolRegistry:
 # Instance globale
 _global_registry: Optional[ToolRegistry] = None
 
-def initialize_tool_registry(memory_engine: MemoryEngine) -> ToolRegistry:
+def initialize_tool_registry(memory_engine: TemporalEngine) -> ToolRegistry:
     """Initialise le registre global d'outils."""
     global _global_registry
     if _global_registry is None:
