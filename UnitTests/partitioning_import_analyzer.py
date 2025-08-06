@@ -987,43 +987,34 @@ class PartitioningImportAnalyzer:
                 
             self.logger.log_info(f"📁 Analyse de {file_path}", file=file_path, depth=0)
             
-            # Analyser les imports du fichier
-            imports = self.extract_imports_with_partitioner(file_path, use_import_resolver)
-            
-            if imports:
-                self.logger.log_info(f"✅ Imports trouvés dans {file_path}", 
-                                   file=file_path, 
-                                   imports=imports,
-                                   depth=0)
-                
-                # Compter les types d'imports
-                for imp in imports:
-                    if imp.startswith('.'):
-                        import_types['relative'] += 1
-                    elif imp.startswith('Core.') or imp.startswith('Assistants.') or imp.startswith('UnitTests.'):
-                        import_types['local'] += 1
-                    else:
-                        import_types['external'] += 1
-                
-                all_dependencies.update(imports)
-            else:
-                self.logger.log_info(f"📄 Aucun import local trouvé dans {file_path}", 
-                                   file=file_path, 
-                                   imports=[],
-                                   depth=0)
-            
             # Analyser récursivement avec le paramètre use_import_resolver
             self.analyze_file_recursively(file_path, 0, True, False, False, use_import_resolver)
+        
+        # Maintenant, ajouter au rapport Markdown TOUS les fichiers analysés (pas seulement ceux de la liste initiale)
+        for file_path in sorted(self.visited):
+            # Extraire les imports du fichier
+            imports = self.extract_imports_with_partitioner(file_path, use_import_resolver)
             
-            # Filtrer les imports locaux pour le rapport Markdown
+            # Filtrer seulement les imports locaux pour le rapport
             local_imports = []
             for imp in imports:
                 if self._is_local_import(imp):
                     local_imports.append(imp)
                     local_dependencies.add(imp)
+                else:
+                    # Compter les types d'imports pour les stats
+                    if imp.startswith('.'):
+                        import_types['relative'] += 1
+                    elif self._is_standard_library_import(imp):
+                        import_types['external'] += 1
+                    else:
+                        import_types['external'] += 1
             
             # Ajouter au rapport Markdown seulement les imports locaux
             self.logger._add_file_to_md_report(file_path, local_imports, 0)
+            
+            # Ajouter tous les imports pour les stats
+            all_dependencies.update(imports)
         
         # Détecter les cycles
         cycles = self.dependency_graph.detect_cycles()
