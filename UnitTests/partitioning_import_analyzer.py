@@ -798,46 +798,66 @@ class PartitioningImportAnalyzer:
         return self.all_dependencies, unused_files if not local_only else set()
 
     def analyze_imports(self, files_to_analyze: List[str]) -> Dict:
-        """Analyse les imports des fichiers donnés avec détection de cycles intelligente."""
-        self.logger.log_info("🚀 Début de l'analyse d'imports", 
+        """Analyse les imports des fichiers donnés avec détection de cycles intelligente et analyse récursive."""
+        self.logger.log_info("🚀 Début de l'analyse d'imports récursive", 
                            files_count=len(files_to_analyze),
                            files=files_to_analyze)
         
         start_time = time.time()
-        all_dependencies = set()
+        local_dependencies = set()  # Seulement les imports locaux
+        all_dependencies = set()    # Tous les imports pour les stats
         import_types = defaultdict(int)
         max_depth = 0
         
+        # Réinitialiser l'état pour une nouvelle analyse
+        self.visited.clear()
+        self.dependency_graph = DependencyGraph()
+        
+        # Analyser chaque fichier de manière récursive
         for file_path in files_to_analyze:
             if file_path in self.visited:
                 continue
                 
-            self.logger.log_info(f"📁 Analyse de {file_path}", file=file_path, depth=0)
+            self.logger.log_info(f"📁 Analyse récursive de {file_path}", file=file_path, depth=0)
             
-            # Analyser les imports du fichier
+            # Utiliser la méthode récursive existante
+            self.analyze_file_recursively(
+                file_path=file_path,
+                depth=0,
+                local_only=True,  # Suivre seulement les imports locaux
+                verbose=False,
+                debug=False
+            )
+        
+        # Collecter toutes les dépendances trouvées et filtrer les locaux
+        for file_path in self.visited:
             imports = self.extract_imports_with_partitioner(file_path)
-            
             if imports:
-                self.logger.log_info(f"✅ Imports trouvés dans {file_path}", 
-                                   file=file_path, 
-                                   imports=imports,
-                                   depth=0)
+                all_dependencies.update(imports)
                 
-                # Compter les types d'imports
+                # Filtrer les imports locaux pour le rapport
+                local_imports_for_file = []
+                
+                # Compter les types d'imports et filtrer les locaux
                 for imp in imports:
                     if imp.startswith('.'):
                         import_types['relative'] += 1
-                    elif imp.startswith('Core.') or imp.startswith('Assistants.') or imp.startswith('UnitTests.'):
+                        local_dependencies.add(imp)
+                        local_imports_for_file.append(imp)
+                    elif (imp.startswith('Core.') or imp.startswith('Assistants.') or 
+                          imp.startswith('UnitTests.') or imp.startswith('MemoryEngine.')):
                         import_types['local'] += 1
+                        local_dependencies.add(imp)
+                        local_imports_for_file.append(imp)
                     else:
                         import_types['external'] += 1
+                        # Ne pas ajouter les imports externes
                 
-                all_dependencies.update(imports)
+                # Ajouter seulement les imports locaux au rapport Markdown
+                self.logger._add_file_to_md_report(file_path, local_imports_for_file, 0)
             else:
-                self.logger.log_info(f"📄 Aucun import local trouvé dans {file_path}", 
-                                   file=file_path, 
-                                   imports=[],
-                                   depth=0)
+                # Ajouter le fichier même s'il n'a pas d'imports
+                self.logger._add_file_to_md_report(file_path, [], 0)
         
         # Détecter les cycles
         cycles = self.dependency_graph.detect_cycles()
@@ -850,22 +870,24 @@ class PartitioningImportAnalyzer:
         # Statistiques finales
         stats = {
             'files_analyzed': len(self.visited),
-            'local_imports': len(all_dependencies),
+            'local_imports': len(local_dependencies),  # Seulement les imports locaux
+            'total_imports': len(all_dependencies),    # Tous les imports
             'cycles_detected': len(cycles),
-            'max_depth': max_depth,
+            'max_depth': 0,  # Pour l'instant, on ne calcule pas la profondeur
             'duration': duration,
             'import_types': dict(import_types)
         }
         
-        self.logger.log_info("🎯 Analyse terminée", 
+        self.logger.log_info("🎯 Analyse récursive terminée", 
                            stats=stats,
                            duration=duration)
         
-        # Finaliser le rapport Markdown
+        # Finaliser le rapport Markdown avec seulement les imports locaux
         self.logger.finalize_report(stats)
         
         return {
-            'dependencies': list(all_dependencies),
+            'dependencies': list(local_dependencies),  # Retourner seulement les imports locaux
+            'all_dependencies': list(all_dependencies),  # Tous les imports pour référence
             'cycles': cycles,
             'stats': stats
         }
