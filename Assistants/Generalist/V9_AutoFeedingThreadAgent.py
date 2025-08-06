@@ -20,7 +20,7 @@ from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
 from TemporalFractalMemoryEngine.core.temporal_workspace_layer import WorkspaceTemporalLayer
 from TemporalFractalMemoryEngine.core.temporal_components import GitTemporalLayer
 from Core.UniversalAutoFeedingThread import UniversalAutoFeedingThread
-from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
+from Assistants.EditingSession.Tools.optimized_tool_registry import OptimizedToolRegistry as ToolRegistry
 from LLMProviders import ProviderFactory, LLMProvider
 
 @dataclass
