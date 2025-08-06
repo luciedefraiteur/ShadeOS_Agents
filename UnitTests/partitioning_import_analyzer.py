@@ -976,59 +976,34 @@ class PartitioningImportAnalyzer:
         
         return self.all_dependencies, unused_files if not local_only else set()
 
-    def analyze_imports(self, files_to_analyze: List[str], use_import_resolver: bool = True) -> Dict:
-        """Analyse les imports des fichiers donnés avec détection de cycles intelligente et analyse récursive."""
-        self.logger.log_info("🚀 Début de l'analyse d'imports récursive", 
+    def analyze_imports(self, files_to_analyze: List[str], use_import_resolver: bool = True, max_depth: Optional[int] = None) -> Dict:
+        """Analyse les imports des fichiers donnés avec détection de cycles intelligente et analyse récursive pure."""
+        self.logger.log_info("🚀 Début de l'analyse d'imports récursive pure", 
                            files_count=len(files_to_analyze),
                            files=files_to_analyze,
-                           use_import_resolver=use_import_resolver)
+                           use_import_resolver=use_import_resolver,
+                           max_depth=max_depth)
         
         start_time = time.time()
         local_dependencies = set()  # Seulement les imports locaux
         all_dependencies = set()    # Tous les imports pour les stats
         import_types = defaultdict(int)
-        max_depth = 0
         
         # Réinitialiser l'état pour une nouvelle analyse
         self.visited.clear()
         self.dependency_graph = DependencyGraph()
         self.file_depths.clear() # Réinitialiser les profondeurs
         
-        # Analyser chaque fichier de manière récursive
+        # Analyser chaque fichier de manière récursive pure
         for file_path in files_to_analyze:
             if file_path in self.visited:
                 continue
                 
             self.logger.log_info(f"📁 Analyse de {file_path}", file=file_path, depth=0)
             
-            # Analyser récursivement avec le paramètre use_import_resolver
-            self.analyze_file_recursively(file_path, 0, True, False, False, use_import_resolver)
-        
-        # Maintenant, ajouter au rapport Markdown TOUS les fichiers analysés (pas seulement ceux de la liste initiale)
-        for file_path in sorted(self.visited):
-            # Extraire les imports du fichier
-            imports = self.extract_imports_with_partitioner(file_path, use_import_resolver)
-            
-            # Filtrer seulement les imports locaux pour le rapport
-            local_imports = []
-            for imp in imports:
-                if self._is_local_import(imp):
-                    local_imports.append(imp)
-                    local_dependencies.add(imp)
-                else:
-                    # Compter les types d'imports pour les stats
-                    if imp.startswith('.'):
-                        import_types['relative'] += 1
-                    elif self._is_standard_library_import(imp):
-                        import_types['external'] += 1
-                    else:
-                        import_types['external'] += 1
-            
-            # Ajouter au rapport Markdown seulement les imports locaux
-            self.logger._add_file_to_md_report(file_path, local_imports, self.file_depths[file_path])
-            
-            # Ajouter tous les imports pour les stats
-            all_dependencies.update(imports)
+            # Analyser récursivement avec logique pure (une seule passe)
+            self._analyze_file_recursively_pure(file_path, 0, use_import_resolver, max_depth, 
+                                              local_dependencies, all_dependencies, import_types)
         
         # Détecter les cycles
         cycles = self.dependency_graph.detect_cycles()
@@ -1044,7 +1019,7 @@ class PartitioningImportAnalyzer:
             'local_imports': len(local_dependencies),  # Seulement les imports locaux
             'total_imports': len(all_dependencies),    # Tous les imports
             'cycles_detected': len(cycles),
-            'max_depth': max(self.file_depths.values()), # Utiliser la profondeur maximale
+            'max_depth': max(self.file_depths.values()) if self.file_depths else 0,
             'duration': duration,
             'import_types': dict(import_types)
         }
@@ -1061,6 +1036,78 @@ class PartitioningImportAnalyzer:
             'cycles': cycles,
             'stats': stats
         }
+    
+    def _analyze_file_recursively_pure(self, file_path: str, depth: int, use_import_resolver: bool, 
+                                     max_depth: Optional[int], local_dependencies: set, 
+                                     all_dependencies: set, import_types: defaultdict):
+        """Analyse récursive pure d'un fichier - tout se fait en une seule passe."""
+        # Vérifier la limite de profondeur AVANT de marquer comme visité
+        if max_depth is not None and depth > max_depth:
+            self.logger.log_info(f"🛑 Limite de profondeur atteinte pour {file_path}", 
+                               file=file_path, depth=depth, max_depth=max_depth)
+            return
+        
+        # Vérifier si déjà visité (éviter les cycles)
+        if file_path in self.visited:
+            self.logger.log_info(f"🔄 Déjà visité: {file_path} (profondeur {depth})", 
+                               file=file_path, depth=depth)
+            return
+        
+        # Marquer comme visité et stocker la profondeur
+        self.visited.add(file_path)
+        self.file_depths[file_path] = depth
+        
+        # Extraire les imports du fichier
+        imports = self.extract_imports_with_partitioner(file_path, use_import_resolver)
+        
+        # Filtrer et traiter les imports
+        local_imports = []
+        for imp in imports:
+            # Ajouter à tous les imports pour les stats
+            all_dependencies.add(imp)
+            
+            if self._is_local_import(imp):
+                local_imports.append(imp)
+                local_dependencies.add(imp)
+            else:
+                # Compter les types d'imports pour les stats
+                if imp.startswith('.'):
+                    import_types['relative'] += 1
+                elif self._is_standard_library_import(imp):
+                    import_types['external'] += 1
+                else:
+                    import_types['external'] += 1
+        
+        # Ajouter au rapport Markdown (seulement les imports locaux)
+        self.logger._add_file_to_md_report(file_path, local_imports, depth)
+        
+        # Log de l'analyse
+        self.logger.log_info(f"📄 Fichier analysé: {file_path}", 
+                           file=file_path, depth=depth, 
+                           local_imports=len(local_imports), 
+                           total_imports=len(imports))
+        
+        # Récursion pour les imports locaux (seulement si pas à la limite)
+        if max_depth is None or depth < max_depth:
+            for import_name in local_imports:
+                local_file = self.find_file_for_import(import_name, file_path, use_import_resolver)
+                
+                if local_file and os.path.exists(local_file):
+                    # Ajouter au graphe de dépendances
+                    self.dependency_graph.add_dependency(file_path, local_file)
+                    
+                    # Vérifier si cette dépendance créerait un cycle
+                    if not self.dependency_graph._would_create_cycle(file_path, local_file):
+                        # Récursion pure
+                        self._analyze_file_recursively_pure(local_file, depth + 1, use_import_resolver, 
+                                                          max_depth, local_dependencies, all_dependencies, import_types)
+                    else:
+                        self.logger.log_warning(f"🔄 Cycle évité: {import_name} -> {local_file}", 
+                                              cycle=[file_path, local_file])
+                else:
+                    self.logger.log_info(f"❌ Import non résolu: {import_name} dans {file_path}")
+        else:
+            self.logger.log_info(f"🛑 Récursion arrêtée à la profondeur {depth} pour {file_path}")
 
 def main():
     """Fonction principale du script d'analyse d'imports."""
@@ -1081,6 +1128,8 @@ def main():
                        help='Utiliser l\'ImportResolver pour une résolution plus intelligente (défaut: True)')
     parser.add_argument('--no-import-resolver', action='store_true',
                        help='Désactiver l\'ImportResolver et utiliser seulement la logique simple')
+    parser.add_argument('--max-depth', type=int, default=None,
+                       help='Limite de profondeur pour l\'analyse récursive (optionnel)')
     
     args = parser.parse_args()
     
@@ -1115,17 +1164,21 @@ def main():
     print(f"   - ImportResolver: {'✅ Activé' if args.use_import_resolver else '❌ Désactivé'}")
     print(f"   - Mode local seulement: {'✅ Oui' if args.local_only else '❌ Non'}")
     print(f"   - Logs: {'✅ Activés' if args.log_output else '❌ Désactivés'}")
+    print(f"   - Profondeur max: {'∞' if args.max_depth is None else args.max_depth}")
     print(f"   - Fichiers à analyser: {len(files_to_analyze)}")
     print()
     
-    # Analyser les imports
-    result = analyzer.analyze_imports(files_to_analyze, use_import_resolver=args.use_import_resolver)
+    # Analyser les imports avec logique récursive pure
+    result = analyzer.analyze_imports(files_to_analyze, 
+                                    use_import_resolver=args.use_import_resolver,
+                                    max_depth=args.max_depth)
     
     # Afficher les résultats
     print(f"📊 Résultats de l'analyse des auto-feeding threads:")
     print(f"   Fichiers analysés: {result['stats']['files_analyzed']}")
     print(f"   Imports locaux trouvés: {result['stats']['local_imports']}")
     print(f"   Cycles détectés: {result['stats']['cycles_detected']}")
+    print(f"   Profondeur max atteinte: {result['stats']['max_depth']}")
     print(f"   Durée: {result['stats']['duration']:.2f}s")
     print()
     
