@@ -8,6 +8,7 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
 import os
+import sys
 import ast
 import logging
 import importlib.util
@@ -42,6 +43,11 @@ class ImportErrorInfo:
     error_message: str
     suggested_fix: Optional[str] = None
     severity: str = "warning"  # info, warning, error, critical
+    
+    @property
+    def message(self) -> str:
+        """Propriété pour compatibilité."""
+        return self.error_message
 
 @dataclass
 class ImportInfo:
@@ -313,118 +319,111 @@ class ImportResolver:
         return result
     
     def _resolve_relative_import(self, import_name: str, current_path: Path) -> Optional[str]:
-        """Résout un import relatif."""
+        """Résout un import relatif en utilisant la vraie API Python."""
         logger.debug(f"  📁 Import relatif: {import_name}")
         
         dots = len(import_name) - len(import_name.lstrip('.'))
         module_name = import_name[dots:]
+        
+        logger.debug(f"    Dots: {dots}")
+        logger.debug(f"    Module name: {module_name}")
         
         # Remonter dans l'arborescence
         target_dir = current_path.parent
         for _ in range(dots - 1):
             target_dir = target_dir.parent
         
-        # Possibilités pour l'import relatif
-        possible_files = [
-            target_dir / f'{module_name}.py',
-            target_dir / module_name / '__init__.py',
-            target_dir / module_name / f'{module_name.split(".")[-1]}.py'
-        ]
+        logger.debug(f"    Target dir: {target_dir}")
         
-        for file_path in possible_files:
-            if file_path.exists():
-                logger.debug(f"    ✅ Trouvé: {file_path}")
-                return str(file_path)
+        # Construire le nom de module absolu
+        if module_name:
+            # Construire le chemin relatif au project_root
+            try:
+                relative_path = target_dir.relative_to(self.project_root)
+                module_parts = list(relative_path.parts) + module_name.split('.')
+                absolute_module_name = '.'.join(module_parts)
+            except ValueError:
+                # Le target_dir n'est pas dans le project_root
+                logger.debug(f"    ❌ Target dir hors du project_root")
+                return None
+        else:
+            # Import du package lui-même
+            try:
+                relative_path = target_dir.relative_to(self.project_root)
+                absolute_module_name = '.'.join(relative_path.parts)
+            except ValueError:
+                logger.debug(f"    ❌ Target dir hors du project_root")
+                return None
         
-        logger.debug(f"    ❌ Aucun fichier trouvé pour {module_name}")
+        logger.debug(f"    Absolute module name: {absolute_module_name}")
+        
+        # Utiliser importlib pour résoudre
+        try:
+            # Sauvegarder sys.path
+            old_sys_path = list(sys.path)
+            
+            # Ajouter le project_root temporairement
+            project_root_str = str(self.project_root)
+            if project_root_str not in sys.path:
+                sys.path.insert(0, project_root_str)
+            
+            try:
+                spec = importlib.util.find_spec(absolute_module_name)
+                if spec and spec.origin:
+                    logger.debug(f"    ✅ Module résolu: {spec.origin}")
+                    return spec.origin
+            finally:
+                sys.path = old_sys_path
+                
+        except Exception as e:
+            logger.debug(f"    ❌ Erreur résolution: {e}")
+        
+        logger.debug(f"    ❌ Module non trouvé: {absolute_module_name}")
         return None
     
     def _resolve_absolute_import_with_paths(self, import_name: str, search_paths: List[Path]) -> Optional[str]:
-        """Résout un import absolu en utilisant les chemins de recherche."""
-        logger.debug(f"  📁 Import absolu avec chemins: {import_name}")
+        """Résout un import absolu en utilisant la vraie API Python (importlib)."""
+        logger.debug(f"  📁 Import absolu avec importlib: {import_name}")
         
-        import_parts = import_name.split('.')
+        # Séparer le nom du module de la classe
+        parts = import_name.split('.')
+        module_name = '.'.join(parts[:-1]) if len(parts) > 1 else import_name
+        class_name = parts[-1] if len(parts) > 1 else None
         
-        # Cas 1: Import avec classe (ex: MemoryEngine.core.engine.MemoryEngine)
-        if len(import_parts) > 1:
-            module_parts = import_parts[:-1]  # ['MemoryEngine', 'core', 'engine']
-            class_name = import_parts[-1]     # 'MemoryEngine'
-            
-            logger.debug(f"    Module parts: {module_parts}")
-            logger.debug(f"    Class name: {class_name}")
-            
-            # Chercher dans tous les chemins de recherche
-            for search_path in search_paths:
-                # Construire le chemin attendu
-                expected_path = search_path / '/'.join(module_parts[:-1]) / f'{module_parts[-1]}.py'
+        logger.debug(f"    Module name: {module_name}")
+        logger.debug(f"    Class name: {class_name}")
+        
+        # Utiliser la vraie API Python pour résoudre l'import
+        for search_path in search_paths:
+            try:
+                # Sauvegarder l'état actuel de sys.path
+                old_sys_path = list(sys.path)
                 
-                logger.debug(f"    Chemin attendu: {expected_path}")
+                # Ajouter le chemin de recherche temporairement
+                search_path_str = str(search_path)
+                if search_path_str not in sys.path:
+                    sys.path.insert(0, search_path_str)
                 
-                # Vérifier si le fichier existe
-                if expected_path.exists():
-                    logger.debug(f"    ✅ Fichier trouvé: {expected_path}")
-                    return str(expected_path)
-                else:
-                    logger.debug(f"    ❌ Fichier non trouvé: {expected_path}")
-                
-                # Cas 2: Chercher par nom de fichier dans ce chemin
-                last_module = module_parts[-1]
-                if f'{last_module}.py' in self.file_structure_cache:
-                    candidates = self.file_structure_cache[f'{last_module}.py']
-                    
-                    for candidate in candidates:
-                        candidate_path = Path(candidate)
-                        if candidate_path.is_relative_to(search_path):
-                            path_parts = list(candidate_path.parts)
-                            path_dirs = path_parts[:-1]
-                            
-                            # Vérifier si le chemin correspond au module
-                            if len(path_dirs) >= len(module_parts):
-                                path_suffix = path_dirs[-(len(module_parts)):]
-                                if path_suffix == module_parts:
-                                    logger.debug(f"    ✅ Match trouvé: {candidate}")
-                                    return candidate
-                                else:
-                                    logger.debug(f"    ❌ Pas de match: {path_suffix} != {module_parts}")
-            
-            # Cas 3: Chercher récursivement dans tout le projet
-            logger.debug(f"    🔍 Recherche récursive...")
-            for root, dirs, files in os.walk(self.project_root):
-                dirs[:] = [d for d in dirs if d not in ['.git', '__pycache__', '.pytest_cache']]
-                
-                for file in files:
-                    if file.endswith('.py'):
-                        file_path = Path(root) / file
-                        path_parts = list(file_path.parts)
-                        path_dirs = path_parts[:-1]  # Enlever le nom du fichier
+                try:
+                    # Utiliser importlib pour résoudre le module
+                    spec = importlib.util.find_spec(module_name)
+                    if spec and spec.origin:
+                        logger.debug(f"    ✅ Module résolu: {spec.origin}")
                         
-                        # Vérifier si les dossiers correspondent au module
-                        if len(path_dirs) >= len(module_parts):
-                            path_suffix = path_dirs[-(len(module_parts)):]
-                            
-                            if path_suffix == module_parts:
-                                logger.debug(f"    ✅ Match récursif: {file_path}")
-                                return str(file_path)
+                        # Vérifier si c'est un fichier local
+                        if spec.origin.startswith(str(self.project_root)):
+                            logger.debug(f"    📍 Module local détecté")
+                        
+                        return spec.origin
+                finally:
+                    # Restaurer sys.path
+                    sys.path = old_sys_path
+                    
+            except Exception as e:
+                logger.debug(f"    ❌ Erreur résolution: {e}")
+                continue
         
-        # Cas 4: Import simple (ex: os, sys)
-        if len(import_parts) == 1:
-            module_name = import_parts[0]
-            logger.debug(f"    Import simple: {module_name}")
-            
-            # Vérifier si c'est une bibliothèque standard
-            if module_name in self.error_classifier.standard_libs:
-                logger.debug(f"    ✅ Bibliothèque standard: {module_name}")
-                return None  # Ne pas résoudre les bibliothèques standard
-            
-            if f'{module_name}.py' in self.file_structure_cache:
-                candidates = self.file_structure_cache[f'{module_name}.py']
-                if candidates:
-                    logger.debug(f"    ✅ Import simple trouvé: {candidates[0]}")
-                    return candidates[0]
-                else:
-                    logger.debug(f"    ❌ Import simple non trouvé: {module_name}")
-        
-        logger.debug(f"    ❌ Aucune correspondance trouvée")
+        logger.debug(f"    ❌ Module non trouvé: {module_name}")
         return None
     
     def _get_search_paths_for_file(self, file_path: str) -> List[Path]:

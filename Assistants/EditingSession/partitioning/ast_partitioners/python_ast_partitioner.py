@@ -367,7 +367,7 @@ class PythonASTPartitioner(BaseASTPartitioner):
         return hierarchy
 
     def extract_import_analysis(self, tree: ast.AST) -> Dict[str, Any]:
-        """Analyse détaillée des imports."""
+        """Analyse détaillée des imports avec résolution via ImportResolver."""
 
         import_analysis = {
             'standard_library': [],
@@ -375,8 +375,17 @@ class PythonASTPartitioner(BaseASTPartitioner):
             'local_imports': [],
             'relative_imports': [],
             'star_imports': [],
-            'conditional_imports': []
+            'conditional_imports': [],
+            'all_imports': []  # NOUVEAU : liste unifiée de tous les imports
         }
+
+        # Importer l'ImportResolver
+        try:
+            from ..import_resolver import ImportResolver
+            resolver = ImportResolver()
+        except ImportError:
+            # Fallback si ImportResolver n'est pas disponible
+            resolver = None
 
         # Bibliothèques standard Python connues
         stdlib_modules = {
@@ -389,6 +398,21 @@ class PythonASTPartitioner(BaseASTPartitioner):
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     module_name = alias.name.split('.')[0]
+                    
+                    # Ajouter à la liste unifiée
+                    import_analysis['all_imports'].append(alias.name)
+                    
+                    # Utiliser l'ImportResolver si disponible
+                    if resolver:
+                        try:
+                            resolved_path = resolver.resolve_import(alias.name, 'current_file.py')
+                            if resolved_path:
+                                import_analysis['local_imports'].append(alias.name)
+                                continue
+                        except:
+                            pass
+                    
+                    # Fallback sur la classification manuelle
                     if module_name in stdlib_modules:
                         import_analysis['standard_library'].append(alias.name)
                     else:
@@ -397,6 +421,15 @@ class PythonASTPartitioner(BaseASTPartitioner):
             elif isinstance(node, ast.ImportFrom):
                 if node.module:
                     if node.level > 0:  # Relative import
+                        # Construire l'import relatif complet
+                        dots = '.' * node.level
+                        for alias in node.names:
+                            if node.module:
+                                relative_import = f"{dots}{node.module}.{alias.name}"
+                            else:
+                                relative_import = f"{dots}{alias.name}"
+                            import_analysis['all_imports'].append(relative_import)
+                        
                         import_analysis['relative_imports'].append({
                             'module': node.module,
                             'level': node.level,
@@ -404,11 +437,28 @@ class PythonASTPartitioner(BaseASTPartitioner):
                         })
                     else:
                         module_name = node.module.split('.')[0]
+                        
+                        # Ajouter tous les imports from
+                        for alias in node.names:
+                            from_import = f"{node.module}.{alias.name}"
+                            import_analysis['all_imports'].append(from_import)
+                        
                         import_info = {
                             'module': node.module,
                             'names': [alias.name for alias in node.names]
                         }
 
+                        # Utiliser l'ImportResolver si disponible
+                        if resolver:
+                            try:
+                                resolved_path = resolver.resolve_import(node.module, 'current_file.py')
+                                if resolved_path:
+                                    import_analysis['local_imports'].append(import_info)
+                                    continue
+                            except:
+                                pass
+
+                        # Fallback sur la classification manuelle
                         if module_name in stdlib_modules:
                             import_analysis['standard_library'].append(import_info)
                         else:
