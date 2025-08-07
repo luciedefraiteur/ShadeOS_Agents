@@ -14,15 +14,12 @@ from pathlib import Path
 from typing import Set, List, Dict, Optional, Tuple
 from collections import defaultdict, deque
 
-# Ajouter le chemin pour importer le partitioner
-sys.path.append('Assistants/EditingSession')
-
 # Ajouter le répertoire racine pour les imports Core
 sys.path.append('.')
 
 try:
-    from partitioning.ast_partitioners import PythonASTPartitioner
-    from partitioning.partition_schemas import PartitioningError
+    from Core.Partitioner.ast_partitioners.python_ast_partitioner import PythonASTPartitioner
+    from Core.Partitioner.partition_schemas import PartitioningError
     print("✅ Partitioner importé avec succès!")
 except ImportError as e:
     print(f"❌ Erreur import partitioner: {e}")
@@ -39,7 +36,7 @@ except ImportError as e:
 
 # Importer l'ImportResolver existant
 try:
-    from Assistants.EditingSession.partitioning.import_resolver import ImportResolver
+    from Core.Partitioner.import_resolver import ImportResolver
     print("✅ ImportResolver importé avec succès!")
 except ImportError as e:
     print(f"⚠️ Erreur import ImportResolver: {e}")
@@ -251,21 +248,28 @@ class SimpleImportAnalyzerLogger:
     
     def _add_file_to_md_report(self, file_path: str, imports: List[str], depth: int):
         """Ajoute un fichier analysé au rapport Markdown (en mémoire)."""
+        # Convertir le chemin absolu en chemin relatif
+        try:
+            relative_path = os.path.relpath(file_path, self.project_root)
+        except ValueError:
+            # Si le fichier n'est pas dans le projet, garder le chemin absolu
+            relative_path = file_path
+        
         # Stocker dans le dictionnaire pour éviter les doublons
-        if file_path not in self.files_data:
-            self.files_data[file_path] = {
+        if relative_path not in self.files_data:
+            self.files_data[relative_path] = {
                 'depth': depth,
                 'imports': imports
             }
         else:
             # Si le fichier est déjà présent, mettre à jour la profondeur et les imports
             # Garder la profondeur la plus élevée (plus de détails)
-            if depth > self.files_data[file_path]['depth']:
-                self.files_data[file_path]['depth'] = depth
+            if depth > self.files_data[relative_path]['depth']:
+                self.files_data[relative_path]['depth'] = depth
             # Fusionner les imports (éviter les doublons)
-            existing_imports = set(self.files_data[file_path]['imports'])
+            existing_imports = set(self.files_data[relative_path]['imports'])
             new_imports = set(imports)
-            self.files_data[file_path]['imports'] = list(existing_imports | new_imports)
+            self.files_data[relative_path]['imports'] = list(existing_imports | new_imports)
     
     def _add_cycle_to_md_report(self, cycle: List[str]):
         """Ajoute un cycle détecté au rapport Markdown (en mémoire)."""
@@ -476,12 +480,8 @@ La structure des imports est saine, aucune action requise.
         tree = defaultdict(lambda: defaultdict(set))
         
         for file_path in self.files_data.keys():
-            # Convertir en chemin relatif depuis la racine du projet
-            try:
-                rel_path = os.path.relpath(file_path, self.project_root)
-            except ValueError:
-                # Si le fichier n'est pas dans le projet, garder le chemin complet
-                rel_path = file_path
+            # Le file_path est déjà un chemin relatif maintenant
+            rel_path = file_path
             
             # Séparer le chemin en parties
             parts = rel_path.split(os.sep)
@@ -653,7 +653,7 @@ class PartitioningImportAnalyzer:
         
         # Initialiser le partitioner
         try:
-            from Assistants.EditingSession.partitioning import PythonASTPartitioner
+            from Core.Partitioner.ast_partitioners.python_ast_partitioner import PythonASTPartitioner
             self.partitioner = PythonASTPartitioner()
             print("✅ Partitioner importé avec succès!")
         except ImportError as e:
@@ -664,7 +664,7 @@ class PartitioningImportAnalyzer:
         """Retourne l'ImportResolver, en le créant si nécessaire."""
         if self.import_resolver is None:
             try:
-                from Assistants.EditingSession.partitioning.import_resolver import ImportResolver
+                from Core.Partitioner.import_resolver import ImportResolver
                 # Ne pas passer current_file au constructeur car il ne l'accepte pas
                 self.import_resolver = ImportResolver(project_root=self.project_root)
             except ImportError as e:
