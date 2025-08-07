@@ -719,7 +719,7 @@ class PartitioningImportAnalyzer:
                 content = f.read()
             
             # Utiliser le partitioner pour extraire les imports
-            result = self.partitioner.parse_content(content)
+            result = self.partitioner.parse_content(content, file_path)
             if result and hasattr(result, 'imports'):
                 imports = []
                 for imp in result.imports:

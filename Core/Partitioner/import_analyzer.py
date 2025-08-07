@@ -393,7 +393,7 @@ class ImportAnalyzer:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                result = self.partitioner.parse_content(content)
+                result = self.partitioner.parse_content(content, file_path)
                 if result and hasattr(result, 'imports'):
                     imports = []
                     for imp in result.imports:
