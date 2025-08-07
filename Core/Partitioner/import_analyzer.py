@@ -410,6 +410,50 @@ class ImportAnalyzer:
             self.logger.log_error(f"Erreur extraction imports {file_path}: {e}")
             return self._extract_imports_simple(file_path)
     
+    def _get_package_from_path(self, file_path: str) -> str:
+        """Détermine le package Python à partir du chemin du fichier."""
+        try:
+            # Convertir le chemin en chemin relatif au projet
+            rel_path = os.path.relpath(file_path, self.project_root)
+            
+            # Supprimer l'extension .py
+            if rel_path.endswith('.py'):
+                rel_path = rel_path[:-3]
+            
+            # Remplacer les séparateurs de chemin par des points
+            package = rel_path.replace(os.sep, '.')
+            
+            # Supprimer __init__ à la fin si présent
+            if package.endswith('.__init__'):
+                package = package[:-9]
+            
+            return package
+            
+        except Exception:
+            return ""
+
+    def _get_package_from_path(self, file_path: str) -> str:
+        """Détermine le package Python à partir du chemin du fichier."""
+        try:
+            # Convertir le chemin en chemin relatif au projet
+            rel_path = os.path.relpath(file_path, self.project_root)
+            
+            # Supprimer l'extension .py
+            if rel_path.endswith('.py'):
+                rel_path = rel_path[:-3]
+            
+            # Remplacer les séparateurs de chemin par des points
+            package = rel_path.replace(os.sep, '.')
+            
+            # Supprimer __init__ à la fin si présent
+            if package.endswith('.__init__'):
+                package = package[:-9]
+            
+            return package
+            
+        except Exception:
+            return ""
+
     def _extract_imports_simple(self, file_path: str) -> List[str]:
         """Extrait les imports d'un fichier Python avec une méthode simple."""
         try:
@@ -419,6 +463,9 @@ class ImportAnalyzer:
             tree = ast.parse(content)
             imports = []
             
+            # Déterminer le package du fichier courant
+            current_package = self._get_package_from_path(file_path)
+            
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
@@ -427,7 +474,32 @@ class ImportAnalyzer:
                     module = node.module or ""
                     for alias in node.names:
                         if module:
-                            imports.append(f"{module}.{alias.name}")
+                            # Gérer les imports relatifs
+                            if module.startswith('.'):
+                                # Import relatif - reconstruire le chemin complet
+                                relative_level = len(module) - len(module.lstrip('.'))
+                                if relative_level == 1:
+                                    # Import du même package
+                                    full_module = f"{current_package}.{module[1:]}"
+                                else:
+                                    # Import d'un package parent
+                                    package_parts = current_package.split('.')
+                                    if len(package_parts) >= relative_level:
+                                        parent_package = '.'.join(package_parts[:-relative_level+1])
+                                        full_module = f"{parent_package}.{module[relative_level:]}"
+                                    else:
+                                        full_module = module[relative_level:]
+                                
+                                if alias.name == '*':
+                                    imports.append(full_module)
+                                else:
+                                    imports.append(f"{full_module}.{alias.name}")
+                            else:
+                                # Import absolu
+                                if alias.name == '*':
+                                    imports.append(module)
+                                else:
+                                    imports.append(f"{module}.{alias.name}")
                         else:
                             imports.append(alias.name)
             
