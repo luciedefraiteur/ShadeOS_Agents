@@ -8,15 +8,15 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 import os
 from typing import Dict, List, Optional, Type, Any
 from .partition_schemas import PartitionResult, PartitioningError
-from .ast_partitioners.base_ast_partitioner import BaseASTPartitioner
-from .ast_partitioners.python_ast_partitioner import PythonASTPartitioner
-from .ast_partitioners.tree_sitter_partitioner import TreeSitterPartitioner, TREE_SITTER_AVAILABLE
-from .fallback_strategies import (
+from ..ast_partitioners.base_ast_partitioner import BaseASTPartitioner
+from ..ast_partitioners.python_ast_partitioner import PythonASTPartitioner
+from ..ast_partitioners.tree_sitter_partitioner import TreeSitterPartitioner, TREE_SITTER_AVAILABLE
+from ..fallback_strategies import (
     RegexPartitioner,
     TextualPartitioner,
     EmergencyPartitioner
 )
-from .error_logger import log_partitioning_error, log_partitioning_warning
+from ..handlers.error_logger import log_partitioning_error, log_partitioning_warning
 
 
 class LanguageRegistry:

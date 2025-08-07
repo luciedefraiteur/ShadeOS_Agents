@@ -20,7 +20,7 @@ import uuid
 
 # Import de l'analyseur d'imports
 try:
-    from Core.Partitioner.import_analyzer import ImportAnalyzer, ImportAnalysisResult
+    from Core.Partitioner.analyzers.import_analyzer import ImportAnalyzer, ImportAnalysisResult
 except ImportError:
     logger.warning("ImportAnalyzer non disponible")
     ImportAnalyzer = None

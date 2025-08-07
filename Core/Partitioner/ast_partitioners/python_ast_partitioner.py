@@ -8,8 +8,8 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 import ast
 from typing import List, Dict, Any, Optional, Set
 from .base_ast_partitioner import BaseASTPartitioner
-from ..partition_schemas import BlockType, PartitioningError
-from ..error_logger import log_partitioning_warning
+from ..schemas.partition_schemas import BlockType, PartitioningError
+from ..handlers.error_logger import log_partitioning_warning
 
 
 class PythonASTPartitioner(BaseASTPartitioner):

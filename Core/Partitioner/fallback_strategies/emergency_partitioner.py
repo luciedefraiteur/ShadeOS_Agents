@@ -8,11 +8,11 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 import time
 import math
 from typing import List, Dict, Any
-from ..partition_schemas import (
+from ..schemas.partition_schemas import (
     PartitionBlock, PartitionLocation, PartitionResult,
     PartitionMethod, BlockType
 )
-from ..location_tracker import LocationTracker
+from ..trackers.location_tracker import LocationTracker
 
 
 class EmergencyPartitioner:
