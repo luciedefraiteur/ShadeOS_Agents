@@ -5,19 +5,39 @@
 Composant central pour le partitioning de code et l'analyse des dépendances.
 Réutilisable par tous les composants du système (EditingSession, TemporalEngine, etc.)
 
+Structure organisée :
+- analyzers/ : Analyseurs d'imports et de dépendances
+- resolvers/ : Résolveurs d'imports
+- handlers/ : Gestionnaires d'erreurs et de dépendances
+- schemas/ : Schémas et registres de langages
+- trackers/ : Suiveurs de localisation
+- ast_partitioners/ : Partitioners basés sur AST
+- fallback_strategies/ : Stratégies de fallback
+
 Auteur: Alma (via Lucie Defraiteur)
-Date: 2025-08-06
+Date: 2025-08-07
 """
 
 from typing import List
 
-# Imports principaux
-from .import_analyzer import ImportAnalyzer, ImportAnalysisResult, DependencyGraph
-from .import_resolver import ImportResolver
-from .language_registry import LanguageRegistry, global_language_registry
-from .location_tracker import LocationTracker
-from .partition_schemas import PartitionResult, PartitionBlock, PartitionLocation, PartitionMethod, BlockType, PartitioningError, LocationTrackingError, PartitionValidationError
-from .error_logger import PartitioningErrorLogger, ErrorInfo, log_partitioning_error, log_partitioning_warning
+# Imports des analyseurs
+from .analyzers import ImportAnalyzer, ImportAnalysisResult, DependencyGraph
+from .analyzers import ImportAnalysisCache, ImportAnalysisOptimizer
+
+# Imports des résolveurs
+from .resolvers import ImportResolver
+
+# Imports des gestionnaires
+from .handlers import BrokenDependencyHandler, PartitioningErrorLogger
+from .handlers import ErrorInfo, log_partitioning_error, log_partitioning_warning
+
+# Imports des schémas
+from .schemas import LanguageRegistry, global_language_registry
+from .schemas import PartitionResult, PartitionBlock, PartitionLocation, PartitionMethod, BlockType
+from .schemas import PartitioningError, LocationTrackingError, PartitionValidationError
+
+# Imports des trackers
+from .trackers import LocationTracker
 
 # Imports des partitioners AST
 from .ast_partitioners.base_ast_partitioner import BaseASTPartitioner
@@ -46,27 +66,32 @@ def get_supported_languages() -> List[str]:
     """Fonction utilitaire pour obtenir les langages supportés"""
     return global_language_registry.get_supported_languages()
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "Alma (via Lucie Defraiteur)"
 
 # Exports publics
 __all__ = [
-    # Analyseur d'imports
+    # Analyseurs d'imports
     'ImportAnalyzer',
     'ImportAnalysisResult', 
     'DependencyGraph',
+    'ImportAnalysisCache',
+    'ImportAnalysisOptimizer',
     
-    # Résolveur d'imports
+    # Résolveurs d'imports
     'ImportResolver',
     
-    # Registre de langages
+    # Gestionnaires
+    'BrokenDependencyHandler',
+    'PartitioningErrorLogger',
+    'ErrorInfo',
+    'global_error_logger',
+    'log_partitioning_error',
+    'log_partitioning_warning',
+    
+    # Registre de langages et schémas
     'LanguageRegistry',
     'global_language_registry',
-    
-    # Traqueur de localisation
-    'LocationTracker',
-    
-    # Schémas de partition
     'PartitionResult',
     'PartitionBlock',
     'PartitionLocation',
@@ -76,13 +101,8 @@ __all__ = [
     'LocationTrackingError',
     'PartitionValidationError',
     
-    # Logger d'erreurs
-    'ErrorLogger',
-    'PartitioningErrorLogger',
-    'ErrorInfo',
-    'global_error_logger',
-    'log_partitioning_error',
-    'log_partitioning_warning',
+    # Traqueur de localisation
+    'LocationTracker',
     
     # Partitioners AST
     'BaseASTPartitioner',

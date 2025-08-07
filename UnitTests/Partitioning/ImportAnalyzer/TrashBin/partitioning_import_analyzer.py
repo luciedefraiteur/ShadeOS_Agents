@@ -36,7 +36,7 @@ except ImportError as e:
 
 # Importer l'ImportResolver existant
 try:
-    from Core.Partitioner.import_resolver import ImportResolver
+    from Core.Partitioner.resolvers.import_resolver import ImportResolver
     print("✅ ImportResolver importé avec succès!")
 except ImportError as e:
     print(f"⚠️ Erreur import ImportResolver: {e}")
@@ -662,7 +662,7 @@ class PartitioningImportAnalyzer:
         """Retourne l'ImportResolver, en le créant si nécessaire."""
         if self.import_resolver is None:
             try:
-                from Core.Partitioner.import_resolver import ImportResolver
+                from Core.Partitioner.resolvers.import_resolver import ImportResolver
                 # Ne pas passer current_file au constructeur car il ne l'accepte pas
                 self.import_resolver = ImportResolver(project_root=self.project_root)
             except ImportError as e:

@@ -24,7 +24,7 @@ def test_parse_content_correction():
     print("-" * 40)
     
     try:
-        from Core.Partitioner.import_analyzer import ImportAnalyzer
+        from Core.Partitioner.analyzers.import_analyzer import ImportAnalyzer
         
         analyzer = ImportAnalyzer()
         test_file = "Assistants/Generalist/V9_AutoFeedingThreadAgent.py"
@@ -115,7 +115,7 @@ def test_detection_automatique():
     print("-" * 40)
     
     try:
-        from Core.Partitioner.import_analyzer import ImportAnalyzer
+        from Core.Partitioner.analyzers.import_analyzer import ImportAnalyzer
         
         analyzer = ImportAnalyzer()
         
@@ -150,7 +150,7 @@ def test_error_handling():
     print("-" * 40)
     
     try:
-        from Core.Partitioner.import_analyzer import ImportAnalyzer
+        from Core.Partitioner.analyzers.import_analyzer import ImportAnalyzer
         
         analyzer = ImportAnalyzer()
         
@@ -193,7 +193,7 @@ def test_performance():
     
     try:
         import time
-        from Core.Partitioner.import_analyzer import ImportAnalyzer
+        from Core.Partitioner.analyzers.import_analyzer import ImportAnalyzer
         
         analyzer = ImportAnalyzer()
         test_file = "Assistants/Generalist/V9_AutoFeedingThreadAgent.py"

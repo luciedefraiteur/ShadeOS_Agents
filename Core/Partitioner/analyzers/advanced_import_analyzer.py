@@ -21,12 +21,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Imports des nouveaux outils du partitioner
 try:
-    from Core.Partitioner import (
-        ImportAnalyzer, ImportAnalysisResult, DependencyGraph,
+    from Core.Partitioner.schemas import (
         PartitionResult, PartitionBlock, PartitionLocation,
-        PartitioningError, LocationTrackingError, PartitionValidationError,
+        PartitioningError, LocationTrackingError, PartitionValidationError
+    )
+    from Core.Partitioner.handlers import (
         global_error_logger, log_partitioning_error, log_partitioning_warning
     )
+    from .import_analyzer import ImportAnalyzer, ImportAnalysisResult, DependencyGraph
     print("✅ Nouveaux outils du partitioner importés avec succès!")
 except ImportError as e:
     print(f"❌ Erreur import nouveaux outils: {e}")

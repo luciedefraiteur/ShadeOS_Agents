@@ -9,12 +9,12 @@ import ast
 import time
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional, Set, Tuple
-from ..partition_schemas import (
-    PartitionBlock, PartitionLocation, PartitionResult,
-    PartitionMethod, BlockType, PartitioningError
+from ..schemas.partition_schemas import (
+    PartitionResult, PartitionBlock, PartitionLocation, PartitionMethod, BlockType,
+    PartitioningError, LocationTrackingError, PartitionValidationError
 )
-from ..location_tracker import LocationTracker
-from ..error_logger import log_partitioning_error, log_partitioning_warning
+from ..trackers.location_tracker import LocationTracker
+from ..handlers.error_logger import log_partitioning_error, log_partitioning_warning
 
 
 class BaseASTPartitioner(ABC):

@@ -7,12 +7,12 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 
 import time
 from typing import List, Dict, Any, Optional, Tuple
-from ..partition_schemas import (
+from ..schemas.partition_schemas import (
     PartitionBlock, PartitionLocation, PartitionResult,
     PartitionMethod, BlockType
 )
-from ..location_tracker import LocationTracker
-from ..error_logger import log_partitioning_warning
+from ..trackers.location_tracker import LocationTracker
+from ..handlers.error_logger import log_partitioning_warning
 
 
 class TextualPartitioner:

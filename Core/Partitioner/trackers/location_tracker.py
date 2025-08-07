@@ -7,7 +7,7 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 
 import ast
 from typing import List, Tuple, Optional, Dict, Any
-from .partition_schemas import PartitionLocation, LocationTrackingError
+from ..schemas.partition_schemas import PartitionLocation, LocationTrackingError
 
 
 class LocationTracker:

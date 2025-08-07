@@ -7,6 +7,7 @@ Version complètement redesignée avec les découvertes récentes:
 - Cache intelligent pour les performances
 - Résolution d'imports hybride (simple + ImportResolver)
 - AST parsing avancé avec fallback
+- Classification d'imports sophistiquée avec importlib.util
 - Rapports Markdown détaillés avec arbres ASCII
 - Debug intégré et logs détaillés
 - Intégration avec TemporalFractalMemoryEngine
@@ -22,6 +23,7 @@ import asyncio
 import argparse
 import time
 import ast
+import importlib.util
 from pathlib import Path
 from typing import Dict, List, Set, Optional, Any, Tuple
 from dataclasses import dataclass, field
@@ -35,6 +37,37 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+def get_stdlib_paths():
+    """Obtient les chemins de la bibliothèque standard Python."""
+    stdlib_path = os.path.dirname(os.__file__)
+    return [stdlib_path]
+
+
+def classify_import_sophisticated(module_name: str) -> str:
+    """
+    Classification sophistiquée d'un import utilisant importlib.util.
+    
+    Retourne:
+    - "builtin" pour les modules built-in
+    - "standard" pour la bibliothèque standard
+    - "external" pour les modules externes
+    - "unknown" pour les modules non trouvés
+    """
+    try:
+        spec = importlib.util.find_spec(module_name)
+        if spec is None or spec.origin is None:
+            return "unknown"
+        if spec.origin == 'built-in':
+            return "builtin"
+        for stdlib_path in get_stdlib_paths():
+            if spec.origin.startswith(stdlib_path):
+                return "standard"
+        return "external"
+    except Exception as e:
+        logger.debug(f"Erreur classification {module_name}: {e}")
+        return "unknown"
 
 
 @dataclass
@@ -344,6 +377,8 @@ class ImportAnalyzer:
             'files_analyzed': 0,
             'local_imports': 0,
             'external_imports': 0,
+            'standard_imports': 0,
+            'unresolved_imports': 0,
             'cycles_detected': 0,
             'max_depth': 0,
             'duration': 0
@@ -715,7 +750,7 @@ class ImportAnalyzer:
             if debug:
                 self.logger.log_debug(f"   📋 Imports extraits: {len(imports)}")
             
-            # Classifier les imports
+            # Classifier les imports avec la nouvelle logique sophistiquée
             for import_stmt in imports:
                 if debug:
                     self.logger.log_debug(f"   🔍 Classification: {import_stmt}")
@@ -731,26 +766,32 @@ class ImportAnalyzer:
                     if debug:
                         self.logger.log_debug(f"   ✅ Local détecté: {import_stmt}")
                 else:
-                    # Vérifier si c'est une bibliothèque standard
+                    # Classification sophistiquée avec importlib.util
                     first_part = import_stmt.split('.')[0]
-                    if first_part in {
-                        'os', 'sys', 'json', 'pathlib', 'typing', 'dataclasses', 
-                        'asyncio', 'logging', 'datetime', 'collections', 'itertools',
-                        're', 'math', 'random', 'time', 'threading', 'multiprocessing',
-                        'abc', 'hashlib', 'inspect', 'platform', 'shutil', 'subprocess',
-                        'argparse', 'ast', 'signal', 'time'
-                    }:
+                    classification = classify_import_sophisticated(first_part)
+                    
+                    if classification == "builtin":
                         result.standard_imports.append(import_stmt)
                         if debug:
-                            self.logger.log_debug(f"   📚 Standard: {import_stmt}")
-                    else:
+                            self.logger.log_debug(f"   🟢 Builtin: {import_stmt}")
+                    elif classification == "standard":
+                        result.standard_imports.append(import_stmt)
+                        if debug:
+                            self.logger.log_debug(f"   🟡 Standard: {import_stmt}")
+                    elif classification == "external":
                         result.external_imports.append(import_stmt)
                         if debug:
-                            self.logger.log_debug(f"   🌐 Externe: {import_stmt}")
+                            self.logger.log_debug(f"   🔴 Externe: {import_stmt}")
+                    else:  # "unknown"
+                        result.unresolved_imports.append(import_stmt)
+                        if debug:
+                            self.logger.log_debug(f"   ❓ Inconnu: {import_stmt}")
             
             # Mettre à jour les statistiques
             self.stats['local_imports'] += len(result.local_imports)
             self.stats['external_imports'] += len(result.external_imports)
+            self.stats['standard_imports'] += len(result.standard_imports)
+            self.stats['unresolved_imports'] += len(result.unresolved_imports)
             
         except Exception as e:
             result.error_messages.append(str(e))
@@ -767,6 +808,7 @@ class ImportAnalyzer:
         total_local = sum(len(node.local_imports) for node in self.dependency_graph.nodes.values())
         total_external = sum(len(node.external_imports) for node in self.dependency_graph.nodes.values())
         total_standard = sum(len(node.standard_imports) for node in self.dependency_graph.nodes.values())
+        total_unresolved = sum(len(node.unresolved_imports) for node in self.dependency_graph.nodes.values())
         
         # Fichiers avec le plus d'imports
         files_by_imports = sorted(
@@ -795,6 +837,7 @@ class ImportAnalyzer:
                 'local_imports': total_local,
                 'external_imports': total_external,
                 'standard_imports': total_standard,
+                'unresolved_imports': total_unresolved,
                 'cycles_detected': len(cycles),
                 'files_with_errors': len(files_with_errors),
                 'duration': self.stats['duration']
@@ -805,6 +848,7 @@ class ImportAnalyzer:
                     'local_imports': node.local_imports,
                     'external_imports': node.external_imports,
                     'standard_imports': node.standard_imports,
+                    'unresolved_imports': node.unresolved_imports,
                     'import_count': node.import_count,
                     'dependency_depth': node.dependency_depth,
                     'errors': node.error_messages

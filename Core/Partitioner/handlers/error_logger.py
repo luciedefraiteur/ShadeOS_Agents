@@ -8,10 +8,10 @@ Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 import logging
 import traceback
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Optional, Any
 from collections import defaultdict
 from dataclasses import dataclass, field
-from .partition_schemas import PartitionMethod
+# from ..schemas.partition_schemas import PartitionMethod  # Temporairement commenté pour éviter l'import circulaire
 
 
 @dataclass
@@ -21,7 +21,7 @@ class ErrorInfo:
     error_type: str
     message: str
     file_path: str
-    strategy: Optional[PartitionMethod]
+    strategy: Optional[Any]  # PartitionMethod temporairement remplacé par Any
     timestamp: datetime
     traceback_info: Optional[str] = None
     context: Dict[str, Any] = field(default_factory=dict)
@@ -78,7 +78,7 @@ class PartitioningErrorLogger:
         self.logger.setLevel(logging.DEBUG)
     
     def log_error(self, error_type: str, message: str, file_path: str,
-                  strategy: Optional[PartitionMethod] = None,
+                  strategy: Optional[Any] = None,
                   context: Dict[str, Any] = None,
                   exception: Optional[Exception] = None) -> ErrorInfo:
         """Log une erreur avec contexte complet."""
@@ -121,7 +121,7 @@ class PartitioningErrorLogger:
         return error_info
     
     def log_warning(self, warning_type: str, message: str, file_path: str,
-                   strategy: Optional[PartitionMethod] = None,
+                   strategy: Optional[Any] = None,
                    context: Dict[str, Any] = None) -> ErrorInfo:
         """Log un avertissement."""
         
@@ -155,7 +155,7 @@ class PartitioningErrorLogger:
         return warning_info
     
     def log_info(self, info_type: str, message: str, file_path: str,
-                strategy: Optional[PartitionMethod] = None,
+                strategy: Optional[Any] = None,
                 context: Dict[str, Any] = None) -> ErrorInfo:
         """Log une information."""
         
@@ -184,8 +184,8 @@ class PartitioningErrorLogger:
         
         return info
     
-    def log_strategy_fallback(self, failed_strategy: PartitionMethod,
-                             fallback_strategy: PartitionMethod,
+    def log_strategy_fallback(self, failed_strategy: Any,
+                             fallback_strategy: Any,
                              file_path: str, reason: str):
         """Log un fallback de stratégie."""
         
@@ -204,7 +204,7 @@ class PartitioningErrorLogger:
         )
     
     def log_performance_issue(self, file_path: str, processing_time: float,
-                             strategy: PartitionMethod, file_size: int):
+                             strategy: Any, file_size: int):
         """Log un problème de performance."""
         
         context = {
@@ -382,7 +382,7 @@ def log_partitioning_error_legacy(error_type: str, message: str, file_path: str 
 
 
 def log_partitioning_warning(warning_type: str, message: str, file_path: str,
-                            strategy: Optional[PartitionMethod] = None,
+                            strategy: Optional[Any] = None,
                             context: Dict[str, Any] = None) -> ErrorInfo:
     """Fonction utilitaire pour logger un avertissement."""
     return global_error_logger.log_warning(
