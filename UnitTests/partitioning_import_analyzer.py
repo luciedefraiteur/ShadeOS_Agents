@@ -633,23 +633,18 @@ class PartitioningImportAnalyzer:
     """Analyseur d'imports utilisant le partitioner pour une analyse précise des dépendances."""
     
     def __init__(self, project_root: str = '.', logging_provider: BaseLoggingProvider = None):
-        """Initialise l'analyseur d'imports avec partitioner."""
         self.project_root = os.path.abspath(project_root)
         self.logging_provider = logging_provider
+        self.logger = SimpleImportAnalyzerLogger(project_root=self.project_root)
+        
+        # Cache pour les modules locaux détectés
+        self._local_modules_cache = {}
+        
+        # Initialiser les structures de données
         self.visited = set()
+        self.file_depths = {}
         self.all_dependencies = set()
         self.dependency_graph = DependencyGraph()
-        self.file_depths = {}  # Stocker la profondeur de chaque fichier
-        self.partitioner = None
-        self.import_resolver = None
-        
-        # Utiliser le logger simple par défaut
-        if logging_provider is None:
-            self.logger = SimpleImportAnalyzerLogger()
-        else:
-            # Si un provider est fourni, créer un logger simple qui l'utilise
-            self.logger = SimpleImportAnalyzerLogger()
-            # TODO: Adapter pour utiliser le provider si nécessaire
         
         # Initialiser le partitioner
         try:
@@ -659,6 +654,9 @@ class PartitioningImportAnalyzer:
         except ImportError as e:
             print(f"⚠️ Erreur import partitioner: {e}")
             self.partitioner = None
+        
+        # ImportResolver (optionnel)
+        self.import_resolver = None
     
     def _get_import_resolver(self, current_file: str = None):
         """Retourne l'ImportResolver, en le créant si nécessaire."""
@@ -809,31 +807,49 @@ class PartitioningImportAnalyzer:
             return None
     
     def _is_local_import(self, import_name: str) -> bool:
-        """Vérifie rapidement si un import est local au projet."""
+        """Vérifie si un import est local au projet en détectant automatiquement les modules."""
         # Imports relatifs (commencent par .)
         if import_name.startswith('.'):
             return True
         
-        # Imports absolus locaux (commencent par nos modules)
-        if import_name.startswith(('Core.', 'Assistants.', 'MemoryEngine.', 'UnitTests.')):
-            return True
+        # Détection automatique des modules locaux
+        return self._is_local_module(import_name)
+    
+    def _is_local_module(self, import_name: str) -> bool:
+        """Détecte automatiquement si un module est local au projet."""
+        # Vérifier le cache d'abord
+        if import_name in self._local_modules_cache:
+            return self._local_modules_cache[import_name]
         
-        # Autres imports locaux potentiels (à adapter selon le projet)
-        local_prefixes = [
-            'partitioning.',
-            'LLMProviders.',
-            'Utils.',
-            'Parsers.',
-            'Config.',
-            'ProcessManager.',
-            'LoggingProviders.'
-        ]
-        
-        for prefix in local_prefixes:
-            if import_name.startswith(prefix):
-                return True
-        
-        return False
+        try:
+            # Extraire le premier niveau du module (ex: "Core" de "Core.LLMProviders")
+            first_level = import_name.split('.')[0]
+            
+            # Vérifier si ce premier niveau existe comme dossier dans le projet
+            module_path = os.path.join(self.project_root, first_level)
+            
+            is_local = False
+            
+            # Si c'est un dossier, c'est probablement un module local
+            if os.path.isdir(module_path):
+                # Vérifier qu'il contient des fichiers Python ou un __init__.py
+                if (os.path.exists(os.path.join(module_path, '__init__.py')) or
+                    any(f.endswith('.py') for f in os.listdir(module_path) if os.path.isfile(os.path.join(module_path, f)))):
+                    is_local = True
+            
+            # Vérifier aussi si c'est un fichier Python direct
+            module_file = os.path.join(self.project_root, first_level + '.py')
+            if os.path.exists(module_file):
+                is_local = True
+            
+            # Mettre en cache le résultat
+            self._local_modules_cache[import_name] = is_local
+            return is_local
+                
+        except (IndexError, OSError):
+            # En cas d'erreur, considérer comme non local et mettre en cache
+            self._local_modules_cache[import_name] = False
+            return False
     
     def _resolve_import_simple(self, import_name: str, current_file: str) -> Optional[str]:
         """Résout un import de manière simple sans ImportResolver."""
@@ -1296,6 +1312,8 @@ class PartitioningImportAnalyzer:
             for import_name in local_imports:
                 local_file = self.find_file_for_import(import_name, file_path, use_import_resolver)
                 
+
+                
                 if local_file and os.path.exists(local_file):
                     # Ajouter au graphe de dépendances
                     self.dependency_graph.add_dependency(file_path, local_file)
@@ -1303,15 +1321,38 @@ class PartitioningImportAnalyzer:
                     # Vérifier si cette dépendance créerait un cycle
                     if not self.dependency_graph._would_create_cycle(file_path, local_file):
                         # Récursion pure
+                        print(f"🔄 Récursion vers: {local_file} (profondeur {depth + 1})")
                         self._analyze_file_recursively_pure(local_file, depth + 1, use_import_resolver, 
                                                           max_depth, local_dependencies, all_dependencies, import_types)
                     else:
                         self.logger.log_warning(f"🔄 Cycle évité: {import_name} -> {local_file}", 
                                               cycle=[file_path, local_file])
                 else:
-                    self.logger.log_info(f"❌ Import non résolu: {import_name} dans {file_path}")
+                    # Debug: afficher plus d'informations sur les imports non résolus
+                    if 'TemporalFractalMemoryEngine' in import_name:
+                        print(f"🔍 DEBUG: Import non résolu: {import_name} dans {file_path}")
+                        print(f"   Tentative de résolution...")
+                        # Test manuel de résolution
+                        test_resolution = self._resolve_import_simple(import_name, file_path)
+                        print(f"   Résolution test: {test_resolution}")
+                        if test_resolution:
+                            print(f"   Fichier existe: {os.path.exists(test_resolution)}")
+                    else:
+                        self.logger.log_info(f"❌ Import non résolu: {import_name} dans {file_path}")
         else:
             self.logger.log_info(f"🛑 Récursion arrêtée à la profondeur {depth} pour {file_path}")
+
+    def get_detected_local_modules(self) -> Dict[str, bool]:
+        """Retourne tous les modules locaux détectés automatiquement (pour debug)."""
+        return self._local_modules_cache.copy()
+    
+    def print_detected_modules(self):
+        """Affiche les modules locaux détectés (pour debug)."""
+        print("🔍 Modules locaux détectés automatiquement:")
+        for module, is_local in sorted(self._local_modules_cache.items()):
+            status = "✅" if is_local else "❌"
+            print(f"  {status} {module}")
+        print(f"Total: {len(self._local_modules_cache)} modules analysés")
 
 def main():
     """Fonction principale du script d'analyse d'imports."""
@@ -1334,6 +1375,8 @@ def main():
                        help='Désactiver l\'ImportResolver et utiliser seulement la logique simple')
     parser.add_argument('--max-depth', type=int, default=None,
                        help='Limite de profondeur pour l\'analyse récursive (optionnel)')
+    parser.add_argument('--show-detected-modules', action='store_true',
+                       help='Afficher les modules locaux détectés automatiquement')
     
     args = parser.parse_args()
     
@@ -1406,6 +1449,11 @@ def main():
         print(f"📝 Rapport détaillé généré dans: {log_directory}/imports_analysis/")
         print(f"   - Log JSON: imports_analysis.log")
         print(f"   - Rapport Markdown: imports_analysis_report.md")
+        print()
+    
+    # Afficher les modules détectés si demandé
+    if args.show_detected_modules:
+        analyzer.print_detected_modules()
         print()
 
 if __name__ == '__main__':

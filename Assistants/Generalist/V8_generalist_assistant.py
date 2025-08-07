@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 from MemoryEngine.core.engine import MemoryEngine
 from Assistants.EditingSession.Tools.tool_registry import ToolRegistry
-from LLMProviders import ProviderFactory, LLMProvider
+from Core.LLMProviders import ProviderFactory, LLMProvider
 
 class GeneralistAssistantLogger:
     """Logger pour l'assistant généraliste."""

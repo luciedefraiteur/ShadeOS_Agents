@@ -1,0 +1,207 @@
+{
+  "metadata": {
+    "source": "import_analyzer",
+    "timestamp": "2025-08-07T14:47:15.239114",
+    "version": "2.0"
+  },
+  "dependency_graph": {
+    "nodes": [
+      {
+        "id": "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 24,
+          "local_import_count": 10,
+          "external_import_count": 0,
+          "standard_import_count": 14,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_engine.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 24,
+          "local_import_count": 0,
+          "external_import_count": 16,
+          "standard_import_count": 8,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_workspace_layer.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 16,
+          "local_import_count": 1,
+          "external_import_count": 4,
+          "standard_import_count": 11,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/LLMProviders/__init__.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 9,
+          "local_import_count": 0,
+          "external_import_count": 9,
+          "standard_import_count": 0,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_components.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 16,
+          "local_import_count": 0,
+          "external_import_count": 6,
+          "standard_import_count": 10,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/UniversalAutoFeedingThread/__init__.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 3,
+          "local_import_count": 0,
+          "external_import_count": 3,
+          "standard_import_count": 0,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/optimized_tool_registry.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 17,
+          "local_import_count": 5,
+          "external_import_count": 0,
+          "standard_import_count": 12,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/Parsers/luciform_parser.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 3,
+          "local_import_count": 0,
+          "external_import_count": 1,
+          "standard_import_count": 2,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/import_analysis_cache.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 13,
+          "local_import_count": 0,
+          "external_import_count": 2,
+          "standard_import_count": 11,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/resilient_import_analyzer.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 16,
+          "local_import_count": 0,
+          "external_import_count": 5,
+          "standard_import_count": 11,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/broken_dependency_handler.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 13,
+          "local_import_count": 0,
+          "external_import_count": 0,
+          "standard_import_count": 13,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/tool_invoker.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 9,
+          "local_import_count": 0,
+          "external_import_count": 2,
+          "standard_import_count": 7,
+          "depth": 0
+        }
+      },
+      {
+        "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/Config/secure_env_manager.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 9,
+          "local_import_count": 0,
+          "external_import_count": 0,
+          "standard_import_count": 9,
+          "depth": 0
+        }
+      }
+    ],
+    "edges": [],
+    "cycles": []
+  },
+  "complexity_metrics": {
+    "total_files": 13,
+    "total_imports": 172,
+    "total_local_imports": 16,
+    "avg_imports_per_file": 13.23,
+    "avg_local_imports_per_file": 1.23,
+    "most_complex_files": [
+      {
+        "file": "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
+        "import_count": 24,
+        "local_import_count": 10
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_engine.py",
+        "import_count": 24,
+        "local_import_count": 0
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/optimized_tool_registry.py",
+        "import_count": 17,
+        "local_import_count": 5
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_workspace_layer.py",
+        "import_count": 16,
+        "local_import_count": 1
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_components.py",
+        "import_count": 16,
+        "local_import_count": 0
+      }
+    ]
+  },
+  "critical_modules": [
+    {
+      "module": "Core",
+      "dependency_count": 10,
+      "criticality_level": "HIGH"
+    },
+    {
+      "module": "TemporalFractalMemoryEngine",
+      "dependency_count": 4,
+      "criticality_level": "MEDIUM"
+    },
+    {
+      "module": "Assistants",
+      "dependency_count": 2,
+      "criticality_level": "LOW"
+    }
+  ]
+}
