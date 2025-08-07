@@ -1,7 +1,7 @@
 {
   "metadata": {
     "source": "import_analyzer",
-    "timestamp": "2025-08-07T14:47:15.239114",
+    "timestamp": "2025-08-07T18:27:44.949574",
     "version": "2.0"
   },
   "dependency_graph": {
@@ -98,10 +98,10 @@
         "id": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/import_analysis_cache.py",
         "type": "python_file",
         "properties": {
-          "import_count": 13,
+          "import_count": 14,
           "local_import_count": 0,
           "external_import_count": 2,
-          "standard_import_count": 11,
+          "standard_import_count": 12,
           "depth": 0
         }
       },
@@ -148,17 +148,28 @@
           "standard_import_count": 9,
           "depth": 0
         }
+      },
+      {
+        "id": "Core/Partitioner/import_analyzer.py",
+        "type": "python_file",
+        "properties": {
+          "import_count": 22,
+          "local_import_count": 0,
+          "external_import_count": 2,
+          "standard_import_count": 20,
+          "depth": 0
+        }
       }
     ],
     "edges": [],
     "cycles": []
   },
   "complexity_metrics": {
-    "total_files": 13,
-    "total_imports": 172,
+    "total_files": 14,
+    "total_imports": 195,
     "total_local_imports": 16,
-    "avg_imports_per_file": 13.23,
-    "avg_local_imports_per_file": 1.23,
+    "avg_imports_per_file": 13.93,
+    "avg_local_imports_per_file": 1.14,
     "most_complex_files": [
       {
         "file": "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
@@ -171,6 +182,11 @@
         "local_import_count": 0
       },
       {
+        "file": "Core/Partitioner/import_analyzer.py",
+        "import_count": 22,
+        "local_import_count": 0
+      },
+      {
         "file": "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/optimized_tool_registry.py",
         "import_count": 17,
         "local_import_count": 5
@@ -179,11 +195,6 @@
         "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_workspace_layer.py",
         "import_count": 16,
         "local_import_count": 1
-      },
-      {
-        "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_components.py",
-        "import_count": 16,
-        "local_import_count": 0
       }
     ]
   },

@@ -23,7 +23,7 @@ try:
     from MemoryEngine.core.engine import MemoryEngine
     from MemoryEngine.core.memory_node import FractalMemoryNode
     from IAIntrospectionDaemons.core.simple_assistant import SimpleAssistant
-    from MemoryEngine.EditingSession.Tools.openai_integration import OpenAIEditingSession
+    from Assistants.EditingSession.Tools.openai_integration import OpenAIEditingSession
 except ImportError as e:
     print(f"⚠️ Import error: {e}")
     print("🕷️ Using fallback components...")
