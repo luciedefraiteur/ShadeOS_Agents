@@ -46,10 +46,10 @@ except ImportError:
     NEO4J_AVAILABLE = False
 
 # Import des composants utilitaires
-from .core.logging_architecture import TemporalLoggingArchitecture
-from .core.initialization import TemporalInitialization
-from .core.meta_path_adapter import TemporalMetaPathAdapter
-from .core.neo4j_manager import TemporalNeo4jManager
+from .core.logging_architecture import ShadeOSLogger as TemporalLoggingArchitecture
+from .core.initialization import MemoryEngineInitializer as TemporalInitialization
+from .core.meta_path_adapter import MetaPathAdapter as TemporalMetaPathAdapter
+from .core.neo4j_manager import Neo4jManager as TemporalNeo4jManager
 
 __version__ = "2.0.0"
 __author__ = "Alma⛧ - Architecte Démoniaque"

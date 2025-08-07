@@ -1,23 +1,28 @@
-# V9 Test Project
 
-Projet de test pour l'assistant V9 Auto-Feeding Thread.
+# Projet de Test V9
 
-## Fonctionnalités
+Ce projet a été créé pour tester le V9_AutoFeedingThreadAgent.
 
-- Calcul de somme (avec bug)
-- Recherche de maximum
-- Validation d'email (avec bug)
-- Traitement de données (avec bug)
+## Structure
+
+- `main.py` : Classe principale du projet
+- `utils.py` : Utilitaires et fonctions d'aide
+- `test_main.py` : Tests unitaires
+- `README.md` : Documentation
+
+## Utilisation
+
+```python
+from main import TestProject
+from utils import generate_test_data
+
+project = TestProject()
+data = generate_test_data(10)
+project.add_data("test_data", data)
+```
 
 ## Tests
 
 ```bash
-python main.py
+python test_main.py
 ```
-
-## Bugs connus
-
-1. `calculate_sum` ajoute 1 au résultat
-2. `validate_email` validation trop simple
-3. `process_data` ne gère pas tous les types
-4. `find_max` retourne None au lieu de lever une exception

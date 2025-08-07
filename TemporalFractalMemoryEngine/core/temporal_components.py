@@ -465,4 +465,36 @@ class TemplateTemporalLayer(TemporalVirtualLayer):
                 "template_name": template_name,
                 "usage_count": self.template_usage[template_name]["usage_count"]
             }
+        })
+
+
+class ToolTemporalLayer(TemporalVirtualLayer):
+    """Couche temporelle pour les outils"""
+    
+    def __init__(self, memory_engine=None):
+        super().__init__("tool", memory_engine)
+        self.tool_registry = TemporalRegistry("tool_registry")
+        self.tool_usage = {}
+    
+    def track_tool_usage(self, tool_id: str, usage_context: Dict[str, Any]):
+        """Tracking de l'usage des outils"""
+        self.access_layer("tool_usage")
+        
+        if tool_id not in self.tool_usage:
+            self.tool_usage[tool_id] = {
+                "usage_count": 0,
+                "contexts": [],
+                "last_used": None
+            }
+        
+        self.tool_usage[tool_id]["usage_count"] += 1
+        self.tool_usage[tool_id]["contexts"].append(usage_context)
+        self.tool_usage[tool_id]["last_used"] = time.time()
+        
+        self.adapt_to_usage({
+            "type": "tool_usage",
+            "data": {
+                "tool_id": tool_id,
+                "usage_count": self.tool_usage[tool_id]["usage_count"]
+            }
         }) 

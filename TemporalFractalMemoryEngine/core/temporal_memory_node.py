@@ -12,7 +12,8 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
 
-from .temporal_base import TemporalNode, TemporalDimension, FractalLinks, ConsciousnessInterface
+from .temporal_base import TemporalDimension, FractalLinks, ConsciousnessInterface
+from .temporal_components import TemporalNode
 
 
 class TemporalMemoryNode(TemporalNode):

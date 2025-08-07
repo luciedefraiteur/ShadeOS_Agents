@@ -16,7 +16,8 @@ from datetime import datetime
 
 from Core.LLMProviders import LLMProvider
 from .temporal_components import WorkspaceTemporalLayer as BaseWorkspaceTemporalLayer
-from .engine import MemoryEngine
+# Import lazy pour éviter l'import circulaire
+MemoryEngine = None
 from .fractal_search_engine import FractalSearchEngine
 from .meta_path_adapter import MetaPathAdapter, UnifiedResultFormatter
 
@@ -24,7 +25,7 @@ from .meta_path_adapter import MetaPathAdapter, UnifiedResultFormatter
 class WorkspaceTemporalLayer(BaseWorkspaceTemporalLayer):
     """Migration de WorkspaceLayer vers l'architecture temporelle universelle"""
     
-    def __init__(self, memory_engine: MemoryEngine, llm_provider: LLMProvider, workspace_path: str = "."):
+    def __init__(self, memory_engine, llm_provider: LLMProvider, workspace_path: str = "."):
         # Initialisation de la base temporelle
         super().__init__(memory_engine)
         
