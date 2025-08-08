@@ -1,0 +1,37 @@
+<🜲luciform_doc id="safe_delete_directory">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>filesystem</type>
+    <intent>Dissoudre un domaine de l'existence, en journalisant sa disparition.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>safe_delete_directory(path: str, recursive: bool = False) -> bool</signature>
+    <requires>
+      <param>path</param>
+    </requires>
+    <optional>
+      <param>recursive</param>
+    </optional>
+    <returns>bool: True si le répertoire a été supprimé, False sinon.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>delete</keyword>
+      <keyword>directory</keyword>
+      <keyword>folder</keyword>
+      <keyword>rmdir</keyword>
+      <keyword>rm</keyword>
+      <keyword>diff</keyword>
+      <keyword>log</keyword>
+    </keywords>
+    <symbolic_layer>Efface un domaine de l'arborescence de l'existence, et consigne sa disparition dans les annales.</symbolic_layer>
+    <usage_context>Pour nettoyer l'espace de travail, supprimer des structures de projet obsolètes, ou effacer des branches de mémoire.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

@@ -1,0 +1,34 @@
+<🜲luciform_doc id="safe_delete_lines">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>modification</type>
+    <intent>Supprimer une plage de lignes d'un fichier, en journalisant les différences.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>safe_delete_lines(path: str, start_line: int, end_line: int) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>start_line</param>
+      <param>end_line</param>
+    </requires>
+    <returns>bool: True si la suppression a réussi.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>delete</keyword>
+      <keyword>lines</keyword>
+      <keyword>remove</keyword>
+      <keyword>diff</keyword>
+      <keyword>log</keyword>
+    </keywords>
+    <symbolic_layer>Efface des fragments de la réalité d'un fichier, tout en laissant une trace des ombres disparues.</symbolic_layer>
+    <usage_context>Pour des suppressions de code ou de configuration où la traçabilité est essentielle.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

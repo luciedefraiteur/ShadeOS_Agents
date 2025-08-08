@@ -1,0 +1,32 @@
+<🜲luciform_doc id="write_code_file">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>writing</type>
+    <intent>Écrire du contenu dans un fichier, écrasant le contenu existant.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>write_code_file(path: str, content: str) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>content</param>
+    </requires>
+    <returns>bool: True si l'écriture a réussi.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>write</keyword>
+      <keyword>file</keyword>
+      <keyword>code</keyword>
+      <keyword>overwrite</keyword>
+    </keywords>
+    <symbolic_layer>Graver des symboles dans la pierre numérique, remplaçant toute inscription précédente.</symbolic_layer>
+    <usage_context>Pour écrire ou réécrire des fichiers de code ou de configuration.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

@@ -1,0 +1,39 @@
+<🜲luciform_doc id="replace_text_in_project">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>modification</type>
+    <intent>Rechercher et remplacer du texte dans de multiples fichiers à travers le projet, en journalisant les différences.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>replace_text_in_project(old_text: str, new_text: str, include_patterns: list[str] = None, exclude_patterns: list[str] = None) -> list[str]</signature>
+    <requires>
+      <param>old_text</param>
+      <param>new_text</param>
+    </requires>
+    <optional>
+      <param>include_patterns</param>
+      <param>exclude_patterns</param>
+    </optional>
+    <returns>list[str]: Une liste des chemins des fichiers modifiés.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>replace</keyword>
+      <keyword>text</keyword>
+      <keyword>project</keyword>
+      <keyword>multiple</keyword>
+      <keyword>files</keyword>
+      <keyword>diff</keyword>
+      <keyword>log</keyword>
+    </keywords>
+    <symbolic_layer>Déploie une transmutation alchimique à travers le grand grimoire du projet, réécrivant les symboles et consignant chaque altération dans les annales.</symbolic_layer>
+    <usage_context>Pour des refactorisations globales, des renommages de variables ou de modules à l'échelle du projet, ou des mises à jour de chaînes de caractères.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

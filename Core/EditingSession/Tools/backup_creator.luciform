@@ -1,0 +1,42 @@
+<🜲luciform_doc id="backup_creator">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>protection</type>
+    <intent>Créer des sauvegardes horodatées avec compression, métadonnées et restauration.</intent>
+    <level>fondamental</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>create_file_backup(file_path: str, backup_dir: str = None, compress: bool = False, keep_structure: bool = False, notes: str = "", metadata: bool = True, overwrite: bool = False) -> dict</signature>
+    <requires>
+      <param>file_path</param>
+    </requires>
+    <optional>
+      <param>backup_dir</param>
+      <param>compress</param>
+      <param>keep_structure</param>
+      <param>notes</param>
+      <param>metadata</param>
+      <param>overwrite</param>
+    </optional>
+    <returns>Dictionnaire avec success, original_file, backup_file, metadata_file, compressed, size_original, size_backup, compression_ratio, timestamp, metadata.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>backup</keyword>
+      <keyword>sauvegarde</keyword>
+      <keyword>protection</keyword>
+      <keyword>horodatage</keyword>
+      <keyword>compression</keyword>
+      <keyword>métadonnées</keyword>
+      <keyword>restauration</keyword>
+    </keywords>
+    <symbolic_layer>⛧ Gardien éternel des grimoires sacrés, tissant des liens temporels entre le présent et l'avenir, préservant chaque essence de code dans les archives mystiques du temps, protégeant contre l'oubli et la corruption ⛧</symbolic_layer>
+    <usage_context>Quand un agent doit protéger des fichiers critiques avant modification, créer des points de restauration, archiver des versions importantes, ou sécuriser le travail en cours. Essentiel avant toute opération risquée, pour l'historique des versions, et la récupération d'urgence.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
