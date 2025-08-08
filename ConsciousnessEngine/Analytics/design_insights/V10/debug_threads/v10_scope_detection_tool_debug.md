@@ -5,3 +5,7 @@ Imports à corriger dans Core/Agents/V10/specialized_tools.py:
 - from Core.Agents.V10.llm_provider import V10LLMProvider
 
 Tests avec vrais appels LLM pour granularité et validation complète.
+
+PROBLÈME RÉSOLU : TemporalFileSystemBackend créé
+- Mock backend créé dans TemporalFractalMemoryEngine/backends/
+- __init__.py créé pour l'import

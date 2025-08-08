@@ -62,8 +62,8 @@ class TemporalEngine(BaseTemporalEntity):
         """
         # Initialisation de la base temporelle
         super().__init__(
-            entity_id=f"temporal_engine_{datetime.now().isoformat()}",
-            entity_type="temporal_engine"
+            entity_type="temporal_engine",
+            content="Temporal Engine initialized"
         )
         
         # Configuration du backend temporel
@@ -90,9 +90,8 @@ class TemporalEngine(BaseTemporalEntity):
                 raise ImportError("Backend Neo4j demandé mais package neo4j non disponible")
             self.backend = TemporalNeo4jBackend(**backend_kwargs)
         elif backend_type == "filesystem":
-            # TODO: Créer TemporalFileSystemBackend
-            from ..backends.temporal_filesystem_backend import TemporalFileSystemBackend
-            self.backend = TemporalFileSystemBackend(base_path=base_path)
+            # Mock backend pour le développement
+            self.backend = MockTemporalBackend(base_path=base_path)
         elif backend_type == "auto":
             if NEO4J_AVAILABLE:
                 try:

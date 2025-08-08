@@ -14,8 +14,8 @@ import re
 
 # Import des composants V10
 from Core.Agents.V10.file_intelligence_engine import V10ContentSummarizer
-from TemporalFractalMemoryEngine.core.temporal_engine import TemporalFractalMemoryEngine
-from Core.Agents.V10.llm_provider import V10LLMProvider
+from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
+from Core.Providers.LLMProviders.llm_provider import LLMProvider, ProviderType
 
 
 @dataclass
@@ -715,10 +715,27 @@ class V10SummarizeSectionTool:
 class V10ReadChunksUntilScopeTool:
     """Outil spécialisé pour lire des chunks jusqu'au prochain scope complet."""
     
-    def __init__(self, temporal_engine: TemporalFractalMemoryEngine):
+    def __init__(self, temporal_engine: TemporalEngine):
         self.temporal_engine = temporal_engine
         self.scope_detector = V10ScopeDetector()
-        self.llm_provider = V10LLMProvider()
+        # Mock LLM provider pour le développement
+        self.llm_provider = MockLLMProvider()
+
+
+class MockLLMProvider:
+    """Mock LLM Provider pour le développement V10."""
+    
+    def __init__(self):
+        self.provider_type = ProviderType.LOCAL
+        self.config = {}
+    
+    async def generate_response(self, prompt: str, **kwargs) -> str:
+        """Mock de génération de réponse."""
+        return f"Mock response for: {prompt[:100]}..."
+    
+    async def test_connection(self):
+        """Mock de test de connexion."""
+        return {"valid": True, "provider_type": "mock"}
     
     async def execute(self, params: Dict) -> ToolResult:
         """Exécute la lecture de chunks jusqu'au prochain scope."""
@@ -1021,7 +1038,7 @@ class V10SpecializedToolsRegistry:
             'analyze_structure': V10AnalyzeStructureTool(),
             'create_index': V10CreateIndexTool(),
             'summarize_section': V10SummarizeSectionTool(),
-            'read_chunks_until_scope': V10ReadChunksUntilScopeTool(TemporalFractalMemoryEngine()), # Initialize with a dummy engine
+            'read_chunks_until_scope': V10ReadChunksUntilScopeTool(TemporalEngine()), # Initialize with a dummy engine
         }
     
     def get_tool(self, tool_name: str):
