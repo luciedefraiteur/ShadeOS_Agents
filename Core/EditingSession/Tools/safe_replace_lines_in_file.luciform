@@ -1,0 +1,36 @@
+<🜲luciform_doc id="safe_replace_lines_in_file">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>modification</type>
+    <intent>Remplacer un bloc de lignes par un nouveau contenu, en journalisant les différences.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>safe_replace_lines_in_file(path: str, start_line: int, end_line: int, new_lines: list[str]) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>start_line</param>
+      <param>end_line</param>
+      <param>new_lines</param>
+    </requires>
+    <returns>bool: True si la modification a réussi.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>replace</keyword>
+      <keyword>lines</keyword>
+      <keyword>block</keyword>
+      <keyword>section</keyword>
+      <keyword>diff</keyword>
+      <keyword>log</keyword>
+    </keywords>
+    <symbolic_layer>Excision et greffe d'une partie de l'âme d'un fichier, avec un compte rendu détaillé de l'opération.</symbolic_layer>
+    <usage_context>Pour des refactorisations majeures ou des modifications de sections de code où la précision et la traçabilité sont primordiales.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>
