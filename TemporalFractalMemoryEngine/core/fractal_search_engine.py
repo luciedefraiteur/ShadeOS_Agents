@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass
 from enum import Enum
 
-from Core.LLMProviders import LLMProvider
+from Core.Providers.LLMProviders import LLMProvider
 from .meta_path_adapter import MetaPathAdapter, UnifiedResultFormatter
 
 
