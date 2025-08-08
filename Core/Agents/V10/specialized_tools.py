@@ -14,7 +14,7 @@ import re
 
 # Import des composants V10
 from Core.Agents.V10.file_intelligence_engine import V10ContentSummarizer
-from Core.Agents.V10.temporal_fractal_memory_engine import TemporalFractalMemoryEngine
+from TemporalFractalMemoryEngine.core.temporal_engine import TemporalFractalMemoryEngine
 from Core.Agents.V10.llm_provider import V10LLMProvider
 
 
@@ -1050,4 +1050,3 @@ async def execute_specialized_tool(tool_name: str, params: Dict[str, Any]) -> To
     """Interface principale pour exécution d'outils spécialisés."""
     registry = V10SpecializedToolsRegistry()
     return await registry.execute_tool(tool_name, params)
-V10ReadChunksUntilScopeTool
