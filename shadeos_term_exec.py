@@ -110,9 +110,22 @@ def main() -> int:
 
     # Auto-detect default FIFO if not specified and no other backend was provided
     if not args.fifo and not args.tmux_pane and not args.tmux_pid and not args.pid:
+        # Try state file from shadeos_start_listener.py
+        state_path = os.path.expanduser("~/.shadeos_listener.json")
         default_fifo = os.environ.get("SHADEOS_FIFO", "/tmp/shadeos_cmd.fifo")
-        if os.path.exists(default_fifo):
-            args.fifo = default_fifo
+        fifo_candidate = None
+        try:
+            if os.path.exists(state_path):
+                import json
+                with open(state_path) as f:
+                    state = json.load(f)
+                    fifo_candidate = state.get("fifo")
+        except Exception:
+            fifo_candidate = None
+        for candidate in (fifo_candidate, default_fifo):
+            if candidate and os.path.exists(candidate):
+                args.fifo = candidate
+                break
 
     cmd = args.cmd or RECIPES[args.recipe]
     if args.cwd:
