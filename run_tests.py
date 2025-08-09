@@ -55,8 +55,8 @@ def main() -> int:
 
     # Ensure PYTHONPATH
     os.environ["PYTHONPATH"] = f"{repo_root}:{os.environ.get('PYTHONPATH','')}"
-    # Prefer mock for safety unless user overrides
-    os.environ.setdefault("LLM_MODE", "mock")
+    # Force mock LLM for tests to avoid network/provider hangs
+    os.environ["LLM_MODE"] = "mock"
 
     cmd = build_pytest_command(args, repo_root)
 
