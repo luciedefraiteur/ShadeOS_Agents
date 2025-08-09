@@ -113,16 +113,11 @@ class TemporalEngine(BaseTemporalEntity):
     def _initialize_temporal_layers(self):
         """Initialise les couches temporelles."""
         # Couche workspace temporelle
-        self.workspace_layer = WorkspaceTemporalLayer(
-            memory_engine=self,
-            auto_adapt=True
-        )
+        # Workspace layer requires llm_provider; pass None for now
+        self.workspace_layer = WorkspaceTemporalLayer(self, llm_provider=None, workspace_path='.')
         
         # Couche outils temporelle
-        self.tool_layer = ToolTemporalLayer(
-            memory_engine=self,
-            auto_adapt=True
-        )
+        self.tool_layer = ToolTemporalLayer(self)
         
         # Enregistrement des couches dans l'index temporel
         register_temporal_entity(self.workspace_layer)
