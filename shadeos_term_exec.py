@@ -93,6 +93,7 @@ def main() -> int:
     parser.add_argument("--tee-log", type=str, help="If set, append '|& tee -a <log>' to the command")
     parser.add_argument("--enter-times", type=int, default=1, help="Number of extra newlines to send after the command")
     parser.add_argument("--wake", action="store_true", help="Send Ctrl-C before the command to return to prompt")
+    parser.add_argument("--timeout-sec", type=int, help="If set, wrap the command with 'timeout <sec>s' to prevent hangs")
 
     args = parser.parse_args()
 
@@ -102,6 +103,10 @@ def main() -> int:
         cmd = f"cd {args.cwd} && {cmd}"
     if args.tee_log:
         cmd = f"{cmd} |& tee -a {args.tee_log}"
+
+    # Optional timeout wrapper (basic GNU coreutils 'timeout')
+    if args.timeout_sec and args.timeout_sec > 0:
+        cmd = f"timeout {args.timeout_sec}s {cmd}"
 
     if args.dry_run:
         print(f"Resolved PTY: {tty_path}")
