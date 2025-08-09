@@ -42,10 +42,12 @@ except Exception:
     ProviderFactory = None  # type: ignore
 
 try:
-    from Core.Config.feature_flags import get_llm_mode
+    from Core.Config.feature_flags import get_llm_mode, allow_mock_fallback
 except Exception:
     def get_llm_mode() -> str:  # type: ignore
         return "mock"
+    def allow_mock_fallback() -> bool:  # type: ignore
+        return True
 
 try:
     from Core.Config.secure_env_manager import load_project_environment
@@ -1052,11 +1054,26 @@ class V10SpecializedToolsRegistry:
                     "local_subprocess": "local_subprocess",
                 }.get(mode, "gemini")
                 default_cfg = ProviderFactory.create_default_config(provider_type)
-                llm_provider_instance, _validation = __import__('asyncio').get_event_loop().run_until_complete(
+                llm_provider_instance, validation = __import__('asyncio').get_event_loop().run_until_complete(
                     ProviderFactory.create_and_validate_provider(provider_type, **default_cfg)
                 )
-        except Exception:
-            llm_provider_instance = None
+                if not validation.valid:
+                    # Si non valide: seulement fallback mock si autorisé explicitement
+                    llm_provider_instance = None
+                    if not allow_mock_fallback():
+                        raise RuntimeError(f"Provider LLM invalide: {validation.error}")
+        except Exception as e:
+            # En mode strict (pas de fallback), propager l'erreur lors du premier usage de l'outil
+            if not allow_mock_fallback():
+                # Enregistre un placeholder qui soulèvera une erreur à l'exécution
+                class _FailingProvider:
+                    async def generate_text(self, *a, **k):
+                        raise RuntimeError(f"LLM provider indisponible: {e}")
+                    async def generate_response(self, *a, **k):
+                        raise RuntimeError(f"LLM provider indisponible: {e}")
+                llm_provider_instance = _FailingProvider()
+            else:
+                llm_provider_instance = None
 
         self.tools = {
             'read_lines': V10ReadLinesTool(),
