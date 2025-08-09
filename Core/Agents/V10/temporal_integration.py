@@ -14,10 +14,16 @@ from dataclasses import dataclass
 from datetime import datetime
 
 try:
+    from Core.Config.feature_flags import is_temporal_engine_enabled
+except Exception:
+    def is_temporal_engine_enabled() -> bool:
+        return False
+
+try:
     from TemporalFractalMemoryEngine import TemporalEngine
-    TEMPORAL_ENGINE_AVAILABLE = True
+    _TFME_IMPORTED = True
 except ImportError:
-    TEMPORAL_ENGINE_AVAILABLE = False
+    _TFME_IMPORTED = False
     print("⚠️ TemporalFractalMemoryEngine non disponible - Mode simulation activé")
 
 
@@ -88,6 +94,8 @@ class V10TemporalIntegration:
         self.temporal_engine = None
         self.session_manager = V10SessionManager()
         
+        # Activation contrôlée par feature flag
+        TEMPORAL_ENGINE_AVAILABLE = _TFME_IMPORTED and is_temporal_engine_enabled()
         if TEMPORAL_ENGINE_AVAILABLE:
             try:
                 self.temporal_engine = TemporalEngine()
@@ -95,7 +103,7 @@ class V10TemporalIntegration:
             except Exception as e:
                 print(f"⚠️ Erreur initialisation TemporalEngine: {e}")
         else:
-            print("⚠️ Mode simulation TemporalEngine activé")
+            print("ℹ️ TemporalEngine désactivé ou indisponible - Mode simulation activé")
     
     async def initialize_session(self, user_id: str) -> TemporalSession:
         """Initialise une session temporelle pour l'utilisateur."""
