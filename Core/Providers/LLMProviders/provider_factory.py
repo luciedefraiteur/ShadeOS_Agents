@@ -32,8 +32,15 @@ class ProviderFactory:
         elif provider_type == "local_subprocess":
             # Ancien provider subprocess (pour compatibilité)
             return LocalProvider(kwargs)
+        elif provider_type == "gemini":
+            # Charge paresseuse pour éviter dépendances manquantes
+            from .providers_optional.gemini_provider import GeminiProvider
+            return GeminiProvider(kwargs)
+        elif provider_type == "anthropic":
+            from .providers_optional.anthropic_provider import AnthropicProvider
+            return AnthropicProvider(kwargs)
         else:
-            raise ValueError(f"Provider inconnu: {provider_type}. Types supportés: openai, local")
+            raise ValueError(f"Provider inconnu: {provider_type}. Types supportés: openai, local, gemini, anthropic")
     
     @staticmethod
     async def validate_provider(provider: LLMProvider) -> ValidationResult:
@@ -96,6 +103,18 @@ class ProviderFactory:
                 "required_config": ["model"],
                 "optional_config": ["ollama_host", "ollama_binary", "timeout", "temperature"],
                 "capabilities": ["text_generation", "chat_completion", "local_inference"]
+            },
+            "gemini": {
+                "description": "Google Gemini (multi-clés via ~/.shadeos_env)",
+                "required_config": ["model"],
+                "optional_config": ["timeout", "temperature"],
+                "capabilities": ["text_generation", "chat_completion"]
+            },
+            "anthropic": {
+                "description": "Anthropic Claude",
+                "required_config": ["model"],
+                "optional_config": ["timeout", "temperature"],
+                "capabilities": ["text_generation", "chat_completion"]
             }
         }
     

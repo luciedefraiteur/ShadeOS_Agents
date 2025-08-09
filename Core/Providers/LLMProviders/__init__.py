@@ -21,6 +21,10 @@ from .llm_provider import LLMProvider, ProviderStatus, LLMResponse, ValidationRe
 from .provider_factory import ProviderFactory
 from .openai_provider import OpenAIProvider
 from .local_provider import LocalProvider
+try:
+    from .providers_optional.gemini_provider import GeminiProvider
+except Exception:
+    GeminiProvider = None
 
 __all__ = [
     'LLMProvider',
@@ -32,4 +36,5 @@ __all__ = [
     'ProviderFactory',
     'OpenAIProvider',
     'LocalProvider',
+    'GeminiProvider',
 ] 
