@@ -6,9 +6,10 @@ Pytest bootstrap for ShadeOS_Agents
 """
 import sys
 import os
+from pathlib import Path
 
-# Prepend project root to sys.path for absolute imports
-repo_root = os.getcwd()
+# Prepend repository root (this file's directory) to sys.path for absolute imports
+repo_root = str(Path(__file__).resolve().parent)
 if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
 
