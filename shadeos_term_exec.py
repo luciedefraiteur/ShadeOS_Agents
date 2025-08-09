@@ -29,6 +29,7 @@ RECIPES = {
     "e2e": "LLM_MODE=mock pytest -q Core/Agents/V10/tests/test_read_chunks_until_scope_e2e.py",
     "unit-fast": "pytest -q Core/Agents/V10/tests/test_specialized_tools.py",
     "all": "pytest -q",
+    "e2e-runner": "python run_tests.py --e2e --timeout 20 --log /tmp/shadeos_e2e.log",
 }
 
 
@@ -87,7 +88,7 @@ def send_command_to_tty(tty_path: str, text: str, add_newline: bool = True, pre:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Send a command to an existing terminal by PID")
-    parser.add_argument("--pid", type=int, required=True, help="Target terminal process PID (shell PID)")
+    parser.add_argument("--pid", type=int, help="Target terminal process PID (shell PID) for PTY fallback")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--cmd", type=str, help="Shell command to send (will append newline)")
     group.add_argument("--recipe", choices=sorted(RECIPES.keys()), help="Use a predefined command recipe")
@@ -106,6 +107,12 @@ def main() -> int:
     parser.add_argument("--fifo", type=str, help="If set, write the command to this FIFO (listener must be running)")
 
     args = parser.parse_args()
+
+    # Auto-detect default FIFO if not specified and no other backend was provided
+    if not args.fifo and not args.tmux_pane and not args.tmux_pid and not args.pid:
+        default_fifo = os.environ.get("SHADEOS_FIFO", "/tmp/shadeos_cmd.fifo")
+        if os.path.exists(default_fifo):
+            args.fifo = default_fifo
 
     cmd = args.cmd or RECIPES[args.recipe]
     if args.cwd:
@@ -158,6 +165,9 @@ def main() -> int:
             print(f"[warn] tmux send failed ({e}); falling back to PTY if available")
 
     # Fallback to PTY injection
+    if not args.pid:
+        print("[error] --pid is required for PTY fallback; provide --fifo or --tmux-* instead")
+        return 2
     tty_path = resolve_tty_from_pid(args.pid)
     if args.dry_run:
         print(f"Resolved PTY: {tty_path}")
