@@ -156,6 +156,14 @@ class ProviderFactory:
                 "enable_timeout": True,
                 "estimate_prompt_size": True
             }
+        elif provider_type == "gemini":
+            return {
+                "model": "gemini-1.5-pro",
+                "timeout": 30,
+                "temperature": 0.7,
+                "enable_timeout": True,
+                "estimate_prompt_size": True
+            }
         elif provider_type == "local":
             return {
                 "model": "qwen2.5:7b-instruct",
