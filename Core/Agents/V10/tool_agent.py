@@ -37,13 +37,22 @@ class V10ToolAgent:
         self.tool_registry = V10ToolRegistry()
         self.mcp_manager = None  # Sera initialisé si MCP disponible
         
-        # Initialisation du gestionnaire MCP si disponible
+        # Initialisation du gestionnaire MCP selon feature flag
         try:
-            from Core.Providers.MCP import V10McpManager
-            self.mcp_manager = V10McpManager(temporal_integration)
-            print("✅ MCP Manager intégré dans Tool Agent")
-        except ImportError:
-            print("⚠️ MCP Manager non disponible - Mode local uniquement")
+            from Core.Config.feature_flags import is_mcp_enabled
+        except Exception:
+            def is_mcp_enabled() -> bool:
+                return False
+
+        if is_mcp_enabled():
+            try:
+                from Core.Providers.MCP import V10McpManager
+                self.mcp_manager = V10McpManager(temporal_integration)
+                print("✅ MCP Manager intégré dans Tool Agent")
+            except ImportError:
+                print("⚠️ MCP Manager non disponible - Mode local uniquement")
+        else:
+            print("ℹ️ MCP désactivé par feature flag - Mode local uniquement")
     
     async def execute_tool(self, tool_name: str, parameters: Dict[str, Any], session_id: str) -> ToolResult:
         """Exécute un outil avec formatage optimisé."""
@@ -412,32 +421,39 @@ class V10ExecuteCommandTool(V10BaseTool):
         super().__init__("execute_command")
     
     async def execute(self, parameters: Dict[str, Any]) -> Dict[str, Any]:
-        """Exécute une commande."""
-        import subprocess
-        
-        command = parameters.get('command', '')
-        
+        """Exécute une commande avec ProcessManager pour plus de sécurité/portabilité."""
         try:
-            result = subprocess.run(
-                command,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=30
+            # Import tardif pour éviter dépendances globales
+            from Core.ProcessManager.execute_command import (
+                execute_command, ExecutionMode
             )
-            
+        except Exception as e:
+            return {"success": False, "error": f"ProcessManager indisponible: {e}"}
+
+        command = parameters.get('command', '')
+        timeout = parameters.get('timeout', 30)
+        cwd = parameters.get('cwd')
+        env = parameters.get('env')
+
+        try:
+            result = execute_command(
+                command=command,
+                mode=ExecutionMode.BLOCKING,
+                timeout=timeout,
+                cwd=cwd,
+                env=env,
+            )
+
             return {
-                "success": result.returncode == 0,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "return_code": result.returncode,
-                "command": command
+                "success": result.success,
+                "stdout": getattr(result, 'stdout', ''),
+                "stderr": getattr(result, 'stderr', ''),
+                "return_code": getattr(result, 'return_code', None),
+                "command": command,
+                "execution_time": getattr(result, 'execution_time', None),
             }
         except Exception as e:
-            return {
-                "error": str(e),
-                "command": command
-            }
+            return {"success": False, "error": str(e), "command": command}
 
 
 class V10CodeAnalyzerTool(V10BaseTool):
