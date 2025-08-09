@@ -15,6 +15,18 @@ from datetime import datetime
 from .temporal_integration import V10TemporalIntegration
 from .llm_provider_decorator import mock_llm_provider, mock_configurator
 
+# LLM provider DI and feature flags
+try:
+    from Core.Config.feature_flags import get_llm_mode
+except Exception:
+    def get_llm_mode() -> str:
+        return "mock"
+
+try:
+    from Core.Providers.LLMProviders.provider_factory import ProviderFactory
+except Exception:
+    ProviderFactory = None  # Sera testé à l'usage
+
 
 @dataclass
 class TaskAnalysis:
@@ -49,18 +61,52 @@ class ExecutionResult:
 class V10DevAgent:
     """Agent spécialisé dans le raisonnement métier et la logique de développement."""
     
-    def __init__(self, temporal_integration: V10TemporalIntegration):
+    def __init__(self, temporal_integration: V10TemporalIntegration, llm_provider: Any = None):
         """Initialise l'agent développeur."""
         self.temporal_integration = temporal_integration
         self.context_manager = V10ContextManager()
         self.planning_engine = V10PlanningEngine()
         self.session_id = None
+        # LLM wiring
+        self._llm_mode = get_llm_mode()
+        self.llm_provider = llm_provider
+        self._llm_ready = llm_provider is not None
     
     async def initialize_session(self, user_id: str) -> None:
         """Initialise une session pour l'utilisateur."""
         session = await self.temporal_integration.initialize_session(user_id)
         self.session_id = session.session_id
         print(f"✅ Session Dev Agent initialisée: {self.session_id}")
+
+    async def _ensure_llm_provider(self) -> None:
+        """Crée et valide un provider LLM si mode réel et pas encore prêt."""
+        if self._llm_ready or self._llm_mode == "mock":
+            return
+        if ProviderFactory is None:
+            print("⚠️ ProviderFactory indisponible - mode réel impossible, fallback mock")
+            self._llm_mode = "mock"
+            return
+        try:
+            # Map mode → provider_type factory
+            provider_type = {
+                "openai": "openai",
+                "local_http": "local",
+                "local_subprocess": "local_subprocess",
+            }.get(self._llm_mode, "local")
+            # Config de base minimale
+            default_cfg = ProviderFactory.create_default_config(provider_type)
+            self.llm_provider, validation = await ProviderFactory.create_and_validate_provider(provider_type, **default_cfg)
+            if not validation.valid:
+                print(f"⚠️ Validation provider échouée: {validation.error} ({validation.provider_type}) - fallback mock")
+                self.llm_provider = None
+                self._llm_mode = "mock"
+                return
+            self._llm_ready = True
+            print(f"✅ Provider LLM prêt: {validation.provider_type.value}")
+        except Exception as e:
+            print(f"⚠️ Erreur création provider LLM ({self._llm_mode}): {e} - fallback mock")
+            self.llm_provider = None
+            self._llm_mode = "mock"
     
     @mock_llm_provider
     async def analyze_task(self, user_request: str, prompt: str = "", model: str = "gpt-4", temperature: float = 0.7) -> TaskAnalysis:
@@ -81,6 +127,29 @@ class V10DevAgent:
         context = await self.temporal_integration.get_relevant_context(
             user_request, self.session_id
         )
+
+        # Optionnel: appel LLM réel pour enrichir l'analyse (si disponible)
+        await self._ensure_llm_provider()
+        if self.llm_provider is not None and self._llm_mode != "mock":
+            try:
+                llm_prompt = prompt or f"""
+Tu es un agent développeur. Analyse la requête suivante et propose un type de tâche, une complexité estimée (1-3) et une liste d'outils nécessaires (parmi: read_file, write_file, list_directory, code_analyzer, import_analyzer, execute_command).
+REQUÊTE: {user_request}
+CONTEXTE: {context}
+"""
+                resp = await self.llm_provider.generate_text(llm_prompt, max_tokens=256)
+                # Pour l’instant, on n’exige pas de parsing strict; trace seulement
+                await self.temporal_integration.create_temporal_node(
+                    content="LLM Enrichment (analyze_task)",
+                    metadata={"provider": "real", "excerpt": getattr(resp, 'content', '')[:200]},
+                    session_id=self.session_id
+                )
+            except Exception as e:
+                await self.temporal_integration.create_temporal_node(
+                    content="LLM Enrichment Error (analyze_task)",
+                    metadata={"error": str(e)},
+                    session_id=self.session_id
+                )
         
         # Planification des actions
         plan = await self.planning_engine.create_plan(user_request, context)
@@ -112,6 +181,24 @@ class V10DevAgent:
         """Crée un plan d'exécution détaillé."""
         
         plan = await self.planning_engine.create_execution_plan(task_analysis)
+
+        # Optionnel: appel LLM réel pour ajuster le plan (trace uniquement pour l’instant)
+        await self._ensure_llm_provider()
+        if self.llm_provider is not None and self._llm_mode != "mock":
+            try:
+                llm_prompt = prompt or f"Refine this plan steps for: {task_analysis.task_type}."
+                resp = await self.llm_provider.generate_text(llm_prompt, max_tokens=200)
+                await self.temporal_integration.create_temporal_node(
+                    content="LLM Enrichment (create_execution_plan)",
+                    metadata={"provider": "real", "excerpt": getattr(resp, 'content', '')[:200]},
+                    session_id=self.session_id
+                )
+            except Exception as e:
+                await self.temporal_integration.create_temporal_node(
+                    content="LLM Enrichment Error (create_execution_plan)",
+                    metadata={"error": str(e)},
+                    session_id=self.session_id
+                )
         
         # Enregistrement du plan
         await self.temporal_integration.create_temporal_node(
@@ -266,6 +353,24 @@ class V10DevAgent:
             },
             session_id=self.session_id
         )
+
+        # Optionnel: LLM réel pour produire un résumé textuel riche
+        await self._ensure_llm_provider()
+        if self.llm_provider is not None and self._llm_mode != "mock":
+            try:
+                llm_prompt = prompt or f"Synthétise en 3 phrases clés ces résultats: {synthesis}"
+                resp = await self.llm_provider.generate_text(llm_prompt, max_tokens=180)
+                await self.temporal_integration.create_temporal_node(
+                    content="LLM Enrichment (synthesize_results)",
+                    metadata={"provider": "real", "excerpt": getattr(resp, 'content', '')[:200]},
+                    session_id=self.session_id
+                )
+            except Exception as e:
+                await self.temporal_integration.create_temporal_node(
+                    content="LLM Enrichment Error (synthesize_results)",
+                    metadata={"error": str(e)},
+                    session_id=self.session_id
+                )
         
         return synthesis
     
