@@ -1054,14 +1054,20 @@ class V10SpecializedToolsRegistry:
                     "local_subprocess": "local_subprocess",
                 }.get(mode, "gemini")
                 default_cfg = ProviderFactory.create_default_config(provider_type)
-                llm_provider_instance, validation = __import__('asyncio').get_event_loop().run_until_complete(
-                    ProviderFactory.create_and_validate_provider(provider_type, **default_cfg)
-                )
-                if not validation.valid:
-                    # Si non valide: seulement fallback mock si autorisé explicitement
+                import asyncio as _aio
+                loop = _aio.get_event_loop()
+                if loop.is_running():
+                    # Ne pas bloquer une boucle déjà active (ex: tests async). Le provider sera None.
                     llm_provider_instance = None
-                    if not allow_mock_fallback():
-                        raise RuntimeError(f"Provider LLM invalide: {validation.error}")
+                else:
+                    llm_provider_instance, validation = loop.run_until_complete(
+                        ProviderFactory.create_and_validate_provider(provider_type, **default_cfg)
+                    )
+                    if not validation.valid:
+                        # Si non valide: seulement fallback mock si autorisé explicitement
+                        llm_provider_instance = None
+                        if not allow_mock_fallback():
+                            raise RuntimeError(f"Provider LLM invalide: {validation.error}")
         except Exception as e:
             # En mode strict (pas de fallback), propager l'erreur lors du premier usage de l'outil
             if not allow_mock_fallback():
