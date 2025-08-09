@@ -47,3 +47,14 @@ def is_temporal_engine_enabled() -> bool:
 def is_mcp_enabled() -> bool:
     """Whether MCP integration should be attempted at runtime."""
     return _get_env_bool("MCP_ENABLED", default=False)
+
+def allow_mock_fallback() -> bool:
+    """Whether mock LLM fallback is allowed outside explicit mock mode.
+
+    Controlled by any of these env vars: LLM_FALLBACK_MOCK, SHADEOS_DEBUG_MOCK, DEBUG.
+    Defaults to False for safety (no silent mock usage in production).
+    """
+    for name in ("LLM_FALLBACK_MOCK", "SHADEOS_DEBUG_MOCK", "DEBUG"):
+        if _get_env_bool(name, default=False):
+            return True
+    return False
