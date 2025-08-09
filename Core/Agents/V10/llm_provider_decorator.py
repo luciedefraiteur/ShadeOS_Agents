@@ -69,23 +69,24 @@ class LLMProviderDecorator:
         """Décorateur principal."""
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
-            # Extraction des paramètres LLM
-            llm_request = self._extract_llm_request(func, args, kwargs)
-            
-            # Enregistrement de la requête
-            self.request_history.append(llm_request)
-            
-            # Exécution avec le provider approprié
-            if self.provider_type == LLMProviderType.MOCK:
+            # Résolution du mode depuis les feature flags (mock par défaut)
+            try:
+                from Core.Config.feature_flags import get_llm_mode
+                mode = get_llm_mode()
+            except Exception:
+                mode = "mock"
+
+            # Si en mode mock (par défaut): comportement historique (retourne un texte simulé)
+            if mode == "mock" or self.provider_type == LLMProviderType.MOCK:
+                llm_request = self._extract_llm_request(func, args, kwargs)
+                self.request_history.append(llm_request)
                 response = await self._execute_mock(llm_request)
-            else:
-                response = await self._execute_real_provider(llm_request)
-            
-            # Enregistrement de la réponse
-            self.response_history.append(response)
-            
-            # Retour du résultat
-            return response.content
+                self.response_history.append(response)
+                return response.content
+
+            # Sinon: laisser la fonction métier s'exécuter normalement (pas de mock)
+            # NOTE: l'intégration provider réel sera branchée à même la fonction métier ultérieurement
+            return await func(*args, **kwargs)
         
         return wrapper
     
