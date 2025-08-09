@@ -24,6 +24,8 @@ import sys
 import subprocess
 from pathlib import Path
 from typing import Optional
+import fcntl
+import termios
 import time
 
 DONE_MARK = "__DONE__"
@@ -59,7 +61,7 @@ def _write_to_tty(tty: Optional[Path], text: str) -> None:
         print(text)
 
 
-def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optional[Path], tty: Optional[Path], post_ctrl_c: bool) -> int:
+def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optional[Path], tty: Optional[Path], post_ctrl_c: bool, inject_enter: bool) -> int:
     if echo:
         _write_to_tty(tty, f"$ {cmd}")
     try:
@@ -91,6 +93,15 @@ def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optio
                 tf.flush()
         except Exception:
             pass
+    if inject_enter and tty:
+        try:
+            fd = os.open(str(tty), os.O_WRONLY)
+            try:
+                fcntl.ioctl(fd, termios.TIOCSTI, "\n")
+            finally:
+                os.close(fd)
+        except Exception:
+            pass
     return rc
 
 
@@ -104,6 +115,7 @@ def main() -> int:
     parser.add_argument("--daemon", action="store_true", help="Detach and run in background (keep terminal free)")
     parser.add_argument("--print-ready", action="store_true", help="Print READY when listener is active")
     parser.add_argument("--post-ctrl-c", action="store_true", help="Send Ctrl-C to TTY after each command to restore prompt")
+    parser.add_argument("--inject-enter", action="store_true", help="Try ioctl(TIOCSTI) to push Enter into shell input (if allowed)")
 
     args = parser.parse_args()
 
@@ -161,7 +173,7 @@ def main() -> int:
                     cmd = line.rstrip("\r\n")
                     if not cmd:
                         continue
-                    run_command(cmd, exec_cwd, env, args.echo, log_path, tty_path, args.post_ctrl_c)
+                    run_command(cmd, exec_cwd, env, args.echo, log_path, tty_path, args.post_ctrl_c, args.inject_enter)
                 # Writer closed; loop to reopen
     except KeyboardInterrupt:
         _write_to_tty(tty_path, "[info] Listener stopped (Ctrl-C)")
