@@ -116,6 +116,15 @@ NEO4J_PASSWORD=ShadeOS_Agents_2025
 # Configuration OpenAI (optionnel)
 # OPENAI_API_KEY=your_openai_api_key_here
 
+# Configuration Anthropic / Claude (optionnel)
+# ANTHROPIC_API_KEY=your_anthropic_api_key_here
+# CLAUDE_API_KEY=your_claude_api_key_here
+
+# Autres providers (optionnel)
+# COHERE_API_KEY=your_cohere_api_key_here
+# MISTRAL_API_KEY=your_mistral_api_key_here
+# GROQ_API_KEY=your_groq_api_key_here
+
 # Configuration Gemini (optionnel)
 # GEMINI_API_KEY=your_gemini_primary_key
 # GEMINI_API_KEYS=["primary_key","secondary_key"]
