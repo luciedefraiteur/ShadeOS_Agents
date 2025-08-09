@@ -53,14 +53,28 @@ def resolve_tty_from_pid(pid: int) -> str:
     return target
 
 
-def send_command_to_tty(tty_path: str, text: str, add_newline: bool = True) -> None:
+def send_command_to_tty(tty_path: str, text: str, add_newline: bool = True, pre: str = "", post: str = "", enter_times: int = 1, wake: bool = False) -> None:
     data = text
     if add_newline and not data.endswith("\n"):
         data += "\n"
     # Open the PTY for write only; requires permission.
     try:
         with open(tty_path, "w", buffering=1) as tty:
+            if wake:
+                # Send Ctrl-C to try to get back to prompt
+                tty.write("\x03")
+                tty.flush()
+            if pre:
+                tty.write(pre)
+                if not pre.endswith("\n"):
+                    tty.write("\n")
             tty.write(data)
+            for _ in range(max(0, enter_times-1)):
+                tty.write("\n")
+            if post:
+                if not post.endswith("\n"):
+                    post += "\n"
+                tty.write(post)
             tty.flush()
     except PermissionError as e:
         raise RuntimeError(f"Permission denied writing to {tty_path}: {e}")
@@ -75,18 +89,26 @@ def main() -> int:
     group.add_argument("--cmd", type=str, help="Shell command to send (will append newline)")
     group.add_argument("--recipe", choices=sorted(RECIPES.keys()), help="Use a predefined command recipe")
     parser.add_argument("--dry-run", action="store_true", help="Do not send, just print resolved PTY and command")
+    parser.add_argument("--cwd", type=str, help="If set, prepend 'cd <cwd> &&' before the command")
+    parser.add_argument("--tee-log", type=str, help="If set, append '|& tee -a <log>' to the command")
+    parser.add_argument("--enter-times", type=int, default=1, help="Number of extra newlines to send after the command")
+    parser.add_argument("--wake", action="store_true", help="Send Ctrl-C before the command to return to prompt")
 
     args = parser.parse_args()
 
     tty_path = resolve_tty_from_pid(args.pid)
     cmd = args.cmd or RECIPES[args.recipe]
+    if args.cwd:
+        cmd = f"cd {args.cwd} && {cmd}"
+    if args.tee_log:
+        cmd = f"{cmd} |& tee -a {args.tee_log}"
 
     if args.dry_run:
         print(f"Resolved PTY: {tty_path}")
         print(f"Command: {cmd}")
         return 0
 
-    send_command_to_tty(tty_path, cmd, add_newline=True)
+    send_command_to_tty(tty_path, cmd, add_newline=True, enter_times=args.enter_times, wake=args.wake)
     print(f"[ok] Sent to {tty_path}")
     return 0
 
