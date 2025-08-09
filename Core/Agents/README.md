@@ -1,161 +1,80 @@
-# 🤖 Core/Agents - Système d'Agents IA
+# Core/Agents — Documentation basée sur le code (2025-08-09)
 
-**Date :** 2025-08-07  
-**Auteur :** Alma (via Lucie Defraiteur)  
-**Contexte :** Centralisation des agents IA avec architecture modulaire
+Ce module regroupe les assistants (agents) par version. Les descriptions ci-dessous sont construites à partir du code Python actuel.
 
----
+## V10 — Assistant multi-agents avec mémoire temporelle (en cours)
 
-## 🎯 Vue d'Ensemble
+- Orchestration: `V10Assistant` (fichier `V10/assistant_v10.py`)
+  - Coordonne un cycle complet: enregistrement de la requête → analyse → plan → exécution d’outils → synthèse → réponse + traces temporelles.
+  - Expose `initialize(user_id)`, `handle_request(user_request)`, métriques et cleanup.
+- Raisonnement/planification: `V10DevAgent` (fichier `V10/dev_agent.py`)
+  - Décore ses méthodes avec un mock LLM (voir plus bas) pour fournir des sorties déterministes en attendant un provider réel.
+  - Construit `TaskAnalysis` et `TaskPlan`, exécute le plan via l’agent d’outils et synthétise les résultats.
+- Exécution d’outils: `V10ToolAgent` (fichier `V10/tool_agent.py`)
+  - Exécute des outils locaux d’un registre (`V10ToolRegistry`) ou via MCP s’il est disponible.
+  - Formate les appels et réponses (XML) via `V10XMLFormatter`.
+  - Outils locaux fournis: lecture/écriture de fichiers, listage de répertoire, exécution de commande (voir Sécurité), analyse simple de code/imports.
+- Mémoire temporelle (session + traces): `V10TemporalIntegration` (fichier `V10/temporal_integration.py`)
+  - Fournit des sessions (`TemporalSession`), la création de nœuds/lien temporels et un mode simulation quand `TemporalFractalMemoryEngine` n’est pas importable.
+- Gestion des gros fichiers: `V10FileIntelligenceEngine` (fichier `V10/file_intelligence_engine.py`)
+  - Stratégies adaptatives selon taille/type (full/chunked/streaming/summarized) + résumeur et métadonnées enrichies.
+- Outils spécialisés: `V10/specialized_tools.py`
+  - Outils ligne-par-ligne, résumé de chunks/sections, analyse de structure, indexation, détection de scopes.
+  - Note: l’outil "read_chunks_until_scope" embarque un `MockLLMProvider` pour le développement. Conserver un nom explicite (« Mock ») et un emplacement dédié aux mocks lors d’une refactorisation.
+- Formatage XML: `V10XMLFormatter` (fichier `V10/xml_formatter.py`)
+  - Règles d’optimisation de la verbosité (minimal/standard/detailed/compact) pour les échanges outillés.
+- Décorateur LLM (mock): `V10/llm_provider_decorator.py`
+  - `@mock_llm_provider` encapsule les méthodes pour retourner des textes simulés (tests/démo). Prévu pour être remplacé par un vrai provider (OpenAI/Ollama via `Core/Providers/LLMProviders`).
 
-Le dossier `Core/Agents` centralise tous les agents IA du système ShadeOS_Agents, organisés par versions pour une meilleure maintenabilité et évolutivité.
+### Exemple d’usage (V10)
 
----
-
-## 📁 Structure
-
-### **🤖 Agents Disponibles :**
-
-#### **V10/ - Assistant V10 (En Développement)**
-- **Architecture** : Multi-agents avec mémoire temporelle fractale
-- **Composants** : Dev Agent + Tool Agent
-- **Innovations** : Format XML optimisé, intégration MCP avancée
-- **Status** : En développement
-
-#### **V9/ - Assistant V9 (Stable)**
-- **Architecture** : Agent généraliste avec TemporalFractalMemoryEngine
-- **Composants** : Auto-feeding thread, tool registry optimisé
-- **Features** : Import analysis, cache intelligent
-- **Status** : Stable, en production
-
-#### **V8/ - Assistant V8 (Legacy)**
-- **Architecture** : Agent spécialiste avec MemoryEngine
-- **Composants** : Archiviste daemon, introspection
-- **Features** : Mémoire fractale, auto-réflexion
-- **Status** : Legacy, maintenance
-
----
-
-## 🔧 Architecture
-
-### **✅ Principe de Versioning :**
-- **Isolation** : Chaque version est indépendante
-- **Rétrocompatibilité** : Migration progressive possible
-- **Évolutivité** : Ajout facile de nouvelles versions
-- **Tests** : Tests isolés par version
-
-### **✅ Imports Standardisés :**
 ```python
-# Import d'un agent spécifique
-from Core.Agents.V10 import V10Assistant
-from Core.Agents.V9 import V9Assistant
-from Core.Agents.V8 import V8Assistant
+import asyncio
+from Core.Agents.V10.assistant_v10 import create_v10_assistant, handle_v10_request
 
-# Import du registre d'agents
-from Core.Agents import AgentRegistry
+async def run():
+    assistant = await create_v10_assistant("user_123")
+    resp = await handle_v10_request(assistant, "Analyse le fichier main.py et liste les imports")
+    print(resp.success, resp.message, resp.execution_time)
+    await assistant.cleanup_session()
+
+asyncio.run(run())
 ```
 
----
+### Sécurité et bonnes pratiques (V10)
+- L’outil `execute_command` de `V10ToolAgent` utilise `subprocess` avec `shell=True`. Préférer, quand possible, les outils `Core/ProcessManager` pour limiter les risques, valider les commandes et centraliser la politique de temps d’exécution.
+- Conserver les mocks LLM avec un nom explicite (ex. `MockLLMProvider`) et les isoler dans un sous-dossier `mocks/` pour éviter toute ambiguïté en production.
+- Certaines classes attendues par les tests historiques ne correspondent pas exactement aux noms actuels (ex. `V10ToolResult` vs `ToolResult`). Harmoniser tests ou exposer alias selon la stratégie retenue.
 
-## 🚀 Utilisation
+### Extension (V10)
+- Ajouter un outil local:
+  1) Créer une sous-classe de `V10BaseTool` avec `async def execute(self, parameters)`.
+  2) L’enregistrer dans `V10ToolRegistry._register_default_tools()`.
+- Brancher un provider LLM réel:
+  - Remplacer `@mock_llm_provider` par un décorateur qui appelle `Core/Providers/LLMProviders`.
+- Activer MCP:
+  - Vérifier `Core/Providers/MCP/mcp_manager.py` et la disponibilité des serveurs MCP; `V10ToolAgent` basculera en MCP s’il détecte l’outil.
 
-### **1. Création d'un Agent :**
+## V9 — Auto-Feeding Thread (stable)
+
+- Fichier: `V9/V9_AutoFeedingThreadAgent.py`
+- Agent `AutoFeedingThreadAgent`: boucle itérative guidée par un LLM (via `ProviderFactory`) avec un protocole d’actions textuel (LAYER/TOOL/INTROSPECT/CONTINUE/DONE).
+- Intégration `TemporalFractalMemoryEngine` (workspace/git layers), registre d’outils d’édition, logs JSONL détaillés.
+
+### Exemple rapide (V9)
+
 ```python
-from Core.Agents.V10 import V10Assistant
-
-# Initialisation avec mémoire temporelle
-temporal_engine = TemporalFractalMemoryEngine()
-agent = V10Assistant(temporal_engine=temporal_engine)
-
-# Exécution d'une tâche
-result = await agent.execute_task("Analyser le code du projet")
+# Voir la fonction test_auto_feeding_thread_agent() dans V9_AutoFeedingThreadAgent.py
 ```
 
-### **2. Migration entre Versions :**
-```python
-# Migration V8 -> V9
-from Core.Agents.V8 import V8Assistant
-from Core.Agents.V9 import V9Assistant
+## V8 — Legacy
 
-v8_agent = V8Assistant()
-v9_agent = V9Assistant.from_v8_migration(v8_agent)
-```
-
-### **3. Tests d'Agents :**
-```python
-# Tests isolés par version
-from Core.Agents.V10.tests import test_v10_agent
-from Core.Agents.V9.tests import test_v9_agent
-```
+- Fichier: `V8/V7_safe.py` — Assistant local V7 (logger + assistant) conservé pour compat.
 
 ---
 
-## 📊 Métriques
-
-### **✅ Performance par Version :**
-- **V10** : 40-50% réduction tokens, < 2s latence
-- **V9** : 30-40% réduction tokens, < 3s latence
-- **V8** : Baseline, < 5s latence
-
-### **✅ Stabilité par Version :**
-- **V10** : En développement, tests intensifs
-- **V9** : Stable, production ready
-- **V8** : Legacy, maintenance minimale
-
----
-
-## 🔄 Migration
-
-### **✅ Stratégie de Migration :**
-1. **Développement** : Nouvelle version dans son dossier
-2. **Tests** : Tests complets et validation
-3. **Migration** : Outils de migration automatique
-4. **Déploiement** : Rollout progressif
-5. **Maintenance** : Support des anciennes versions
-
-### **✅ Outils de Migration :**
-```python
-# Migration automatique
-from Core.Agents.migration import AgentMigrator
-
-migrator = AgentMigrator()
-migrator.migrate_v8_to_v9(source_agent, target_agent)
-```
-
----
-
-## 📝 Développement
-
-### **✅ Ajout d'une Nouvelle Version :**
-1. **Créer le dossier** : `Core/Agents/V11/`
-2. **Implémenter l'agent** : `V11Assistant`
-3. **Ajouter les tests** : `tests/test_v11_agent.py`
-4. **Documenter** : `README.md` spécifique
-5. **Intégrer** : Dans le registre d'agents
-
-### **✅ Standards de Code :**
-- **Type hints** : Obligatoires
-- **Docstrings** : Documentation complète
-- **Tests** : Couverture > 80%
-- **Logging** : Structured logging
-- **Error handling** : Gestion robuste d'erreurs
-
----
-
-## 🔗 Liens
-
-### **📋 Documentation :**
-- [Architecture V10](../ConsciousnessEngine/Analytics/design_insights/V10/)
-- [Migration Guide](./migration/README.md)
-- [Testing Guide](./tests/README.md)
-
-### **📋 Code :**
-- [V10 Implementation](./V10/)
-- [V9 Implementation](./V9/)
-- [V8 Implementation](./V8/)
-
----
-
-**Rapport généré automatiquement par Alma**  
-**Date :** 2025-08-07  
-**Statut :** Documentation complète du système d'agents
+## Intégration transversale
+- Mémoire temporelle: V10 via intégration simulée; V9 direct.
+- Outils d’édition: préférer `Core/EditingSession/Tools`.
+- Exécution shell/processus: `Core/ProcessManager`.
+- Providers LLM: via `Core/Providers/LLMProviders` (OpenAI/local). Conserver des mocks explicites.
