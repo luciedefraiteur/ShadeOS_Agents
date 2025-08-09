@@ -53,10 +53,11 @@ def resolve_tty_from_pid(pid: int) -> str:
     return target
 
 
-def send_command_to_tty(tty_path: str, text: str, add_newline: bool = True, pre: str = "", post: str = "", enter_times: int = 1, wake: bool = False) -> None:
+def send_command_to_tty(tty_path: str, text: str, add_newline: bool = True, pre: str = "", post: str = "", enter_times: int = 1, wake: bool = False, enter_char: str = "\n") -> None:
     data = text
-    if add_newline and not data.endswith("\n"):
-        data += "\n"
+    if add_newline and not data.endswith("\n") and not data.endswith("\r"):
+        # We will handle final enter explicitly below
+        pass
     # Open the PTY for write only; requires permission.
     try:
         with open(tty_path, "w", buffering=1) as tty:
@@ -66,14 +67,15 @@ def send_command_to_tty(tty_path: str, text: str, add_newline: bool = True, pre:
                 tty.flush()
             if pre:
                 tty.write(pre)
-                if not pre.endswith("\n"):
-                    tty.write("\n")
+                if not (pre.endswith("\n") or pre.endswith("\r")):
+                    tty.write(enter_char)
             tty.write(data)
-            for _ in range(max(0, enter_times-1)):
-                tty.write("\n")
+            # Send enter(s)
+            for _ in range(max(1 if add_newline else 0, enter_times)):
+                tty.write(enter_char)
             if post:
-                if not post.endswith("\n"):
-                    post += "\n"
+                if not (post.endswith("\n") or post.endswith("\r")):
+                    post += enter_char
                 tty.write(post)
             tty.flush()
     except PermissionError as e:
@@ -94,6 +96,7 @@ def main() -> int:
     parser.add_argument("--enter-times", type=int, default=1, help="Number of extra newlines to send after the command")
     parser.add_argument("--wake", action="store_true", help="Send Ctrl-C before the command to return to prompt")
     parser.add_argument("--timeout-sec", type=int, help="If set, wrap the command with 'timeout <sec>s' to prevent hangs")
+    parser.add_argument("--enter-cr", action="store_true", help="Use Carriage Return (\r) as enter key instead of newline")
 
     args = parser.parse_args()
 
@@ -113,7 +116,8 @@ def main() -> int:
         print(f"Command: {cmd}")
         return 0
 
-    send_command_to_tty(tty_path, cmd, add_newline=True, enter_times=args.enter_times, wake=args.wake)
+    enter_char = "\r" if args.enter_cr else "\n"
+    send_command_to_tty(tty_path, cmd, add_newline=True, enter_times=args.enter_times, wake=args.wake, enter_char=enter_char)
     print(f"[ok] Sent to {tty_path}")
     return 0
 
