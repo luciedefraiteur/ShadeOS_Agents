@@ -59,7 +59,7 @@ def _write_to_tty(tty: Optional[Path], text: str) -> None:
         print(text)
 
 
-def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optional[Path], tty: Optional[Path]) -> int:
+def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optional[Path], tty: Optional[Path], post_ctrl_c: bool) -> int:
     if echo:
         _write_to_tty(tty, f"$ {cmd}")
     try:
@@ -84,6 +84,13 @@ def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optio
         except Exception:
             pass
     _write_to_tty(tty, f"{DONE_MARK} rc={rc}")
+    if post_ctrl_c and tty:
+        try:
+            with tty.open("a", buffering=1) as tf:
+                tf.write("\x03\n")
+                tf.flush()
+        except Exception:
+            pass
     return rc
 
 
@@ -96,6 +103,7 @@ def main() -> int:
     parser.add_argument("--tty", help="Target TTY path to mirror outputs (preserves terminal scroll)")
     parser.add_argument("--daemon", action="store_true", help="Detach and run in background (keep terminal free)")
     parser.add_argument("--print-ready", action="store_true", help="Print READY when listener is active")
+    parser.add_argument("--post-ctrl-c", action="store_true", help="Send Ctrl-C to TTY after each command to restore prompt")
 
     args = parser.parse_args()
 
@@ -153,7 +161,7 @@ def main() -> int:
                     cmd = line.rstrip("\r\n")
                     if not cmd:
                         continue
-                    run_command(cmd, exec_cwd, env, args.echo, log_path, tty_path)
+                    run_command(cmd, exec_cwd, env, args.echo, log_path, tty_path, args.post_ctrl_c)
                 # Writer closed; loop to reopen
     except KeyboardInterrupt:
         _write_to_tty(tty_path, "[info] Listener stopped (Ctrl-C)")
