@@ -14,8 +14,26 @@ import re
 
 # Import des composants V10
 from Core.Agents.V10.file_intelligence_engine import V10ContentSummarizer
-from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
-from Core.Providers.LLMProviders.llm_provider import LLMProvider, ProviderType
+# Imports optionnels avec fallback pour éviter durs
+try:
+    from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
+    _HAS_TFME = True
+except Exception:
+    _HAS_TFME = False
+    class TemporalEngine:  # type: ignore
+        async def create_temporal_node(self, *args, **kwargs):
+            class _N: node_id = "sim_scope_node"
+            return _N()
+
+try:
+    from Core.Providers.LLMProviders.llm_provider import LLMProvider, ProviderType
+except Exception:
+    class LLMProvider:  # type: ignore
+        async def generate_text(self, prompt: str, **kwargs):
+            class _R: content = f"MOCK_ONLY: {prompt[:60]}..."
+            return _R()
+    class ProviderType:  # type: ignore
+        LOCAL = "local"
 
 
 @dataclass
@@ -715,68 +733,40 @@ class V10SummarizeSectionTool:
 class V10ReadChunksUntilScopeTool:
     """Outil spécialisé pour lire des chunks jusqu'au prochain scope complet."""
     
-    def __init__(self, temporal_engine: TemporalEngine):
+    def __init__(self, temporal_engine: TemporalEngine, llm_provider: Optional[LLMProvider] = None):
         self.temporal_engine = temporal_engine
         self.scope_detector = V10ScopeDetector()
-        # Mock LLM provider pour le développement
-        self.llm_provider = MockLLMProvider()
+        # LLM provider optionnel (utilise un mock local si absent)
+        self.llm_provider = llm_provider or _MockLLMProvider()
 
-
-class MockLLMProvider:
-    """Mock LLM Provider pour le développement V10."""
-    
-    def __init__(self):
-        self.provider_type = ProviderType.LOCAL
-        self.config = {}
-    
-    async def generate_response(self, prompt: str, **kwargs) -> str:
-        """Mock de génération de réponse."""
-        return f"Mock response for: {prompt[:100]}..."
-    
-    async def test_connection(self):
-        """Mock de test de connexion."""
-        return {"valid": True, "provider_type": "mock"}
-    
-    async def execute(self, params: Dict) -> ToolResult:
-        """Exécute la lecture de chunks jusqu'au prochain scope."""
-        
+    async def execute(self, params: Dict[str, Any]) -> ToolResult:
+        """Lit des chunks jusqu'à un scope complet, optionnellement analyse le scope via LLM, et crée un nœud temporel."""
+        start_time = time.time()
         try:
             file_path = params.get('file_path')
             start_line = params.get('start_line', 1)
             max_chunks = params.get('max_chunks', 10)
             scope_type = params.get('scope_type', 'auto')  # auto, function, class, block
             include_analysis = params.get('include_analysis', True)
-            
+
             if not file_path:
-                return ToolResult(
-                    success=False,
-                    error="file_path est requis"
-                )
-            
-            # 1. Lecture du fichier
+                return ToolResult(success=False, tool_name='read_chunks_until_scope', error='file_path est requis')
+
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
-            
-            # 2. Détection du scope
-            scope_result = await self._detect_scope_boundaries(
-                lines, start_line, scope_type, max_chunks
-            )
-            
-            # 3. Extraction du contenu du scope
+
+            scope_result = await self._detect_scope_boundaries(lines, start_line, scope_type, max_chunks)
             scope_content = self._extract_scope_content(lines, scope_result)
-            
-            # 4. Analyse LLM si demandée
+
             analysis = None
             if include_analysis:
                 analysis = await self._analyze_scope_with_llm(scope_content, scope_type)
-            
-            # 5. Création du résultat fractal
-            fractal_result = await self._create_fractal_scope_result(
-                file_path, scope_content, scope_result, analysis
-            )
-            
+
+            fractal_result = await self._create_fractal_scope_result(file_path, scope_content, scope_result, analysis)
+
             return ToolResult(
                 success=True,
+                tool_name='read_chunks_until_scope',
                 data={
                     'file_path': file_path,
                     'scope_content': scope_content,
@@ -785,19 +775,15 @@ class MockLLMProvider:
                     'fractal_result': fractal_result,
                     'scope_type': scope_type,
                     'lines_read': scope_result['end_line'] - scope_result['start_line'] + 1
-                }
+                },
+                execution_time=time.time() - start_time
             )
-            
         except Exception as e:
-            return ToolResult(
-                success=False,
-                error=f"Erreur lors de la lecture des chunks: {str(e)}"
-            )
-    
+            return ToolResult(success=False, tool_name='read_chunks_until_scope', error=str(e), execution_time=time.time() - start_time)
+
     async def _detect_scope_boundaries(self, lines: List[str], start_line: int, 
                                      scope_type: str, max_chunks: int) -> Dict[str, Any]:
         """Détecte les limites du scope."""
-        
         current_line = start_line
         scope_start = start_line
         scope_end = start_line
@@ -805,29 +791,24 @@ class MockLLMProvider:
         bracket_count = 0
         brace_count = 0
         paren_count = 0
-        
-        # Détection du type de scope
+
         scope_patterns = self.scope_detector.get_scope_patterns(scope_type)
-        
+
         for i in range(start_line - 1, min(len(lines), start_line + max_chunks * 50)):
             line = lines[i]
             line_num = i + 1
-            
-            # Analyse des indentations et brackets
+
             indent_level = self._calculate_indent_level(line)
             bracket_count += line.count('[') - line.count(']')
             brace_count += line.count('{') - line.count('}')
             paren_count += line.count('(') - line.count(')')
-            
-            # Détection de fin de scope
-            if self._is_scope_end(line, scope_patterns, indent_level, 
-                                 bracket_count, brace_count, paren_count):
+
+            if self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count):
                 scope_end = line_num
                 break
-            
-            # Mise à jour de la fin du scope
+
             scope_end = line_num
-        
+
         return {
             'start_line': scope_start,
             'end_line': scope_end,
@@ -837,43 +818,34 @@ class MockLLMProvider:
             'paren_count': paren_count,
             'scope_type': scope_type
         }
-    
+
     def _calculate_indent_level(self, line: str) -> int:
         """Calcule le niveau d'indentation."""
         stripped = line.lstrip()
         if not stripped:
             return 0
         return len(line) - len(stripped)
-    
+
     def _is_scope_end(self, line: str, scope_patterns: Dict, indent_level: int,
                       bracket_count: int, brace_count: int, paren_count: int) -> bool:
         """Détermine si c'est la fin d'un scope."""
-        
-        # Vérifications de base
         if bracket_count == 0 and brace_count == 0 and paren_count == 0:
-            # Scope équilibré
             if indent_level == 0 and line.strip():
                 return True
-        
-        # Patterns spécifiques
         for pattern in scope_patterns.get('end_patterns', []):
             if re.search(pattern, line):
                 return True
-        
         return False
-    
+
     def _extract_scope_content(self, lines: List[str], scope_result: Dict) -> str:
         """Extrait le contenu du scope."""
-        
         start = scope_result['start_line'] - 1
         end = scope_result['end_line']
-        
         scope_lines = lines[start:end]
         return ''.join(scope_lines)
-    
+
     async def _analyze_scope_with_llm(self, scope_content: str, scope_type: str) -> Dict[str, Any]:
         """Analyse le scope avec LLM."""
-        
         prompt = f"""
         Analyse ce bloc de code et fournis :
         1. Type de scope détecté
@@ -886,21 +858,27 @@ class MockLLMProvider:
         Contenu:
         {scope_content}
         """
-        
+
         try:
-            response = await self.llm_provider.analyze_with_llm(prompt)
-            return self._parse_llm_analysis(response)
+            # Supporte generate_response OU generate_text
+            call_resp = None
+            if hasattr(self.llm_provider, 'generate_response'):
+                call_resp = await getattr(self.llm_provider, 'generate_response')(prompt)
+            elif hasattr(self.llm_provider, 'generate_text'):
+                call_resp = await getattr(self.llm_provider, 'generate_text')(prompt, max_tokens=200)
+            else:
+                call_resp = ""
+            text = getattr(call_resp, 'content', call_resp)
+            return self._parse_llm_analysis(str(text))
         except Exception as e:
             return {
                 'error': f"Erreur d'analyse LLM: {str(e)}",
                 'scope_type': scope_type,
                 'content_length': len(scope_content)
             }
-    
+
     def _parse_llm_analysis(self, llm_response: str) -> Dict[str, Any]:
         """Parse la réponse LLM."""
-        
-        # Extraction des informations clés
         analysis = {
             'scope_type': 'unknown',
             'functionality': 'unknown',
@@ -909,26 +887,20 @@ class MockLLMProvider:
             'complexity': 'unknown',
             'suggestions': []
         }
-        
-        # Patterns pour extraire les informations
         patterns = {
             'scope_type': r'Type de scope[:\s]+([^\n]+)',
             'functionality': r'Fonctionnalité[:\s]+([^\n]+)',
             'complexity': r'Complexité[:\s]+([^\n]+)'
         }
-        
         for key, pattern in patterns.items():
             match = re.search(pattern, llm_response, re.IGNORECASE)
             if match:
                 analysis[key] = match.group(1).strip()
-        
         return analysis
-    
+
     async def _create_fractal_scope_result(self, file_path: str, scope_content: str,
                                          scope_result: Dict, analysis: Dict) -> Dict[str, Any]:
         """Crée un résultat fractal pour le scope."""
-        
-        # Création d'un nœud temporal pour le scope
         scope_node = await self.temporal_engine.create_temporal_node(
             node_type="scope",
             content=scope_content,
@@ -942,7 +914,6 @@ class MockLLMProvider:
                 'lines_count': scope_result['end_line'] - scope_result['start_line'] + 1
             }
         )
-        
         return {
             'node_id': scope_node.node_id,
             'scope_type': scope_result['scope_type'],
@@ -953,6 +924,20 @@ class MockLLMProvider:
             'analysis': analysis,
             'content_preview': scope_content[:200] + "..." if len(scope_content) > 200 else scope_content
         }
+
+
+class _MockLLMProvider:
+    """MOCK ONLY – remplaçable par un provider réel via DI."""
+    def __init__(self):
+        self.provider_type = getattr(ProviderType, 'LOCAL', 'local')
+    async def generate_response(self, prompt: str, **kwargs) -> str:
+        return f"MOCK: {prompt[:120]}..."
+    async def generate_text(self, prompt: str, **kwargs):
+        class _R: content = f"MOCK: {prompt[:120]}..."
+        return _R()
+    async def test_connection(self):
+        return {"valid": True, "provider_type": "mock"}
+    
 
 class V10ScopeDetector:
     """Détecteur de scopes pour différents langages."""
