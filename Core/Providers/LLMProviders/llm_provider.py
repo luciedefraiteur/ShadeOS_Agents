@@ -18,6 +18,8 @@ class ProviderType(Enum):
     """Types de providers LLM supportés"""
     OPENAI = "openai"
     LOCAL = "local"
+    GEMINI = "gemini"
+    ANTHROPIC = "anthropic"
 
 
 class ErrorType(Enum):
