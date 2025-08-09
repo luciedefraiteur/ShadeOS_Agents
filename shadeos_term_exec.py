@@ -22,7 +22,8 @@ from __future__ import annotations
 import os
 import sys
 import argparse
-from typing import Optional
+from typing import Optional, List, Tuple
+import subprocess
 
 RECIPES = {
     "e2e": "LLM_MODE=mock pytest -q Core/Agents/V10/tests/test_read_chunks_until_scope_e2e.py",
@@ -97,10 +98,15 @@ def main() -> int:
     parser.add_argument("--wake", action="store_true", help="Send Ctrl-C before the command to return to prompt")
     parser.add_argument("--timeout-sec", type=int, help="If set, wrap the command with 'timeout <sec>s' to prevent hangs")
     parser.add_argument("--enter-cr", action="store_true", help="Use Carriage Return (\r) as enter key instead of newline")
+    # tmux integration
+    parser.add_argument("--tmux-pane", type=str, help="Send command to a tmux pane id (e.g., 'my:0.1')")
+    parser.add_argument("--tmux-pid", type=int, help="Resolve tmux pane by PID (matches pane_pid)")
+    parser.add_argument("--tmux-capture", type=int, metavar="LINES", help="Capture last N lines after sending (tmux capture-pane)")
+    # FIFO listener integration
+    parser.add_argument("--fifo", type=str, help="If set, write the command to this FIFO (listener must be running)")
 
     args = parser.parse_args()
 
-    tty_path = resolve_tty_from_pid(args.pid)
     cmd = args.cmd or RECIPES[args.recipe]
     if args.cwd:
         cmd = f"cd {args.cwd} && {cmd}"
@@ -111,15 +117,90 @@ def main() -> int:
     if args.timeout_sec and args.timeout_sec > 0:
         cmd = f"timeout {args.timeout_sec}s {cmd}"
 
+    # If FIFO is requested and exists, use it (most reliable)
+    if args.fifo:
+        fifo_path = args.fifo
+        if not os.path.exists(fifo_path):
+            print(f"[error] FIFO not found: {fifo_path}")
+            return 2
+        if args.dry_run:
+            print(f"FIFO: {fifo_path}")
+            print(f"Command: {cmd}")
+            return 0
+        try:
+            # Open FIFO for write (will block until listener opens for read)
+            with open(fifo_path, 'w', buffering=1) as f:
+                f.write(cmd)
+                if not cmd.endswith("\n"):
+                    f.write("\n")
+                f.flush()
+            print(f"[ok] Sent to FIFO {fifo_path}")
+            return 0
+        except Exception as e:
+            print(f"[warn] FIFO write failed ({e}); trying other backends")
+
+    # If tmux is requested, send via tmux backend
+    if args.tmux_pane or args.tmux_pid:
+        try:
+            pane = args.tmux_pane or tmux_find_pane_by_pid(args.tmux_pid)
+            if args.dry_run:
+                print(f"tmux target pane: {pane}")
+                print(f"Command: {cmd}")
+                return 0
+            tmux_send_keys(pane, cmd)
+            print(f"[ok] Sent to tmux pane {pane}")
+            if args.tmux_capture and args.tmux_capture > 0:
+                out = tmux_capture(pane, args.tmux_capture)
+                if out:
+                    print(out)
+            return 0
+        except Exception as e:
+            print(f"[warn] tmux send failed ({e}); falling back to PTY if available")
+
+    # Fallback to PTY injection
+    tty_path = resolve_tty_from_pid(args.pid)
     if args.dry_run:
         print(f"Resolved PTY: {tty_path}")
         print(f"Command: {cmd}")
         return 0
-
     enter_char = "\r" if args.enter_cr else "\n"
     send_command_to_tty(tty_path, cmd, add_newline=True, enter_times=args.enter_times, wake=args.wake, enter_char=enter_char)
     print(f"[ok] Sent to {tty_path}")
     return 0
+
+
+def tmux_find_pane_by_pid(pid: int) -> str:
+    """Return tmux pane id for a given pane_pid, raises if not found."""
+    if not pid:
+        raise RuntimeError("tmux PID is required")
+    fmt = '#{session_name}:#{window_index}.#{pane_index} #{pane_pid}'
+    try:
+        out = subprocess.check_output(["tmux", "list-panes", "-a", "-F", fmt], text=True)
+    except Exception as e:
+        raise RuntimeError(f"tmux not available or list-panes failed: {e}")
+    for line in out.splitlines():
+        parts = line.strip().split()
+        if len(parts) != 2:
+            continue
+        pane_id, pane_pid = parts
+        try:
+            if int(pane_pid) == int(pid):
+                return pane_id
+        except ValueError:
+            continue
+    raise RuntimeError(f"No tmux pane found for PID {pid}")
+
+
+def tmux_send_keys(pane: str, command: str) -> None:
+    """Send command + Enter to tmux pane."""
+    subprocess.check_call(["tmux", "send-keys", "-t", pane, command, "Enter"]) 
+
+
+def tmux_capture(pane: str, lines: int) -> str:
+    """Capture last N lines from tmux pane."""
+    start = f"-{int(lines)}"
+    out = subprocess.check_output(["tmux", "capture-pane", "-t", pane, "-p", "-S", start], text=True)
+    return out
 
 
 if __name__ == "__main__":
