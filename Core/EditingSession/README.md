@@ -1,294 +1,62 @@
-# ✏️ Core/EditingSession - Système d'Édition Avancé
+# Core/EditingSession — Documentation basée sur le code (2025-08-09)
 
-**Date :** 2025-08-07  
-**Auteur :** Alma (via Lucie Defraiteur)  
-**Contexte :** Système de gestion des sessions d'édition avec partitionnement intelligent
+Système d’édition sécurisé avec registre d’outils et utilitaires d’analyse/recherche.
 
----
+## Quand utiliser EditingSession
+- Lire/écrire des fichiers avec garde-fous (backups, validations)
+- Chercher/diagnostiquer du code (stats, diff, regex, analyse simple)
+- Automatiser des transformations de projet (rename, replace project-wide)
+- Orchestrer des outils via un registre commun (standard/optimisé)
 
-## 🎯 Vue d'Ensemble
+## Composants
 
-Le module `Core/EditingSession` est le cœur du système d'édition de ShadeOS_Agents, intégrant un partitionnement intelligent et une localisation précise des modifications. Il combine des outils d'édition sécurisés avec un système de partitionnement AST avancé.
+### Registres et invocation
+- `ToolRegistry`: charge les fonctions d’outils, gère la résolution par id, propose une interface simple (`invoke_tool`) et des utilitaires.
+- `OptimizedToolRegistry`: ajoute cache d’analyse d’imports, gestion des dépendances brisées (via `Core/Partitioner`) et triggers d’analyse.
+- `ToolInvoker`: couche d’exécution avec historique, formatage des retours, et possibilité de formater les réponses pour un SDK externe.
+- `ToolSearchEngine`: recherche des outils par mots-clés/métadonnées.
 
----
+### Outils sécurisés (écriture)
+- `safe_write_file_content`, `safe_overwrite_file`, `safe_insert_text_at_line`, `safe_delete_lines`, `safe_append_to_file`, `safe_create_file`, `safe_create_directory`, `safe_delete_directory`.
+- Principes: validations d’entrée, backups optionnels, opérations ciblées (ligne ou texte), messages d’erreur explicites.
 
-## 🏗️ Architecture
+### Lecture/recherche/diagnostic
+- Lecture: `safe_read_file_content`, `read_file_content`, `read_file_content_naked`, `read_file_lines`, `read_file_chars`.
+- Recherche: `regex_search_file`, `find_text_in_project`, `scry_for_text`, `locate_text_sigils`.
+- Analyse: `code_analyzer` (statistiques simples), `file_stats`, `file_diff` (diff contextuel et formatage), `md_hierarchy_basic` (organisation Markdown).
 
-### **✅ Composants Principaux :**
+### Templating
+- `TemplateEngine` + helpers `generate_from_template`, `create_template_from_file` — pour générer des fichiers boilerplate.
 
-#### **1. Partitionnement Intelligent**
+## Bonnes pratiques
+- Toujours préférer les variantes `safe_*` pour éviter les corruptions de fichiers.
+- Pour des opérations shell/processus, déléguer à `Core/ProcessManager` plutôt que d’appeler `subprocess` directement.
+- En projets volumineux: utiliser `OptimizedToolRegistry` pour bénéficier du cache d’analyse d’imports et de la résilience.
+
+## Exemples
+
+### Écriture sécurisée
 ```python
-from Core.EditingSession import (
-    # Schémas de données
-    PartitionLocation,
-    PartitionBlock,
-    PartitionResult,
-    PartitionMethod,
-    BlockType,
-    
-    # Partitionneurs AST
-    PythonASTPartitioner,
-    TreeSitterPartitioner,
-    
-    # Stratégies de Fallback
-    RegexPartitioner,
-    TextualPartitioner,
-    EmergencyPartitioner
-)
+from Core.EditingSession.Tools.safe_write_file_content import safe_write_file_content
+ok = safe_write_file_content("src/new.py", "print('hello')")
 ```
 
-#### **2. Outils d'Édition Sécurisés**
+### Recherche regex avec contexte
 ```python
-from Core.EditingSession.Tools import (
-    # Outils de lecture/écriture sécurisés
-    safe_read_file_content,
-    safe_write_file_content,
-    safe_replace_text_in_file,
-    safe_create_file,
-    
-    # Outils d'analyse
-    code_analyzer,
-    file_stats,
-    file_diff,
-    
-    # Outils de recherche
-    find_text_in_project,
-    regex_search_file,
-    scry_for_text
-)
+from Core.EditingSession.Tools.regex_search_file import regex_search_file
+results = regex_search_file("src/main.py", r"def\s+\w+", context_before=2, context_after=2)
 ```
 
-#### **3. Registre d'Outils Optimisé**
+### Invocation via registre
 ```python
-from Core.EditingSession.Tools import (
-    OptimizedToolRegistry,
-    ToolRegistry,
-    ToolInvoker,
-    ToolSearch
-)
+from Core.EditingSession.Tools.tool_registry import initialize_tool_registry
+from TemporalFractalMemoryEngine.core.temporal_engine import TemporalEngine
+
+registry = initialize_tool_registry(TemporalEngine())
+result = registry.invoke_tool("safe_create_file", path="docs/README.md")
 ```
 
----
-
-## 📁 Structure
-
-### **✅ Core/EditingSession/**
-```
-Core/EditingSession/
-├── __init__.py              # Interface principale
-├── Tools/                   # Arsenal d'outils
-│   ├── __init__.py         # Export des outils
-│   ├── optimized_tool_registry.py  # Registre optimisé
-│   ├── tool_registry.py    # Registre standard
-│   ├── tool_invoker.py     # Invocation d'outils
-│   ├── tool_search.py      # Recherche d'outils
-│   ├── code_analyzer.py    # Analyse de code
-│   ├── file_stats.py       # Statistiques de fichiers
-│   ├── file_diff.py        # Différences de fichiers
-│   ├── safe_*.py           # Outils sécurisés
-│   └── *.luciform          # Templates Luciform
-└── README.md               # Documentation
-```
-
----
-
-## 🔧 Fonctionnalités
-
-### **✅ Partitionnement Intelligent :**
-
-#### **1. Partitionneurs AST**
-- **PythonASTPartitioner** : Analyse syntaxique Python native
-- **TreeSitterPartitioner** : Analyse multi-langage avancée
-- **BaseASTPartitioner** : Interface commune pour tous les partitionneurs
-
-#### **2. Stratégies de Fallback**
-- **RegexPartitioner** : Partitionnement par expressions régulières
-- **TextualPartitioner** : Partitionnement textuel simple
-- **EmergencyPartitioner** : Partitionnement d'urgence
-
-#### **3. Tracking de Localisation**
-- **LocationTracker** : Suivi précis des modifications
-- **PartitionLocation** : Localisation dans les fichiers
-- **PartitionBlock** : Blocs de code partitionnés
-
-### **✅ Outils d'Édition Sécurisés :**
-
-#### **1. Outils de Lecture/Écriture**
-```python
-# Lecture sécurisée
-content = safe_read_file_content(file_path)
-
-# Écriture sécurisée
-safe_write_file_content(file_path, content)
-
-# Remplacement sécurisé
-safe_replace_text_in_file(file_path, old_text, new_text)
-```
-
-#### **2. Outils d'Analyse**
-```python
-# Analyse de code
-analysis = code_analyzer(file_path, depth=2)
-
-# Statistiques de fichiers
-stats = file_stats(directory_path)
-
-# Différences de fichiers
-diff = file_diff(file1_path, file2_path)
-```
-
-#### **3. Outils de Recherche**
-```python
-# Recherche dans le projet
-results = find_text_in_project(search_term, root_path)
-
-# Recherche regex
-matches = regex_search_file(pattern, file_path)
-
-# Recherche mystique
-sigils = scry_for_text(mystical_pattern, directory)
-```
-
----
-
-## 🚀 Utilisation
-
-### **1. Partitionnement de Fichiers :**
-```python
-from Core.EditingSession import partition_file, detect_language
-
-# Détection automatique du langage
-language = detect_language(file_path)
-
-# Partitionnement intelligent
-result = partition_file(file_path, language=language)
-
-# Accès aux blocs partitionnés
-for block in result.blocks:
-    print(f"Block {block.type}: {block.content[:50]}...")
-```
-
-### **2. Utilisation des Outils Sécurisés :**
-```python
-from Core.EditingSession.Tools import (
-    safe_read_file_content,
-    safe_write_file_content,
-    code_analyzer
-)
-
-# Lecture sécurisée
-content = safe_read_file_content("src/main.py")
-
-# Analyse du code
-analysis = code_analyzer("src/main.py", depth=2)
-
-# Écriture sécurisée
-safe_write_file_content("output/analysis.json", analysis.to_json())
-```
-
-### **3. Registre d'Outils :**
-```python
-from Core.EditingSession.Tools import OptimizedToolRegistry
-
-# Initialisation du registre
-registry = OptimizedToolRegistry()
-
-# Recherche d'outils
-tools = registry.search_tools("file", "analysis")
-
-# Exécution d'outil
-result = registry.execute_tool("code_analyzer", {
-    "file_path": "src/main.py",
-    "depth": 2
-})
-```
-
----
-
-## 📊 Métriques
-
-### **✅ Performance :**
-- **Partitionnement** : < 100ms pour fichiers < 1MB
-- **Analyse de code** : < 500ms pour projets moyens
-- **Recherche** : < 200ms pour requêtes simples
-- **Écriture sécurisée** : < 50ms par fichier
-
-### **✅ Sécurité :**
-- **Validation** : 100% des entrées validées
-- **Rollback** : Sauvegarde automatique avant modification
-- **Permissions** : Vérification des droits d'accès
-- **Isolation** : Exécution dans des contextes isolés
-
-### **✅ Précision :**
-- **Partitionnement AST** : > 95% de précision
-- **Fallback** : 100% de couverture avec stratégies multiples
-- **Localisation** : Précision au caractère près
-- **Différences** : Détection précise des changements
-
----
-
-## 🔄 Intégration
-
-### **✅ Avec TemporalFractalMemoryEngine :**
-```python
-from Core.EditingSession import EditingSession
-from TemporalFractalMemoryEngine import TemporalEngine
-
-# Session d'édition avec mémoire temporelle
-temporal_engine = TemporalEngine()
-editing_session = EditingSession(temporal_engine=temporal_engine)
-
-# Enregistrement des modifications
-session_id = editing_session.start_session("refactoring_task")
-editing_session.record_modification(file_path, old_content, new_content)
-```
-
-### **✅ Avec Core/Agents :**
-```python
-from Core.Agents.V10 import V10Assistant
-from Core.EditingSession.Tools import OptimizedToolRegistry
-
-# Assistant avec outils d'édition
-tool_registry = OptimizedToolRegistry()
-assistant = V10Assistant(tool_registry=tool_registry)
-
-# Exécution de tâches d'édition
-result = await assistant.execute_editing_task("refactor main.py")
-```
-
----
-
-## 📝 Développement
-
-### **✅ Ajout d'un Nouvel Outil :**
-1. **Créer l'outil** : `Tools/nouvel_outil.py`
-2. **Créer le template** : `Tools/nouvel_outil.luciform`
-3. **Ajouter au registre** : Dans `__init__.py`
-4. **Ajouter les tests** : `tests/test_nouvel_outil.py`
-5. **Documenter** : Dans le README
-
-### **✅ Standards de Code :**
-- **Type hints** : Obligatoires
-- **Docstrings** : Documentation complète
-- **Tests** : Couverture > 90%
-- **Validation** : Validation des entrées
-- **Logging** : Logging structuré
-
----
-
-## 🔗 Liens
-
-### **📋 Documentation :**
-- [Tools README](./Tools/README.md)
-- [Partitioning Guide](../Partitioner/README.md)
-- [Testing Guide](./tests/README.md)
-
-### **📋 Code :**
-- [Tools Implementation](./Tools/)
-- [Partitioner Integration](../Partitioner/)
-
----
-
-**Rapport généré automatiquement par Alma**  
-**Date :** 2025-08-07  
-**Statut :** Documentation complète du système d'édition
+## Intégrations
+- `Core/Partitioner`: pour analyses avancées (imports, AST, tracking de localisation)
+- `TemporalFractalMemoryEngine`: pour persister l’historique si nécessaire
+- `Core/Agents`: les agents V9/V10 peuvent orchestrer ces outils
