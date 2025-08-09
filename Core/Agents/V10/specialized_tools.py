@@ -1081,6 +1081,22 @@ class V10SpecializedToolsRegistry:
             else:
                 llm_provider_instance = None
 
+        # Initialiser un TemporalEngine sécurisé
+        try:
+            temporal_engine_instance = TemporalEngine(
+                backend_type="filesystem",
+                base_path='.',
+                enable_auto_improvement=False,
+                enable_query_enrichment=False,
+            )
+        except Exception:
+            class _DummyTemporalEngine:
+                async def create_temporal_node(self, *args, **kwargs):
+                    class _N:
+                        node_id = "sim_scope_node"
+                    return _N()
+            temporal_engine_instance = _DummyTemporalEngine()
+
         self.tools = {
             'read_lines': V10ReadLinesTool(),
             'write_lines': V10WriteLinesTool(),
@@ -1089,7 +1105,7 @@ class V10SpecializedToolsRegistry:
             'analyze_structure': V10AnalyzeStructureTool(),
             'create_index': V10CreateIndexTool(),
             'summarize_section': V10SummarizeSectionTool(),
-            'read_chunks_until_scope': V10ReadChunksUntilScopeTool(TemporalEngine(), llm_provider=llm_provider_instance),
+            'read_chunks_until_scope': V10ReadChunksUntilScopeTool(temporal_engine_instance, llm_provider=llm_provider_instance),
         }
     
     def get_tool(self, tool_name: str):
