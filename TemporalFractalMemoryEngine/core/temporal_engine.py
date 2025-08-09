@@ -99,11 +99,11 @@ class TemporalEngine(BaseTemporalEntity):
                     print("⛧ Utilisation du backend Neo4j temporel")
                 except Exception as e:
                     print(f"⛧ Connexion Neo4j échouée ({e}), fallback vers FileSystem")
-                    from ..backends.temporal_filesystem_backend import TemporalFileSystemBackend
+                    from ..backends.temporal_file_system_backend import TemporalFileSystemBackend
                     self.backend = TemporalFileSystemBackend(base_path=base_path)
             else:
                 print("⛧ Neo4j non disponible, utilisation du backend FileSystem")
-                from ..backends.temporal_filesystem_backend import TemporalFileSystemBackend
+                from ..backends.temporal_file_system_backend import TemporalFileSystemBackend
                 self.backend = TemporalFileSystemBackend(base_path=base_path)
         else:
             raise ValueError(f"Type de backend inconnu: {backend_type}")
