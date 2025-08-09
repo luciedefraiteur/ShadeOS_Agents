@@ -35,6 +35,24 @@ except Exception:
     class ProviderType:  # type: ignore
         LOCAL = "local"
 
+# Imports optionnels ProviderFactory et flags/env
+try:
+    from Core.Providers.LLMProviders.provider_factory import ProviderFactory
+except Exception:
+    ProviderFactory = None  # type: ignore
+
+try:
+    from Core.Config.feature_flags import get_llm_mode
+except Exception:
+    def get_llm_mode() -> str:  # type: ignore
+        return "mock"
+
+try:
+    from Core.Config.secure_env_manager import load_project_environment
+except Exception:
+    async def load_project_environment():  # type: ignore
+        return {}
+
 
 @dataclass
 class ToolResult:
@@ -1015,6 +1033,31 @@ class V10SpecializedToolsRegistry:
     """Registre des outils spécialisés V10."""
     
     def __init__(self):
+        # Charger l'environnement (pour les clés Gemini/OpenAI)
+        try:
+            # load_project_environment peut être sync dans notre implémentation
+            env_vars = load_project_environment()
+        except Exception:
+            env_vars = {}
+
+        # Préparer un provider LLM si disponible
+        llm_provider_instance = None
+        try:
+            mode = get_llm_mode()
+            if ProviderFactory is not None and mode != "mock":
+                provider_type = {
+                    "gemini": "gemini",
+                    "openai": "openai",
+                    "local_http": "local",
+                    "local_subprocess": "local_subprocess",
+                }.get(mode, "gemini")
+                default_cfg = ProviderFactory.create_default_config(provider_type)
+                llm_provider_instance, _validation = __import__('asyncio').get_event_loop().run_until_complete(
+                    ProviderFactory.create_and_validate_provider(provider_type, **default_cfg)
+                )
+        except Exception:
+            llm_provider_instance = None
+
         self.tools = {
             'read_lines': V10ReadLinesTool(),
             'write_lines': V10WriteLinesTool(),
@@ -1023,7 +1066,7 @@ class V10SpecializedToolsRegistry:
             'analyze_structure': V10AnalyzeStructureTool(),
             'create_index': V10CreateIndexTool(),
             'summarize_section': V10SummarizeSectionTool(),
-            'read_chunks_until_scope': V10ReadChunksUntilScopeTool(TemporalEngine()), # Initialize with a dummy engine
+            'read_chunks_until_scope': V10ReadChunksUntilScopeTool(TemporalEngine(), llm_provider=llm_provider_instance),
         }
     
     def get_tool(self, tool_name: str):
