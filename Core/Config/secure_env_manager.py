@@ -118,10 +118,11 @@ NEO4J_PASSWORD=ShadeOS_Agents_2025
 
 # Configuration Gemini (optionnel)
 # GEMINI_API_KEY=your_gemini_primary_key
-# GEMINI_LURK=your_gemini_secondary_key
 # GEMINI_API_KEYS=["primary_key","secondary_key"]
-# Ou sous forme objet JSON:
-# GEMINI_API_KEYS={"primary":"key1","secondary":"key2","fallback":["k3","k4"]}
+# Ou structure JSON complète:
+# GEMINI_CONFIG={"api_keys":["key1","key2"],"strategy":"round_robin"}
+# Note: les alias historiques comme GEMINI_LURK / GEMINI_API_KEY_LURK sont supportés en lecture
+#       puis migrés automatiquement vers la structure ci-dessus.
 
 # Configuration Ollama
 OLLAMA_HOST=http://localhost:11434
@@ -165,9 +166,16 @@ PATH={os.environ.get('PATH', '')}
     def _augment_gemini_keys(self, env_vars: Dict[str, str]) -> None:
         """Normalise et enrichit la configuration Gemini.
 
-        - Accepte GEMINI_API_KEYS en JSON (liste ou objet)
-        - Combine GEMINI_API_KEY (primaire) et GEMINI_LURK (secondaire)
-        - Expose GEMINI_API_KEY_{i} indexées et garantit GEMINI_API_KEY
+        Sources acceptées (en lecture):
+        - GEMINI_API_KEY (primaire)
+        - GEMINI_LURK / GEMINI_API_KEY_LURK (alias historiques, secondaires)
+        - GEMINI_API_KEYS (JSON liste) ou GEMINI_CONFIG (JSON objet {api_keys:[...], strategy})
+
+        Sortie normalisée (en écriture dans env_vars):
+        - GEMINI_API_KEY (toujours défini au premier de la liste)
+        - GEMINI_API_KEYS (JSON liste ordonnée sans doublons)
+        - GEMINI_CONFIG (JSON objet {api_keys:[...], strategy})
+        - GEMINI_API_KEY_{i} pour accès indexé
         """
         try:
             # Récupérer sources de clés
@@ -176,25 +184,26 @@ PATH={os.environ.get('PATH', '')}
             secondary = env_vars.get('GEMINI_LURK') or env_vars.get('GEMINI_API_KEY_LURK')
             keys_from_json: list[str] = []
 
+            # Lire GEMINI_CONFIG (objet)
+            raw_cfg = env_vars.get('GEMINI_CONFIG')
+            parsed_cfg = None
+            if raw_cfg:
+                raw = raw_cfg.strip().strip('"').strip("'")
+                try:
+                    parsed_cfg = json.loads(raw)
+                except Exception as e:
+                    self.logger.warning(f"GEMINI_CONFIG JSON invalide: {e}")
+
+            # Lire GEMINI_API_KEYS (liste)
             raw_json = env_vars.get('GEMINI_API_KEYS')
             if raw_json:
                 raw = raw_json.strip()
-                # Autoriser quotes externes
                 if (raw.startswith("'") and raw.endswith("'")) or (raw.startswith('"') and raw.endswith('"')):
                     raw = raw[1:-1]
                 try:
                     parsed = json.loads(raw)
                     if isinstance(parsed, list):
                         keys_from_json = [str(k) for k in parsed if k]
-                    elif isinstance(parsed, dict):
-                        # Objet avec primary/secondary/fallback
-                        if parsed.get('primary'):
-                            keys_from_json.append(str(parsed['primary']))
-                        if parsed.get('secondary'):
-                            keys_from_json.append(str(parsed['secondary']))
-                        fallback = parsed.get('fallback') or parsed.get('others') or []
-                        if isinstance(fallback, list):
-                            keys_from_json.extend([str(k) for k in fallback if k])
                 except Exception as e:  # JSON invalide -> ignorer silencieusement
                     self.logger.warning(f"GEMINI_API_KEYS JSON invalide: {e}")
 
@@ -211,9 +220,14 @@ PATH={os.environ.get('PATH', '')}
             if ordered:
                 # Normaliser env_vars
                 env_vars['GEMINI_API_KEYS'] = json.dumps(ordered)
-                # Définir GEMINI_API_KEY si absent
-                if not primary:
-                    env_vars['GEMINI_API_KEY'] = ordered[0]
+                # Construire/configurer GEMINI_CONFIG
+                cfg = parsed_cfg if isinstance(parsed_cfg, dict) else {}
+                cfg_keys = list(dict.fromkeys(list(cfg.get('api_keys', [])) + ordered))
+                cfg['api_keys'] = cfg_keys
+                cfg.setdefault('strategy', 'round_robin')
+                env_vars['GEMINI_CONFIG'] = json.dumps(cfg)
+                # Définir GEMINI_API_KEY au premier
+                env_vars['GEMINI_API_KEY'] = ordered[0]
                 # Exposer des variables indexées
                 for i, k in enumerate(ordered):
                     env_vars[f'GEMINI_API_KEY_{i}'] = k
