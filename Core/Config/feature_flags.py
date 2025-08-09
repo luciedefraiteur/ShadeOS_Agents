@@ -4,7 +4,7 @@
 Alma's centralized feature toggles for runtime switching between mocks and real integrations.
 
 Environment variables:
-- LLM_MODE: "mock" | "openai" | "local_http" | "local_subprocess" (default: "mock")
+- LLM_MODE: "auto" | "gemini" | "openai" | "local_http" | "local_subprocess" | "mock" (default: auto)
 - TEMPORAL_ENGINE: "on" | "off" (default: "off")
 - MCP_ENABLED: "1" | "0" | "true" | "false" (default: "0")
 """
@@ -19,8 +19,25 @@ def _get_env_bool(name: str, default: bool = False) -> bool:
     return value_lower in {"1", "true", "yes", "on"}
 
 def get_llm_mode() -> str:
-    """Returns the configured LLM mode: mock|openai|local_http|local_subprocess."""
-    return os.getenv("LLM_MODE", "mock").strip().lower()
+    """Returns the configured LLM mode.
+
+    auto detection order:
+    - If GEMINI_CONFIG/GEMINI_API_KEYS/GEMINI_API_KEY present → gemini
+    - Else if OPENAI_API_KEY present → openai
+    - Else if OLLAMA_HOST present → local_http
+    - Else → mock
+    """
+    mode = os.getenv("LLM_MODE", "auto").strip().lower()
+    if mode and mode != "auto":
+        return mode
+    # auto-detect
+    if os.getenv("GEMINI_CONFIG") or os.getenv("GEMINI_API_KEYS") or os.getenv("GEMINI_API_KEY"):
+        return "gemini"
+    if os.getenv("OPENAI_API_KEY"):
+        return "openai"
+    if os.getenv("OLLAMA_HOST"):
+        return "local_http"
+    return "mock"
 
 def is_temporal_engine_enabled() -> bool:
     """Whether to enable TemporalFractalMemoryEngine (filesystem backend by default)."""

@@ -87,12 +87,13 @@ class V10DevAgent:
             self._llm_mode = "mock"
             return
         try:
-            # Map mode → provider_type factory
+            # Map mode → provider_type factory (favor gemini for tests)
             provider_type = {
+                "gemini": "gemini",
                 "openai": "openai",
                 "local_http": "local",
                 "local_subprocess": "local_subprocess",
-            }.get(self._llm_mode, "local")
+            }.get(self._llm_mode, "gemini")
             # Config de base minimale
             default_cfg = ProviderFactory.create_default_config(provider_type)
             self.llm_provider, validation = await ProviderFactory.create_and_validate_provider(provider_type, **default_cfg)
