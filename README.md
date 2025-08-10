@@ -14,6 +14,11 @@ Substrat mémoire/conscience à dimension temporelle universelle
 - **Backends**: Neo4j (optionnel), FileSystem par défaut
   - Voir `TemporalFractalMemoryEngine/README.md`
 
+### ℹ️ Note de migration — MemoryEngine ➜ TemporalFractalMemoryEngine
+- L’ancien « MemoryEngine » (V1) est en cours de remplacement par **TemporalFractalMemoryEngine** (V2).
+- Certaines mentions historiques de « MemoryEngine » peuvent subsister dans la doc/code; l’intention est désormais de considérer **TFME** comme le substrat mémoire/conscience par défaut.
+- Les APIs, outils et tests sont en cours de bascule. Quand vous voyez « MemoryEngine » dans un exemple, l’équivalent moderne est sous `TemporalFractalMemoryEngine/`.
+
 ### 🎭 **ConsciousnessEngine/**
 Moteur de conscience stratifiée (4 niveaux)
 - **Core/** : Système d'injection dynamique et assistants
@@ -36,7 +41,7 @@ Personnalité et essence d'Alma
 
 ### 🧪 **UnitTests/**
 Tests unitaires et d'intégration organisés
-- **MemoryEngine/** : Tests du système de mémoire
+- **MemoryEngine/** : Tests du système de mémoire (obsolete lié a l'ancien memory engine, refactor en cours)
 - **Assistants/** : Tests des assistants IA
 - **Archiviste/** : Tests du daemon Archiviste
 - **Integration/** : Tests d'intégration
@@ -167,7 +172,7 @@ python shadeos_term_exec.py --cmd 'python run_tests.py --e2e --timeout 20 --log 
 ## 🔮 **Futur**
 
 Le projet évolue vers :
-- **Intégration complète** : MemoryEngine + ConsciousnessEngine
+- **Intégration complète** : TemporalFractalMemoryEngine + ConsciousnessEngine
 - **Nouvelles strates** : Évolution de la conscience
 - **Apprentissage automatique** : Systèmes d'auto-amélioration
 - **Interfaces avancées** : Interfaces utilisateur sophistiquées
