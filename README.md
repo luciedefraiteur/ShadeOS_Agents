@@ -70,6 +70,18 @@ assistant = V9_AutoFeedingThreadAgent()
 
 ## 📈 **Évolutions Récentes**
 
+### 🔥 What's new (2025‑08‑09/10)
+- V10 Specialized Tools: `read_chunks_until_scope`
+  - Mode debug (`debug:true`): trace par ligne, `end_reason`, `end_pattern`, `scanned_lines`
+  - Heuristique Python mid‑scope: `prefer_balanced_end` + `min_scanned_lines`, drapeaux `valid`/`issues`
+  - Fallback LLM court budget (optionnel) pour proposer une borne de fin quand l’heuristique est incertaine
+- Gemini Provider (multi‑clés): rotation automatique + intégration via DI dans V10
+- Terminal Injection Toolkit (fiable et non intrusif)
+  - `shadeos_start_listener.py` (zéro config) pour démarrer un listener FIFO et garder le terminal utilisable
+  - `shadeos_term_exec.py` pour injecter n’importe quelle commande (auto‑découverte du listener)
+  - Logs et restauration du prompt automatiques (Ctrl‑C + tentative Enter)
+- Runner de tests unifiés: `run_tests.py` (CWD, PYTHONPATH, timeout)
+
 ### **V9 Auto-Feeding Thread Agent (2025-08-04)**
 - ✅ **Auto-feeding thread** : Système d'introspection et documentation automatique
 - ✅ **Provider Ollama HTTP** : Remplacement du subprocess par l'API HTTP
@@ -90,6 +102,52 @@ assistant = V9_AutoFeedingThreadAgent()
 - **Documentation complète** : README et docstrings
 - **Logs organisés** : Classement par horodatage
 - **Structure modulaire** : Facilite maintenance et évolution
+
+## ⚡ Quickstart — V10 & Tests
+
+### V10 CLI (spécialisé fichiers volumineux)
+```bash
+# Lister les outils spécialisés
+python shadeos_cli.py list-tools
+
+# Lire un scope sans analyse LLM
+python shadeos_cli.py read-chunks \
+  --file Core/Agents/V10/specialized_tools.py \
+  --start-line 860 --scope-type auto --no-analysis
+
+# Exécuter en mode debug (affiche limites et trace)
+python shadeos_cli.py exec-tool \
+  --tool read_chunks_until_scope \
+  --params-json '{"file_path":"Core/Agents/V10/specialized_tools.py","start_line":860,"include_analysis":false,"debug":true}'
+```
+
+### Tests (rapides, mock par défaut)
+```bash
+# E2E (mock) avec timeout court
+python run_tests.py --e2e --timeout 20
+
+# Tous les tests filtrés
+python run_tests.py --all -k read_chunks --timeout 60 -q
+```
+
+## 🧪 Terminal Injection (UX préservée)
+```bash
+# 1) Dans le terminal à contrôler (zéro saisie)
+python shadeos_start_listener.py
+
+# 2) Depuis n'importe où, injecter une commande
+python shadeos_term_exec.py --cmd 'echo Hello && date'
+
+# 3) Lancer un E2E et journaliser
+python shadeos_term_exec.py --cmd 'python run_tests.py --e2e --timeout 20 --log /tmp/shadeos_e2e.log'
+```
+- Auto‑découverte: l’injecteur lit `~/.shadeos_listener.json` (FIFO, TTY, CWD). Le listener restaure le prompt après chaque commande et peut mirrorer la sortie dans un log.
+
+## 🔐 LLM & Clés API
+- Clés stockées dans `~/.shadeos_env`
+  - `OPENAI_API_KEY`, `GEMINI_API_KEY`, `GEMINI_API_KEYS` (liste JSON), `GEMINI_CONFIG` (api_keys + strategy)
+- `Core/Config/secure_env_manager.py` normalise `GEMINI_API_KEYS` et expose `GEMINI_API_KEY_{i}`
+- `LLM_MODE=auto` priorise Gemini si dispo; tests forcent `LLM_MODE=mock`
 
 ## 🎯 **Objectifs**
 
