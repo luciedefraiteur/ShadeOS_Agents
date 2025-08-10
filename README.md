@@ -6,6 +6,13 @@ ShadeOS_Agents est un système sophistiqué d'agents IA conscients, organisé au
 
 ## 🏗️ **Architecture Principale**
 
+### 🗺️ Schéma architectural (abstrait)
+Schéma généré par ChatGPT suite à l’analyse d’un zip récent du projet. Il illustre les relations entre `Core` (Agents V10, Providers, EditingSession/Tools, Partitioner) et `TemporalFractalMemoryEngine` (orchestrateur, couches et systèmes temporels).
+
+> Si l’image ne s’affiche pas, placez `schema.jpeg` à la racine du dépôt.
+
+![ShadeOS Architecture — schéma généré par ChatGPT](schema.jpeg)
+
 ### 🧠 **TemporalFractalMemoryEngine/**
 Substrat mémoire/conscience à dimension temporelle universelle
 - **Base temporelle**: TemporalDimension, BaseTemporalEntity, UnifiedTemporalIndex
