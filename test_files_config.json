@@ -1,0 +1,10 @@
+{
+  "files": [
+    "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
+    "Core/UniversalAutoFeedingThread/universal_auto_feeding_thread.py",
+    "Core/Partitioner/import_analyzer.py",
+    "TemporalFractalMemoryEngine/core/temporal_engine.py",
+    "TestProject/V9_Test/main.py"
+  ],
+  "description": "Configuration de test pour l'analyseur d'imports avancé"
+} 

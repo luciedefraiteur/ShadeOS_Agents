@@ -1,0 +1,31 @@
+<🜲luciform_doc id="walk_directory">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>listing</type>
+    <intent>Parcourir récursivement une arborescence pour en cartographier tous les fichiers.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>walk_directory(path: str) -> list[str]</signature>
+    <requires>
+      <param>path</param>
+    </requires>
+    <returns>list[str]: La liste de tous les chemins de fichiers trouvés.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>walk</keyword>
+      <keyword>recursive</keyword>
+      <keyword>find</keyword>
+      <keyword>files</keyword>
+    </keywords>
+    <symbolic_layer>Envoie des échos astraux dans un labyrinthe pour en révéler toutes les issues.</symbolic_layer>
+    <usage_context>Essentiel pour des opérations sur un projet entier, comme des recherches ou des modifications de masse.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

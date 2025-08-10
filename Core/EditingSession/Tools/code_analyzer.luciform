@@ -1,0 +1,37 @@
+<🜲luciform_doc id="code_analyzer">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>divination</type>
+    <intent>Analyse le code Python pour détecter les bugs et problèmes potentiels</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>code_analyzer(file_path: str, analysis_type: str = 'all') -> Dict</signature>
+    <requires>
+      <param>file_path</param>
+    </requires>
+    <optional>
+      <param>analysis_type</param>
+    </optional>
+    <returns>Dict contenant l'analyse du code et les bugs détectés</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>code</keyword>
+      <keyword>analysis</keyword>
+      <keyword>debug</keyword>
+      <keyword>python</keyword>
+      <keyword>bugs</keyword>
+      <keyword>lint</keyword>
+      <keyword>review</keyword>
+    </keywords>
+    <symbolic_layer>Analyse mystique du code pour révéler les imperfections cachées</symbolic_layer>
+    <usage_context>Utilisé par l'agent pour analyser le code avant correction</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc> 

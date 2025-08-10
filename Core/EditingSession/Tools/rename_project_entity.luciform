@@ -1,0 +1,34 @@
+<🜲luciform_doc id="rename_project_entity">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>filesystem</type>
+    <intent>Renommer une entité (fichier ou dossier) dans le projet et mettre à jour toutes ses références internes.</intent>
+    <level>avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>rename_project_entity(old_name: str, new_name: str) -> bool</signature>
+    <requires>
+      <param>old_name</param>
+      <param>new_name</param>
+    </requires>
+    <returns>bool: True si le renommage et la mise à jour ont réussi.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>rename</keyword>
+      <keyword>move</keyword>
+      <keyword>refactor</keyword>
+      <keyword>file</keyword>
+      <keyword>directory</keyword>
+      <keyword>project</keyword>
+    </keywords>
+    <symbolic_layer>Transmute l'identité d'une entité dans le grand grimoire du projet, et réécrit son nom partout où il est invoqué, assurant la cohérence de la réalité.</symbolic_layer>
+    <usage_context>Pour renommer des modules, des dossiers de code, ou des fichiers importants sans briser les références dans le reste du projet.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

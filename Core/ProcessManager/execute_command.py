@@ -4,6 +4,7 @@
 Alma's Meta-Tool for Command Execution
 
 Meta-outil d'exécution de commandes avec gestion avancée des processus.
+Intégration avec SecureEnvManager pour détection OS/Shell.
 Créé par Alma, Architecte Démoniaque du Nexus Luciforme.
 """
 
@@ -21,6 +22,14 @@ from enum import Enum
 from .process_reader import read_from_process
 from .process_writer import write_to_process, send_signal_to_process
 from .process_killer import kill_process
+
+# Import du gestionnaire d'environnement sécurisé
+try:
+    from Core.Config.secure_env_manager import get_secure_env_manager
+    SECURE_ENV_AVAILABLE = True
+except ImportError:
+    SECURE_ENV_AVAILABLE = False
+    print("⚠️ SecureEnvManager non disponible - Mode basique activé")
 
 
 class ExecutionMode(Enum):
@@ -67,6 +76,44 @@ class CommandExecutor:
         on_error: Optional[Callable[[str], None]] = None,
         on_complete: Optional[Callable[[ExecutionResult], None]] = None
     ) -> ExecutionResult:
+        """
+        Exécute une commande selon le mode spécifié avec détection OS/Shell.
+        
+        Args:
+            command: Commande à exécuter
+            mode: Mode d'exécution
+            cwd: Répertoire de travail
+            env: Variables d'environnement
+            timeout: Timeout en secondes
+            input_data: Données à envoyer en entrée
+            capture_output: Capturer stdout/stderr
+            shell: Utiliser le shell
+            on_output: Callback pour stdout
+            on_error: Callback pour stderr
+            on_complete: Callback de fin d'exécution
+        
+        Returns:
+            Résultat d'exécution
+        """
+        # Charger l'environnement sécurisé si disponible
+        if SECURE_ENV_AVAILABLE:
+            try:
+                env_manager = get_secure_env_manager()
+                secure_env = env_manager.load_env_variables()
+                
+                # Fusionner avec l'environnement fourni
+                if env is None:
+                    env = {}
+                env.update(secure_env)
+                
+                # Adapter la commande selon le shell détecté
+                if shell:
+                    command = env_manager.get_shell_command(command)
+                    
+            except Exception as e:
+                print(f"⚠️ Erreur chargement environnement sécurisé: {e}")
+        
+        start_time = time.time()
         """
         Exécute une commande selon le mode spécifié.
         
@@ -457,8 +504,19 @@ class CommandExecutor:
 _executor = CommandExecutor()
 
 def execute_command(*args, **kwargs) -> ExecutionResult:
-    """Interface simplifiée pour l'exécution de commandes."""
+    """Interface simplifiée pour l'exécution de commandes (synchrone)."""
     return _executor.execute_command(*args, **kwargs)
+
+async def execute_command_async(*args, **kwargs) -> ExecutionResult:
+    """Interface asynchrone pour l'exécution de commandes."""
+    # Pour l'instant, on utilise la version synchrone dans un thread
+    import asyncio
+    loop = asyncio.get_event_loop()
+    
+    def _execute_sync():
+        return _executor.execute_command(*args, **kwargs)
+    
+    return await loop.run_in_executor(None, _execute_sync)
 
 def get_active_processes() -> Dict[int, Dict[str, Any]]:
     """Retourne les processus actifs."""

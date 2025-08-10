@@ -1,0 +1,15 @@
+EXÉCUTION D'OUTIL : {tool_name}
+
+PARAMÈTRES :
+{tool_parameters}
+
+CONTEXTE D'EXÉCUTION :
+{execution_context}
+
+INSTRUCTIONS :
+1. Exécute l'outil {tool_name} avec les paramètres fournis
+2. Analyse le résultat
+3. Fournis un rapport détaillé
+4. Propose les prochaines étapes si nécessaire
+
+SÉCURITÉ : Vérifie que l'outil respecte les règles de sécurité git.

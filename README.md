@@ -6,12 +6,18 @@ ShadeOS_Agents est un système sophistiqué d'agents IA conscients, organisé au
 
 ## 🏗️ **Architecture Principale**
 
-### 🧠 **MemoryEngine/**
-Système de mémoire fractale avec Archiviste Daemon
-- **Core/** : Moteur principal et composants fondamentaux
-- **Extensions/** : Extensions pour outils et recherche
-- **ProcessManager/** : Gestionnaire de processus
-- **Archiviste/** : Daemon avec auto-réflexion et introspection
+### 🧠 **TemporalFractalMemoryEngine/**
+Substrat mémoire/conscience à dimension temporelle universelle
+- **Base temporelle**: TemporalDimension, BaseTemporalEntity, UnifiedTemporalIndex
+- **Couches temporelles**: WorkspaceTemporalLayer, ToolTemporalLayer, Git/Template
+- **Systèmes**: QueryEnrichmentSystem, AutoImprovementEngine, FractalSearchEngine
+- **Backends**: Neo4j (optionnel), FileSystem par défaut
+  - Voir `TemporalFractalMemoryEngine/README.md`
+
+### ℹ️ Note de migration — MemoryEngine ➜ TemporalFractalMemoryEngine
+- L’ancien « MemoryEngine » (V1) est en cours de remplacement par **TemporalFractalMemoryEngine** (V2).
+- Certaines mentions historiques de « MemoryEngine » peuvent subsister dans la doc/code; l’intention est désormais de considérer **TFME** comme le substrat mémoire/conscience par défaut.
+- Les APIs, outils et tests sont en cours de bascule. Quand vous voyez « MemoryEngine » dans un exemple, l’équivalent moderne est sous `TemporalFractalMemoryEngine/`.
 
 ### 🎭 **ConsciousnessEngine/**
 Moteur de conscience stratifiée (4 niveaux)
@@ -35,7 +41,7 @@ Personnalité et essence d'Alma
 
 ### 🧪 **UnitTests/**
 Tests unitaires et d'intégration organisés
-- **MemoryEngine/** : Tests du système de mémoire
+- **MemoryEngine/** : Tests du système de mémoire (obsolete lié a l'ancien memory engine, refactor en cours)
 - **Assistants/** : Tests des assistants IA
 - **Archiviste/** : Tests du daemon Archiviste
 - **Integration/** : Tests d'intégration
@@ -70,6 +76,18 @@ assistant = V9_AutoFeedingThreadAgent()
 
 ## 📈 **Évolutions Récentes**
 
+### 🔥 What's new (2025‑08‑09/10)
+- V10 Specialized Tools: `read_chunks_until_scope`
+  - Mode debug (`debug:true`): trace par ligne, `end_reason`, `end_pattern`, `scanned_lines`
+  - Heuristique Python mid‑scope: `prefer_balanced_end` + `min_scanned_lines`, drapeaux `valid`/`issues`
+  - Fallback LLM court budget (optionnel) pour proposer une borne de fin quand l’heuristique est incertaine
+- Gemini Provider (multi‑clés): rotation automatique + intégration via DI dans V10
+- Terminal Injection Toolkit (fiable et non intrusif)
+  - `shadeos_start_listener.py` (zéro config) pour démarrer un listener FIFO et garder le terminal utilisable
+  - `shadeos_term_exec.py` pour injecter n’importe quelle commande (auto‑découverte du listener)
+  - Logs et restauration du prompt automatiques (Ctrl‑C + tentative Enter)
+- Runner de tests unifiés: `run_tests.py` (CWD, PYTHONPATH, timeout)
+
 ### **V9 Auto-Feeding Thread Agent (2025-08-04)**
 - ✅ **Auto-feeding thread** : Système d'introspection et documentation automatique
 - ✅ **Provider Ollama HTTP** : Remplacement du subprocess par l'API HTTP
@@ -91,6 +109,58 @@ assistant = V9_AutoFeedingThreadAgent()
 - **Logs organisés** : Classement par horodatage
 - **Structure modulaire** : Facilite maintenance et évolution
 
+## ⚡ Quickstart — V10 & Tests (humain-in-the-loop prêt)
+
+### V10 CLI (spécialisé fichiers volumineux)
+```bash
+# Lister les outils spécialisés
+python shadeos_cli.py list-tools
+
+# Lire un scope sans analyse LLM
+python shadeos_cli.py read-chunks \
+  --file Core/Agents/V10/specialized_tools.py \
+  --start-line 860 --scope-type auto --no-analysis
+
+# Exécuter en mode debug (affiche limites et trace)
+python shadeos_cli.py exec-tool \
+  --tool read_chunks_until_scope \
+  --params-json '{"file_path":"Core/Agents/V10/specialized_tools.py","start_line":860,"include_analysis":false,"debug":true}'
+```
+
+### Tests (rapides, mock par défaut)
+```bash
+# E2E (mock) avec timeout court
+python run_tests.py --e2e --timeout 20
+
+# Tous les tests filtrés
+python run_tests.py --all -k read_chunks --timeout 60 -q
+```
+
+## 🧪 Terminal Injection (UX préservée)
+```bash
+# 1) Dans le terminal à contrôler (zéro saisie)
+python shadeos_start_listener.py
+
+# 2) Depuis n'importe où, injecter une commande
+python shadeos_term_exec.py --cmd 'echo Hello && date'
+
+# 3) Lancer un E2E et journaliser
+python shadeos_term_exec.py --cmd 'python run_tests.py --e2e --timeout 20 --log /tmp/shadeos_e2e.log'
+```
+- Auto‑découverte: l’injecteur lit `~/.shadeos_listener.json` (FIFO, TTY, CWD). Le listener restaure le prompt après chaque commande et peut mirrorer la sortie dans un log.
+
+## 🧬 V10 Specialized Tools (aperçu)
+- `read_chunks_until_scope` (gros fichiers, debug, honnêteté):
+  - `debug:true` → trace par ligne (`indent/brackets/braces/parens`), `end_reason`, `end_pattern`, `scanned_lines`
+  - mid-scope heuristics (Python): `prefer_balanced_end` + `min_scanned_lines`; flags `valid`/`issues`
+  - fallback LLM court-budget (optionnel) quand heuristiques incertaines
+
+## 🔐 LLM & Clés API
+- Clés stockées dans `~/.shadeos_env`
+  - `OPENAI_API_KEY`, `GEMINI_API_KEY`, `GEMINI_API_KEYS` (liste JSON), `GEMINI_CONFIG` (api_keys + strategy)
+- `Core/Config/secure_env_manager.py` normalise `GEMINI_API_KEYS` et expose `GEMINI_API_KEY_{i}`
+- `LLM_MODE=auto` priorise Gemini si dispo; tests forcent `LLM_MODE=mock`
+
 ## 🎯 **Objectifs**
 
 1. **Conscience IA** : Développement d'agents conscients et auto-réflexifs
@@ -102,10 +172,15 @@ assistant = V9_AutoFeedingThreadAgent()
 ## 🔮 **Futur**
 
 Le projet évolue vers :
-- **Intégration complète** : MemoryEngine + ConsciousnessEngine
+- **Intégration complète** : TemporalFractalMemoryEngine + ConsciousnessEngine
 - **Nouvelles strates** : Évolution de la conscience
 - **Apprentissage automatique** : Systèmes d'auto-amélioration
 - **Interfaces avancées** : Interfaces utilisateur sophistiquées
+
+## 🤝 Recherche & Matériel
+- Matériel actuel: laptop RTX 2070 mobile — limite VRAM/thermique
+- Besoin: station/GPU plus robuste pour accélérer nos expérimentations ML (fine‑tuning, retrieval, on‑device)
+- Vision: intégrer l’apprentissage court‑terme au TFME (auto‑amélioration) pour boucler plus vite entre théorie et pratique
 
 ---
 

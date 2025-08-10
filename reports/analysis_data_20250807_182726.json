@@ -1,0 +1,767 @@
+{
+  "analysis_metadata": {
+    "timestamp": "2025-08-07T18:27:26.020605",
+    "target_files": [
+      "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
+      "Core/Partitioner/import_analyzer.py"
+    ],
+    "total_files_analyzed": 14,
+    "max_depth": 10,
+    "project_root": "/home/luciedefraiteur/ShadeOS_Agents"
+  },
+  "statistics": {
+    "files_analyzed": 14,
+    "total_imports": 195,
+    "local_imports": 16,
+    "external_imports": 50,
+    "standard_imports": 129,
+    "cycles_detected": 0,
+    "files_with_errors": 0,
+    "duration": 0.4558413028717041
+  },
+  "files_analysis": {
+    "Assistants/Generalist/V9_AutoFeedingThreadAgent.py": {
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "json",
+        "re",
+        "asyncio",
+        "subprocess",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.List",
+        "typing.Any",
+        "typing.Optional",
+        "dataclasses.dataclass",
+        "TemporalFractalMemoryEngine.core.temporal_engine.TemporalEngine",
+        "TemporalFractalMemoryEngine.core.temporal_workspace_layer.WorkspaceTemporalLayer",
+        "TemporalFractalMemoryEngine.core.temporal_components.GitTemporalLayer",
+        "Core.UniversalAutoFeedingThread.UniversalAutoFeedingThread",
+        "Assistants.EditingSession.Tools.optimized_tool_registry.OptimizedToolRegistry",
+        "Core.LLMProviders.ProviderFactory",
+        "Core.LLMProviders.LLMProvider",
+        "asyncio",
+        "Assistants.EditingSession.Tools.tool_invoker.ToolInvoker",
+        "Core.Config.secure_env_manager.load_project_environment",
+        "Core.Config.secure_env_manager.get_secure_env_manager"
+      ],
+      "local_imports": [
+        "TemporalFractalMemoryEngine.core.temporal_engine.TemporalEngine",
+        "TemporalFractalMemoryEngine.core.temporal_workspace_layer.WorkspaceTemporalLayer",
+        "TemporalFractalMemoryEngine.core.temporal_components.GitTemporalLayer",
+        "Core.UniversalAutoFeedingThread.UniversalAutoFeedingThread",
+        "Assistants.EditingSession.Tools.optimized_tool_registry.OptimizedToolRegistry",
+        "Core.LLMProviders.ProviderFactory",
+        "Core.LLMProviders.LLMProvider",
+        "Assistants.EditingSession.Tools.tool_invoker.ToolInvoker",
+        "Core.Config.secure_env_manager.load_project_environment",
+        "Core.Config.secure_env_manager.get_secure_env_manager"
+      ],
+      "external_imports": [],
+      "standard_imports": [
+        "os",
+        "sys",
+        "time",
+        "json",
+        "re",
+        "asyncio",
+        "subprocess",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.List",
+        "typing.Any",
+        "typing.Optional",
+        "dataclasses.dataclass",
+        "asyncio"
+      ],
+      "import_count": 24,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_engine.py": {
+      "imports": [
+        "os",
+        "asyncio",
+        "typing.Optional",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Union",
+        "datetime.datetime",
+        "temporal_base.BaseTemporalEntity",
+        "temporal_base.UnifiedTemporalIndex",
+        "temporal_base.get_temporal_index",
+        "temporal_base.register_temporal_entity",
+        "temporal_base.unregister_temporal_entity",
+        "temporal_memory_node.TemporalMemoryNode",
+        "temporal_workspace_layer.WorkspaceTemporalLayer",
+        "temporal_tool_layer.ToolTemporalLayer",
+        "query_enrichment_system.QueryEnrichmentSystem",
+        "query_enrichment_system.EnrichmentPower",
+        "auto_improvement_engine.AutoImprovementEngine",
+        "fractal_search_engine.FractalSearchEngine",
+        "temporal_neo4j_backend.TemporalNeo4jBackend",
+        "backends.temporal_filesystem_backend.TemporalFileSystemBackend",
+        "backends.temporal_filesystem_backend.TemporalFileSystemBackend",
+        "backends.temporal_filesystem_backend.TemporalFileSystemBackend"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "temporal_base.BaseTemporalEntity",
+        "temporal_base.UnifiedTemporalIndex",
+        "temporal_base.get_temporal_index",
+        "temporal_base.register_temporal_entity",
+        "temporal_base.unregister_temporal_entity",
+        "temporal_memory_node.TemporalMemoryNode",
+        "temporal_workspace_layer.WorkspaceTemporalLayer",
+        "temporal_tool_layer.ToolTemporalLayer",
+        "query_enrichment_system.QueryEnrichmentSystem",
+        "query_enrichment_system.EnrichmentPower",
+        "auto_improvement_engine.AutoImprovementEngine",
+        "fractal_search_engine.FractalSearchEngine",
+        "temporal_neo4j_backend.TemporalNeo4jBackend",
+        "backends.temporal_filesystem_backend.TemporalFileSystemBackend",
+        "backends.temporal_filesystem_backend.TemporalFileSystemBackend",
+        "backends.temporal_filesystem_backend.TemporalFileSystemBackend"
+      ],
+      "standard_imports": [
+        "os",
+        "asyncio",
+        "typing.Optional",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Union",
+        "datetime.datetime"
+      ],
+      "import_count": 24,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_workspace_layer.py": {
+      "imports": [
+        "asyncio",
+        "os",
+        "re",
+        "subprocess",
+        "typing.Dict",
+        "typing.List",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Union",
+        "pathlib.Path",
+        "datetime.datetime",
+        "Core.LLMProviders.LLMProvider",
+        "temporal_components.WorkspaceTemporalLayer",
+        "fractal_search_engine.FractalSearchEngine",
+        "meta_path_adapter.MetaPathAdapter",
+        "meta_path_adapter.UnifiedResultFormatter"
+      ],
+      "local_imports": [
+        "Core.LLMProviders.LLMProvider"
+      ],
+      "external_imports": [
+        "temporal_components.WorkspaceTemporalLayer",
+        "fractal_search_engine.FractalSearchEngine",
+        "meta_path_adapter.MetaPathAdapter",
+        "meta_path_adapter.UnifiedResultFormatter"
+      ],
+      "standard_imports": [
+        "asyncio",
+        "os",
+        "re",
+        "subprocess",
+        "typing.Dict",
+        "typing.List",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Union",
+        "pathlib.Path",
+        "datetime.datetime"
+      ],
+      "import_count": 16,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/LLMProviders/__init__.py": {
+      "imports": [
+        "llm_provider.LLMProvider",
+        "llm_provider.ProviderStatus",
+        "llm_provider.LLMResponse",
+        "llm_provider.ValidationResult",
+        "llm_provider.ProviderType",
+        "llm_provider.ErrorType",
+        "provider_factory.ProviderFactory",
+        "openai_provider.OpenAIProvider",
+        "local_provider.LocalProvider"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "llm_provider.LLMProvider",
+        "llm_provider.ProviderStatus",
+        "llm_provider.LLMResponse",
+        "llm_provider.ValidationResult",
+        "llm_provider.ProviderType",
+        "llm_provider.ErrorType",
+        "provider_factory.ProviderFactory",
+        "openai_provider.OpenAIProvider",
+        "local_provider.LocalProvider"
+      ],
+      "standard_imports": [],
+      "import_count": 9,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_components.py": {
+      "imports": [
+        "time",
+        "json",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Union",
+        "abc.ABC",
+        "abc.abstractmethod",
+        "pathlib.Path",
+        "temporal_base.BaseTemporalEntity",
+        "temporal_base.TemporalDimension",
+        "temporal_base.FractalLinks",
+        "temporal_base.ConsciousnessInterface",
+        "temporal_base.UnifiedTemporalIndex",
+        "temporal_base.register_temporal_entity"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "temporal_base.BaseTemporalEntity",
+        "temporal_base.TemporalDimension",
+        "temporal_base.FractalLinks",
+        "temporal_base.ConsciousnessInterface",
+        "temporal_base.UnifiedTemporalIndex",
+        "temporal_base.register_temporal_entity"
+      ],
+      "standard_imports": [
+        "time",
+        "json",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Union",
+        "abc.ABC",
+        "abc.abstractmethod",
+        "pathlib.Path"
+      ],
+      "import_count": 16,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/UniversalAutoFeedingThread/__init__.py": {
+      "imports": [
+        "universal_auto_feeding_thread.UniversalAutoFeedingThread",
+        "universal_auto_feeding_thread.AutoFeedMessage",
+        "universal_auto_feeding_thread.create_auto_feeding_thread"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "universal_auto_feeding_thread.UniversalAutoFeedingThread",
+        "universal_auto_feeding_thread.AutoFeedMessage",
+        "universal_auto_feeding_thread.create_auto_feeding_thread"
+      ],
+      "standard_imports": [],
+      "import_count": 3,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/optimized_tool_registry.py": {
+      "imports": [
+        "os",
+        "sys",
+        "inspect",
+        "asyncio",
+        "typing.Dict",
+        "typing.Any",
+        "typing.List",
+        "typing.Optional",
+        "typing.Callable",
+        "pathlib.Path",
+        "Core.Parsers.luciform_parser.parse_luciform",
+        "TemporalFractalMemoryEngine.core.temporal_engine.TemporalEngine",
+        "Core.Partitioner.import_analysis_cache.get_import_optimizer",
+        "Core.Partitioner.resilient_import_analyzer.get_resilient_import_analyzer",
+        "Core.Partitioner.broken_dependency_handler.get_broken_dependency_handler",
+        "subprocess",
+        "subprocess"
+      ],
+      "local_imports": [
+        "Core.Parsers.luciform_parser.parse_luciform",
+        "TemporalFractalMemoryEngine.core.temporal_engine.TemporalEngine",
+        "Core.Partitioner.import_analysis_cache.get_import_optimizer",
+        "Core.Partitioner.resilient_import_analyzer.get_resilient_import_analyzer",
+        "Core.Partitioner.broken_dependency_handler.get_broken_dependency_handler"
+      ],
+      "external_imports": [],
+      "standard_imports": [
+        "os",
+        "sys",
+        "inspect",
+        "asyncio",
+        "typing.Dict",
+        "typing.Any",
+        "typing.List",
+        "typing.Optional",
+        "typing.Callable",
+        "pathlib.Path",
+        "subprocess",
+        "subprocess"
+      ],
+      "import_count": 17,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/Parsers/luciform_parser.py": {
+      "imports": [
+        "os",
+        "sys",
+        "Utils.string_utils._simple_xml_tokenizer"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "Utils.string_utils._simple_xml_tokenizer"
+      ],
+      "standard_imports": [
+        "os",
+        "sys"
+      ],
+      "import_count": 3,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/import_analysis_cache.py": {
+      "imports": [
+        "os",
+        "hashlib",
+        "asyncio",
+        "typing.Dict",
+        "typing.Set",
+        "typing.Optional",
+        "typing.Any",
+        "typing.List",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "logging",
+        "import_analyzer.ImportAnalyzer",
+        "import_analyzer.ImportAnalyzer"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "import_analyzer.ImportAnalyzer",
+        "import_analyzer.ImportAnalyzer"
+      ],
+      "standard_imports": [
+        "os",
+        "hashlib",
+        "asyncio",
+        "typing.Dict",
+        "typing.Set",
+        "typing.Optional",
+        "typing.Any",
+        "typing.List",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "logging"
+      ],
+      "import_count": 14,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/resilient_import_analyzer.py": {
+      "imports": [
+        "os",
+        "asyncio",
+        "logging",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Any",
+        "typing.Set",
+        "pathlib.Path",
+        "datetime.datetime",
+        "broken_dependency_handler.BrokenDependencyHandler",
+        "broken_dependency_handler.get_broken_dependency_handler",
+        "import_analysis_cache.ImportAnalysisOptimizer",
+        "import_analysis_cache.get_import_optimizer",
+        "re",
+        "import_analyzer.ImportAnalyzer"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "broken_dependency_handler.BrokenDependencyHandler",
+        "broken_dependency_handler.get_broken_dependency_handler",
+        "import_analysis_cache.ImportAnalysisOptimizer",
+        "import_analysis_cache.get_import_optimizer",
+        "import_analyzer.ImportAnalyzer"
+      ],
+      "standard_imports": [
+        "os",
+        "asyncio",
+        "logging",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Any",
+        "typing.Set",
+        "pathlib.Path",
+        "datetime.datetime",
+        "re"
+      ],
+      "import_count": 16,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/broken_dependency_handler.py": {
+      "imports": [
+        "os",
+        "asyncio",
+        "logging",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Any",
+        "typing.Set",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "datetime.timedelta",
+        "pathlib.Path"
+      ],
+      "local_imports": [],
+      "external_imports": [],
+      "standard_imports": [
+        "os",
+        "asyncio",
+        "logging",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Any",
+        "typing.Set",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "datetime.timedelta",
+        "pathlib.Path"
+      ],
+      "import_count": 13,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/tool_invoker.py": {
+      "imports": [
+        "json",
+        "traceback",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Callable",
+        "typing.List",
+        "datetime.datetime",
+        "tool_registry.ToolRegistry"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "traceback",
+        "tool_registry.ToolRegistry"
+      ],
+      "standard_imports": [
+        "json",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Callable",
+        "typing.List",
+        "datetime.datetime"
+      ],
+      "import_count": 9,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "/home/luciedefraiteur/ShadeOS_Agents/Core/Config/secure_env_manager.py": {
+      "imports": [
+        "os",
+        "sys",
+        "platform",
+        "subprocess",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.Optional",
+        "typing.Tuple",
+        "logging"
+      ],
+      "local_imports": [],
+      "external_imports": [],
+      "standard_imports": [
+        "os",
+        "sys",
+        "platform",
+        "subprocess",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.Optional",
+        "typing.Tuple",
+        "logging"
+      ],
+      "import_count": 9,
+      "dependency_depth": 0,
+      "errors": []
+    },
+    "Core/Partitioner/import_analyzer.py": {
+      "imports": [
+        "os",
+        "sys",
+        "json",
+        "asyncio",
+        "argparse",
+        "time",
+        "ast",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.List",
+        "typing.Set",
+        "typing.Optional",
+        "typing.Any",
+        "typing.Tuple",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "logging",
+        "collections.defaultdict",
+        "import_resolver.ImportResolver",
+        "ast_partitioners.python_ast_partitioner.PythonASTPartitioner",
+        "signal"
+      ],
+      "local_imports": [],
+      "external_imports": [
+        "import_resolver.ImportResolver",
+        "ast_partitioners.python_ast_partitioner.PythonASTPartitioner"
+      ],
+      "standard_imports": [
+        "os",
+        "sys",
+        "json",
+        "asyncio",
+        "argparse",
+        "time",
+        "ast",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.List",
+        "typing.Set",
+        "typing.Optional",
+        "typing.Any",
+        "typing.Tuple",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "datetime.datetime",
+        "logging",
+        "collections.defaultdict",
+        "signal"
+      ],
+      "import_count": 22,
+      "dependency_depth": 0,
+      "errors": []
+    }
+  },
+  "top_files_by_imports": [
+    {
+      "file": "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
+      "import_count": 24
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_engine.py",
+      "import_count": 24
+    },
+    {
+      "file": "Core/Partitioner/import_analyzer.py",
+      "import_count": 22
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/optimized_tool_registry.py",
+      "import_count": 17
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_workspace_layer.py",
+      "import_count": 16
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_components.py",
+      "import_count": 16
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/resilient_import_analyzer.py",
+      "import_count": 16
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/import_analysis_cache.py",
+      "import_count": 14
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/Core/Partitioner/broken_dependency_handler.py",
+      "import_count": 13
+    },
+    {
+      "file": "/home/luciedefraiteur/ShadeOS_Agents/Core/LLMProviders/__init__.py",
+      "import_count": 9
+    }
+  ],
+  "cycles": [],
+  "detected_modules": {
+    "os": false,
+    "sys": false,
+    "time": false,
+    "json": false,
+    "re": false,
+    "asyncio": false,
+    "subprocess": false,
+    "pathlib.Path": false,
+    "typing.Dict": false,
+    "typing.List": false,
+    "typing.Any": false,
+    "typing.Optional": false,
+    "dataclasses.dataclass": false,
+    "TemporalFractalMemoryEngine.core.temporal_engine.TemporalEngine": true,
+    "TemporalFractalMemoryEngine.core.temporal_workspace_layer.WorkspaceTemporalLayer": true,
+    "TemporalFractalMemoryEngine.core.temporal_components.GitTemporalLayer": true,
+    "Core.UniversalAutoFeedingThread.UniversalAutoFeedingThread": true,
+    "Assistants.EditingSession.Tools.optimized_tool_registry.OptimizedToolRegistry": true,
+    "Core.LLMProviders.ProviderFactory": true,
+    "Core.LLMProviders.LLMProvider": true,
+    "Assistants.EditingSession.Tools.tool_invoker.ToolInvoker": true,
+    "Core.Config.secure_env_manager.load_project_environment": true,
+    "Core.Config.secure_env_manager.get_secure_env_manager": true,
+    "typing.Union": false,
+    "datetime.datetime": false,
+    "temporal_base.BaseTemporalEntity": false,
+    "temporal_base.UnifiedTemporalIndex": false,
+    "temporal_base.get_temporal_index": false,
+    "temporal_base.register_temporal_entity": false,
+    "temporal_base.unregister_temporal_entity": false,
+    "temporal_memory_node.TemporalMemoryNode": false,
+    "temporal_workspace_layer.WorkspaceTemporalLayer": false,
+    "temporal_tool_layer.ToolTemporalLayer": false,
+    "query_enrichment_system.QueryEnrichmentSystem": false,
+    "query_enrichment_system.EnrichmentPower": false,
+    "auto_improvement_engine.AutoImprovementEngine": false,
+    "fractal_search_engine.FractalSearchEngine": false,
+    "temporal_neo4j_backend.TemporalNeo4jBackend": false,
+    "backends.temporal_filesystem_backend.TemporalFileSystemBackend": false,
+    "temporal_components.WorkspaceTemporalLayer": false,
+    "meta_path_adapter.MetaPathAdapter": false,
+    "meta_path_adapter.UnifiedResultFormatter": false,
+    "llm_provider.LLMProvider": false,
+    "llm_provider.ProviderStatus": false,
+    "llm_provider.LLMResponse": false,
+    "llm_provider.ValidationResult": false,
+    "llm_provider.ProviderType": false,
+    "llm_provider.ErrorType": false,
+    "provider_factory.ProviderFactory": false,
+    "openai_provider.OpenAIProvider": false,
+    "local_provider.LocalProvider": false,
+    "abc.ABC": false,
+    "abc.abstractmethod": false,
+    "temporal_base.TemporalDimension": false,
+    "temporal_base.FractalLinks": false,
+    "temporal_base.ConsciousnessInterface": false,
+    "universal_auto_feeding_thread.UniversalAutoFeedingThread": false,
+    "universal_auto_feeding_thread.AutoFeedMessage": false,
+    "universal_auto_feeding_thread.create_auto_feeding_thread": false,
+    "inspect": false,
+    "typing.Callable": false,
+    "Core.Parsers.luciform_parser.parse_luciform": true,
+    "Core.Partitioner.import_analysis_cache.get_import_optimizer": true,
+    "Core.Partitioner.resilient_import_analyzer.get_resilient_import_analyzer": true,
+    "Core.Partitioner.broken_dependency_handler.get_broken_dependency_handler": true,
+    "Utils.string_utils._simple_xml_tokenizer": false,
+    "hashlib": false,
+    "typing.Set": false,
+    "dataclasses.field": false,
+    "logging": false,
+    "import_analyzer.ImportAnalyzer": false,
+    "broken_dependency_handler.BrokenDependencyHandler": false,
+    "broken_dependency_handler.get_broken_dependency_handler": false,
+    "import_analysis_cache.ImportAnalysisOptimizer": false,
+    "import_analysis_cache.get_import_optimizer": false,
+    "datetime.timedelta": false,
+    "traceback": false,
+    "tool_registry.ToolRegistry": false,
+    "platform": false,
+    "typing.Tuple": false,
+    "argparse": false,
+    "ast": false,
+    "collections.defaultdict": false,
+    "import_resolver.ImportResolver": false,
+    "ast_partitioners.python_ast_partitioner.PythonASTPartitioner": false,
+    "signal": false
+  },
+  "project_metadata": {
+    "project_root": "/home/luciedefraiteur/ShadeOS_Agents",
+    "analysis_timestamp": "2025-08-07T18:27:26.021198",
+    "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 16:09:02) [GCC 11.2.0]",
+    "total_python_files": 272
+  },
+  "complexity_analysis": {
+    "total_files": 14,
+    "total_imports": 195,
+    "total_local_imports": 16,
+    "avg_imports_per_file": 13.93,
+    "avg_local_imports_per_file": 1.14,
+    "most_complex_files": [
+      {
+        "file": "Assistants/Generalist/V9_AutoFeedingThreadAgent.py",
+        "import_count": 24,
+        "local_import_count": 10
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_engine.py",
+        "import_count": 24,
+        "local_import_count": 0
+      },
+      {
+        "file": "Core/Partitioner/import_analyzer.py",
+        "import_count": 22,
+        "local_import_count": 0
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/Assistants/EditingSession/Tools/optimized_tool_registry.py",
+        "import_count": 17,
+        "local_import_count": 5
+      },
+      {
+        "file": "/home/luciedefraiteur/ShadeOS_Agents/TemporalFractalMemoryEngine/core/temporal_workspace_layer.py",
+        "import_count": 16,
+        "local_import_count": 1
+      }
+    ]
+  },
+  "critical_modules": [
+    {
+      "module": "Core",
+      "dependency_count": 10,
+      "criticality_level": "HIGH"
+    },
+    {
+      "module": "TemporalFractalMemoryEngine",
+      "dependency_count": 4,
+      "criticality_level": "MEDIUM"
+    },
+    {
+      "module": "Assistants",
+      "dependency_count": 2,
+      "criticality_level": "LOW"
+    }
+  ]
+}

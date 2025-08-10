@@ -1,7 +1,7 @@
 import os
 import sys
 
-from ..Utils.string_utils import _simple_xml_tokenizer
+from Core.Utils.string_utils import _simple_xml_tokenizer
 
 def parse_luciform(file_path: str) -> dict:
     """

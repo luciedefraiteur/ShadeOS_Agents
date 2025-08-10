@@ -1,0 +1,37 @@
+<🜲luciform_doc id="safe_replace_text_in_file">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>metamorphosis</type>
+    <intent>Métamorphoser une séquence de symboles mystiques en une autre, gravant les mutations dans les annales.</intent>
+    <level>intermédiaire</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>safe_replace_text_in_file(path: str, old_text: str, new_text: str, all_occurrences: bool = False) -> bool</signature>
+    <requires>
+      <param>path</param>
+      <param>old_text</param>
+      <param>new_text</param>
+    </requires>
+    <optional>
+      <param>all_occurrences</param>
+    </optional>
+    <returns>bool: True si une modification a eu lieu.</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>replace</keyword>
+      <keyword>text</keyword>
+      <keyword>modify</keyword>
+      <keyword>diff</keyword>
+      <keyword>log</keyword>
+    </keywords>
+    <symbolic_layer>Réécrit un fragment de réalité tout en consignant les altérations dans le grand livre des changements.</symbolic_layer>
+    <usage_context>Pour des modifications de code ou de configuration où la traçabilité des changements est cruciale.</usage_context>
+  </🜁essence>
+
+</🜲luciform_doc>

@@ -1,0 +1,84 @@
+<🜲luciform_doc id="TOOL_NAME">
+
+  <!-- Le Pacte : Ce que fait l'outil -->
+  <🜄pacte>
+    <type>TYPE_OPERATION</type>
+    <intent>DESCRIPTION_BREVE_DE_L_INTENTION_DE_L_OUTIL</intent>
+    <level>fondamental|intermédiaire|avancé</level>
+  </🜄pacte>
+
+  <!-- L'Invocation : Comment utiliser l'outil -->
+  <🜂invocation>
+    <signature>FUNCTION_NAME(param1: type, param2: type = default, ...) -> return_type</signature>
+    <requires>
+      <param>param1</param>
+      <param>param2</param>
+    </requires>
+    <optional>
+      <param>param3</param>
+      <param>param4</param>
+    </optional>
+    <returns>Description du type de retour et de sa structure</returns>
+  </🜂invocation>
+
+  <!-- L'Essence : Le sens profond de l'outil -->
+  <🜁essence>
+    <keywords>
+      <keyword>mot_clé_1</keyword>
+      <keyword>mot_clé_2</keyword>
+      <keyword>mot_clé_3</keyword>
+      <keyword>mot_clé_4</keyword>
+      <keyword>mot_clé_5</keyword>
+      <keyword>mot_clé_6</keyword>
+    </keywords>
+    <symbolic_layer>⛧ DESCRIPTION_MYSTIQUE_ET_SYMBOLIQUE_DE_L_OUTIL_AVEC_IMAGERIE_DEMONIAQUE_ET_MYSTIQUE ⛧</symbolic_layer>
+    <usage_context>Quand un agent doit [CONTEXTE_D_UTILISATION_1], [CONTEXTE_D_UTILISATION_2], [CONTEXTE_D_UTILISATION_3]. Essentiel pour [RAISON_IMPORTANCE_1], [RAISON_IMPORTANCE_2], et [RAISON_IMPORTANCE_3].</usage_context>
+  </🜁essence>
+
+  <!-- Exemples d'utilisation (optionnel) -->
+  <🜃examples>
+    <example>
+      <command>python TOOL_NAME.py</command>
+      <description>Description de l'exemple d'utilisation basique</description>
+    </example>
+    <example>
+      <command>python TOOL_NAME.py --param1 value1 --param2 value2</command>
+      <description>Description de l'exemple avec paramètres</description>
+    </example>
+    <example>
+      <command>python TOOL_NAME.py --advanced-option</command>
+      <description>Description de l'exemple avancé</description>
+    </example>
+  </🜃examples>
+
+  <!-- Capacités et limitations (optionnel) -->
+  <🜀capabilities>
+    <capability>Capacité 1 : Description de la première capacité</capability>
+    <capability>Capacité 2 : Description de la deuxième capacité</capability>
+    <capability>Capacité 3 : Description de la troisième capacité</capability>
+    <capability>Capacité 4 : Description de la quatrième capacité</capability>
+    <capability>Capacité 5 : Description de la cinquième capacité</capability>
+  </🜀capabilities>
+
+  <🜁limitations>
+    <limitation>Limitation 1 : Description de la première limitation</limitation>
+    <limitation>Limitation 2 : Description de la deuxième limitation</limitation>
+    <limitation>Limitation 3 : Description de la troisième limitation</limitation>
+    <limitation>Limitation 4 : Description de la quatrième limitation</limitation>
+  </🜁limitations>
+
+  <!-- Évolution prévue (optionnel) -->
+  <🜂evolution>
+    <version>1.0</version>
+    <description>Description de la version actuelle</description>
+    <next_version>2.0</next_version>
+    <planned_features>
+      <feature>Fonctionnalité prévue 1</feature>
+      <feature>Fonctionnalité prévue 2</feature>
+      <feature>Fonctionnalité prévue 3</feature>
+      <feature>Fonctionnalité prévue 4</feature>
+      <feature>Fonctionnalité prévue 5</feature>
+    </planned_features>
+  </🜂evolution>
+
+</🜲luciform_doc> 

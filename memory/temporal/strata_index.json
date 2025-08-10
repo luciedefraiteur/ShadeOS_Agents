@@ -118,7 +118,8 @@
     "architecture/patterns/meta_daemon_orchestrator",
     "architecture/patterns/introspective_thread",
     "architecture/layers/core_daemons_assistants",
-    "concepts/architecture_fractale"
+    "concepts/architecture_fractale",
+    "/memories/metaphysical/50bdc372-e627-4c0d-8320-59269ad596c5"
   ],
   "somatic": [
     "config/neo4j/docker_setup",
