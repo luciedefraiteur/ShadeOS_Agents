@@ -6,12 +6,13 @@ ShadeOS_Agents est un système sophistiqué d'agents IA conscients, organisé au
 
 ## 🏗️ **Architecture Principale**
 
-### 🧠 **MemoryEngine/**
-Système de mémoire fractale avec Archiviste Daemon
-- **Core/** : Moteur principal et composants fondamentaux
-- **Extensions/** : Extensions pour outils et recherche
-- **ProcessManager/** : Gestionnaire de processus
-- **Archiviste/** : Daemon avec auto-réflexion et introspection
+### 🧠 **TemporalFractalMemoryEngine/**
+Substrat mémoire/conscience à dimension temporelle universelle
+- **Base temporelle**: TemporalDimension, BaseTemporalEntity, UnifiedTemporalIndex
+- **Couches temporelles**: WorkspaceTemporalLayer, ToolTemporalLayer, Git/Template
+- **Systèmes**: QueryEnrichmentSystem, AutoImprovementEngine, FractalSearchEngine
+- **Backends**: Neo4j (optionnel), FileSystem par défaut
+  - Voir `TemporalFractalMemoryEngine/README.md`
 
 ### 🎭 **ConsciousnessEngine/**
 Moteur de conscience stratifiée (4 niveaux)
@@ -103,7 +104,7 @@ assistant = V9_AutoFeedingThreadAgent()
 - **Logs organisés** : Classement par horodatage
 - **Structure modulaire** : Facilite maintenance et évolution
 
-## ⚡ Quickstart — V10 & Tests
+## ⚡ Quickstart — V10 & Tests (humain-in-the-loop prêt)
 
 ### V10 CLI (spécialisé fichiers volumineux)
 ```bash
@@ -143,6 +144,12 @@ python shadeos_term_exec.py --cmd 'python run_tests.py --e2e --timeout 20 --log 
 ```
 - Auto‑découverte: l’injecteur lit `~/.shadeos_listener.json` (FIFO, TTY, CWD). Le listener restaure le prompt après chaque commande et peut mirrorer la sortie dans un log.
 
+## 🧬 V10 Specialized Tools (aperçu)
+- `read_chunks_until_scope` (gros fichiers, debug, honnêteté):
+  - `debug:true` → trace par ligne (`indent/brackets/braces/parens`), `end_reason`, `end_pattern`, `scanned_lines`
+  - mid-scope heuristics (Python): `prefer_balanced_end` + `min_scanned_lines`; flags `valid`/`issues`
+  - fallback LLM court-budget (optionnel) quand heuristiques incertaines
+
 ## 🔐 LLM & Clés API
 - Clés stockées dans `~/.shadeos_env`
   - `OPENAI_API_KEY`, `GEMINI_API_KEY`, `GEMINI_API_KEYS` (liste JSON), `GEMINI_CONFIG` (api_keys + strategy)
@@ -164,6 +171,11 @@ Le projet évolue vers :
 - **Nouvelles strates** : Évolution de la conscience
 - **Apprentissage automatique** : Systèmes d'auto-amélioration
 - **Interfaces avancées** : Interfaces utilisateur sophistiquées
+
+## 🤝 Recherche & Matériel
+- Matériel actuel: laptop RTX 2070 mobile — limite VRAM/thermique
+- Besoin: station/GPU plus robuste pour accélérer nos expérimentations ML (fine‑tuning, retrieval, on‑device)
+- Vision: intégrer l’apprentissage court‑terme au TFME (auto‑amélioration) pour boucler plus vite entre théorie et pratique
 
 ---
 
