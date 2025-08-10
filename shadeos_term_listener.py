@@ -24,6 +24,7 @@ import sys
 import subprocess
 from pathlib import Path
 from typing import Optional
+import json
 import fcntl
 import termios
 import time
@@ -124,6 +125,7 @@ def main() -> int:
     parser.add_argument("--print-ready", action="store_true", help="Print READY when listener is active")
     parser.add_argument("--post-ctrl-c", action="store_true", help="Send Ctrl-C to TTY after each command to restore prompt")
     parser.add_argument("--inject-enter", action="store_true", help="Try ioctl(TIOCSTI) to push Enter into shell input (if allowed)")
+    parser.add_argument("--state-file", help="Write listener state (pid, fifo, tty, cwd, log) to this JSON file")
 
     args = parser.parse_args()
 
@@ -149,6 +151,21 @@ def main() -> int:
         _write_to_tty(tty_path, f"Listening on FIFO: {fifo_path}")
         if exec_cwd:
             _write_to_tty(tty_path, f"Working directory: {exec_cwd}")
+        # Persist state if requested
+        if args.state_file:
+            try:
+                state = {
+                    'listener_pid': os.getpid(),
+                    'fifo': str(fifo_path),
+                    'tty': str(tty_path) if tty_path else None,
+                    'cwd': str(exec_cwd) if exec_cwd else None,
+                    'log': str(log_path) if log_path else None,
+                    'started_at': int(time.time()),
+                }
+                with open(args.state_file, 'w') as sf:
+                    json.dump(state, sf, indent=2)
+            except Exception:
+                pass
 
     # Daemonize if requested
     if args.daemon:

@@ -63,6 +63,9 @@ def main() -> int:
         "--cwd", repo_root,
         "--echo",
         "--print-ready",
+        "--post-ctrl-c",
+        "--inject-enter",
+        "--state-file", str(STATE_PATH),
     ]
     if tty.startswith("/dev/pts/"):
         cmd.extend(["--tty", tty])
