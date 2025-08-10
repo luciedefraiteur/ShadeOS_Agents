@@ -768,6 +768,8 @@ class V10ReadChunksUntilScopeTool:
             max_chunks = params.get('max_chunks', 10)
             scope_type = params.get('scope_type', 'auto')  # auto, function, class, block
             include_analysis = params.get('include_analysis', True)
+            debug_mode = params.get('debug', False)
+            prefer_balanced_end = params.get('prefer_balanced_end')
 
             if not file_path:
                 return ToolResult(success=False, tool_name='read_chunks_until_scope', error='file_path est requis')
@@ -775,7 +777,15 @@ class V10ReadChunksUntilScopeTool:
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
 
-            scope_result = await self._detect_scope_boundaries(lines, start_line, scope_type, max_chunks)
+            file_ext = os.path.splitext(file_path)[1].lower()
+            is_python = file_ext == '.py'
+            if prefer_balanced_end is None:
+                prefer_balanced_end = is_python
+
+            scope_result = await self._detect_scope_boundaries(
+                lines, start_line, scope_type, max_chunks,
+                debug_mode=debug_mode, prefer_balanced_end=prefer_balanced_end, is_python=is_python
+            )
             scope_content = self._extract_scope_content(lines, scope_result)
 
             analysis = None
@@ -796,13 +806,17 @@ class V10ReadChunksUntilScopeTool:
                     'scope_type': scope_type,
                     'lines_read': scope_result['end_line'] - scope_result['start_line'] + 1
                 },
-                execution_time=time.time() - start_time
+                execution_time=time.time() - start_time,
+                metadata={'debug': scope_result.get('debug_trace') if debug_mode else None, 'prefer_balanced_end': prefer_balanced_end}
             )
         except Exception as e:
             return ToolResult(success=False, tool_name='read_chunks_until_scope', error=str(e), execution_time=time.time() - start_time)
 
-    async def _detect_scope_boundaries(self, lines: List[str], start_line: int, 
-                                     scope_type: str, max_chunks: int) -> Dict[str, Any]:
+    async def _detect_scope_boundaries(self, lines: List[str], start_line: int,
+                                     scope_type: str, max_chunks: int,
+                                     debug_mode: bool = False,
+                                     prefer_balanced_end: bool = False,
+                                     is_python: bool = False) -> Dict[str, Any]:
         """Détecte les limites du scope."""
         current_line = start_line
         scope_start = start_line
@@ -813,6 +827,21 @@ class V10ReadChunksUntilScopeTool:
         paren_count = 0
 
         scope_patterns = self.scope_detector.get_scope_patterns(scope_type)
+        debug_trace = [] if debug_mode else None
+        end_reason = None
+        end_pattern = None
+        issues: List[str] = []
+
+        started_on_start_pattern = False
+        try:
+            line0 = lines[start_line - 1] if 0 <= start_line - 1 < len(lines) else ''
+            for p in scope_patterns.get('start_patterns', []):
+                if re.search(p, line0):
+                    started_on_start_pattern = True
+                    break
+        except Exception:
+            pass
+        base_indent = self._calculate_indent_level(lines[start_line - 1]) if 0 <= start_line - 1 < len(lines) else 0
 
         for i in range(start_line - 1, min(len(lines), start_line + max_chunks * 50)):
             line = lines[i]
@@ -823,21 +852,48 @@ class V10ReadChunksUntilScopeTool:
             brace_count += line.count('{') - line.count('}')
             paren_count += line.count('(') - line.count(')')
 
-            if self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count):
+            matched = self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count)
+            if is_python and prefer_balanced_end and not started_on_start_pattern:
+                if isinstance(matched, str) and re.search(r"^\s*(return|break|continue)\b", line):
+                    matched = False
+                if (bracket_count == 0 and brace_count == 0 and paren_count == 0 and indent_level <= base_indent and line.strip()):
+                    matched = True
+            if debug_mode:
+                debug_trace.append({'line_num': line_num, 'indent': indent_level, 'brackets': bracket_count, 'braces': brace_count, 'parens': paren_count, 'matched_end': bool(matched)})
+            if matched:
                 scope_end = line_num
+                end_reason = 'pattern' if isinstance(matched, str) else 'balanced_root_nonempty'
+                end_pattern = matched if isinstance(matched, str) else None
                 break
 
             scope_end = line_num
 
-        return {
+        valid = True
+        if end_reason == 'pattern' and is_python and prefer_balanced_end and not started_on_start_pattern:
+            valid = False
+            issues.append('ended_by_pattern_mid_scope')
+        if (brace_count != 0 or bracket_count != 0 or paren_count != 0):
+            valid = False
+            issues.append('unbalanced_delimiters')
+
+        result = {
             'start_line': scope_start,
             'end_line': scope_end,
             'indent_level': indent_level,
             'bracket_count': bracket_count,
             'brace_count': brace_count,
             'paren_count': paren_count,
-            'scope_type': scope_type
+            'scope_type': scope_type,
+            'scanned_lines': (scope_end - scope_start + 1),
+            'end_reason': end_reason,
+            'end_pattern': end_pattern,
+            'started_on_start_pattern': started_on_start_pattern,
+            'valid': valid,
+            'issues': issues
         }
+        if debug_mode:
+            result['debug_trace'] = debug_trace
+        return result
 
     def _calculate_indent_level(self, line: str) -> int:
         """Calcule le niveau d'indentation."""
@@ -847,14 +903,14 @@ class V10ReadChunksUntilScopeTool:
         return len(line) - len(stripped)
 
     def _is_scope_end(self, line: str, scope_patterns: Dict, indent_level: int,
-                      bracket_count: int, brace_count: int, paren_count: int) -> bool:
+                      bracket_count: int, brace_count: int, paren_count: int):
         """Détermine si c'est la fin d'un scope."""
         if bracket_count == 0 and brace_count == 0 and paren_count == 0:
             if indent_level == 0 and line.strip():
                 return True
         for pattern in scope_patterns.get('end_patterns', []):
             if re.search(pattern, line):
-                return True
+                return pattern
         return False
 
     def _extract_scope_content(self, lines: List[str], scope_result: Dict) -> str:
