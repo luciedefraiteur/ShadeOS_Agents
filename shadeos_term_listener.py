@@ -75,6 +75,14 @@ def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optio
         out = (proc.stdout or "") + (proc.stderr or "")
         if out:
             _write_to_tty(tty, out.rstrip("\n"))
+            if log:
+                try:
+                    with log.open("a", buffering=1) as lf:
+                        lf.write(out)
+                        if not out.endswith("\n"):
+                            lf.write("\n")
+                except Exception:
+                    pass
         rc = proc.returncode
     except Exception as e:
         _write_to_tty(tty, f"[error] execution failed: {e}")
