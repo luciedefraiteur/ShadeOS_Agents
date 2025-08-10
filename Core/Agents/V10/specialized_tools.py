@@ -770,6 +770,7 @@ class V10ReadChunksUntilScopeTool:
             include_analysis = params.get('include_analysis', True)
             debug_mode = params.get('debug', False)
             prefer_balanced_end = params.get('prefer_balanced_end')
+            min_scanned_lines = params.get('min_scanned_lines')
 
             if not file_path:
                 return ToolResult(success=False, tool_name='read_chunks_until_scope', error='file_path est requis')
@@ -781,16 +782,28 @@ class V10ReadChunksUntilScopeTool:
             is_python = file_ext == '.py'
             if prefer_balanced_end is None:
                 prefer_balanced_end = is_python
+            if min_scanned_lines is None:
+                min_scanned_lines = 3 if is_python else 1
 
             scope_result = await self._detect_scope_boundaries(
                 lines, start_line, scope_type, max_chunks,
-                debug_mode=debug_mode, prefer_balanced_end=prefer_balanced_end, is_python=is_python
+                debug_mode=debug_mode, prefer_balanced_end=prefer_balanced_end, is_python=is_python,
+                min_scanned_lines=min_scanned_lines
             )
             scope_content = self._extract_scope_content(lines, scope_result)
 
             analysis = None
             if include_analysis:
                 analysis = await self._analyze_scope_with_llm(scope_content, scope_type)
+
+            # LLM fallback if scope seems invalid and analysis is allowed
+            fallback_used = None
+            if include_analysis and not scope_result.get('valid', True):
+                guess = await self._llm_guess_boundaries(lines, start_line, scope_type, is_python)
+                if guess and guess.get('end_line') and guess['end_line'] > scope_result['end_line']:
+                    scope_result['end_line'] = guess['end_line']
+                    scope_content = self._extract_scope_content(lines, scope_result)
+                    fallback_used = 'llm_guess_boundaries'
 
             fractal_result = await self._create_fractal_scope_result(file_path, scope_content, scope_result, analysis)
 
@@ -807,7 +820,12 @@ class V10ReadChunksUntilScopeTool:
                     'lines_read': scope_result['end_line'] - scope_result['start_line'] + 1
                 },
                 execution_time=time.time() - start_time,
-                metadata={'debug': scope_result.get('debug_trace') if debug_mode else None, 'prefer_balanced_end': prefer_balanced_end}
+                metadata={
+                    'debug': scope_result.get('debug_trace') if debug_mode else None,
+                    'prefer_balanced_end': prefer_balanced_end,
+                    'min_scanned_lines': min_scanned_lines,
+                    'fallback_used': fallback_used,
+                }
             )
         except Exception as e:
             return ToolResult(success=False, tool_name='read_chunks_until_scope', error=str(e), execution_time=time.time() - start_time)
@@ -816,7 +834,8 @@ class V10ReadChunksUntilScopeTool:
                                      scope_type: str, max_chunks: int,
                                      debug_mode: bool = False,
                                      prefer_balanced_end: bool = False,
-                                     is_python: bool = False) -> Dict[str, Any]:
+                                     is_python: bool = False,
+                                     min_scanned_lines: int = 1) -> Dict[str, Any]:
         """Détecte les limites du scope."""
         current_line = start_line
         scope_start = start_line
@@ -843,7 +862,8 @@ class V10ReadChunksUntilScopeTool:
             pass
         base_indent = self._calculate_indent_level(lines[start_line - 1]) if 0 <= start_line - 1 < len(lines) else 0
 
-        for i in range(start_line - 1, min(len(lines), start_line + max_chunks * 50)):
+        max_index = min(len(lines), start_line + max_chunks * 50)
+        for i in range(start_line - 1, max_index):
             line = lines[i]
             line_num = i + 1
 
@@ -860,6 +880,10 @@ class V10ReadChunksUntilScopeTool:
                     matched = True
             if debug_mode:
                 debug_trace.append({'line_num': line_num, 'indent': indent_level, 'brackets': bracket_count, 'braces': brace_count, 'parens': paren_count, 'matched_end': bool(matched)})
+            # Enforce minimum scan window when starting mid-scope
+            if matched and not started_on_start_pattern and (line_num - start_line + 1) < max(1, min_scanned_lines):
+                matched = False
+
             if matched:
                 scope_end = line_num
                 end_reason = 'pattern' if isinstance(matched, str) else 'balanced_root_nonempty'
@@ -875,6 +899,10 @@ class V10ReadChunksUntilScopeTool:
         if (brace_count != 0 or bracket_count != 0 or paren_count != 0):
             valid = False
             issues.append('unbalanced_delimiters')
+        result_len = (scope_end - scope_start + 1)
+        if not started_on_start_pattern and result_len < max(1, min_scanned_lines):
+            valid = False
+            issues.append('below_min_scanned_lines')
 
         result = {
             'start_line': scope_start,
@@ -894,6 +922,34 @@ class V10ReadChunksUntilScopeTool:
         if debug_mode:
             result['debug_trace'] = debug_trace
         return result
+
+    async def _llm_guess_boundaries(self, lines: List[str], start_line: int, scope_type: str, is_python: bool) -> Optional[Dict[str, int]]:
+        """Demande au LLM de proposer une fin de scope, budget très court.
+        Retourne {'end_line': int} ou None.
+        """
+        if not hasattr(self.llm_provider, 'generate_text') and not hasattr(self.llm_provider, 'generate_response'):
+            return None
+        snippet = ''.join(lines[start_line-1:start_line-1+80])
+        prompt = (
+            "Tu es un assistant pour détecter les bornes de scope.\n"
+            f"Langage: {'python' if is_python else 'unknown'}; Type: {scope_type}.\n"
+            f"Texte (80 lignes max) à partir de la ligne {start_line}:\n{snippet}\n\n"
+            "Propose un numéro de ligne de fin plausible (absolu), format strict: END_LINE: <nombre>."
+        )
+        try:
+            if hasattr(self.llm_provider, 'generate_text'):
+                resp = await self.llm_provider.generate_text(prompt, max_tokens=30)
+                text = getattr(resp, 'content', '')
+            else:
+                resp = await self.llm_provider.generate_response(prompt, max_tokens=30)
+                text = getattr(resp, 'content', resp)
+            import re as _re
+            m = _re.search(r"END_LINE:\s*(\d+)", text or '')
+            if m:
+                return {'end_line': int(m.group(1))}
+        except Exception:
+            return None
+        return None
 
     def _calculate_indent_level(self, line: str) -> int:
         """Calcule le niveau d'indentation."""
