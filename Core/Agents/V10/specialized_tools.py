@@ -11,6 +11,9 @@ from typing import Dict, Any, List, Optional, Tuple
 from enum import Enum
 import time
 import re
+import ast
+import tokenize
+import io
 
 # Import des composants V10
 from Core.Agents.V10.file_intelligence_engine import V10ContentSummarizer
@@ -792,6 +795,12 @@ class V10ReadChunksUntilScopeTool:
             )
             scope_content = self._extract_scope_content(lines, scope_result)
 
+            # AST validation (non-invasive): validate snippet and optionally file
+            ast_valid, ast_issues, ast_notes = self._validate_python_ast("\n".join(lines), scope_content)
+            if ast_issues:
+                scope_result.setdefault('issues', []).extend([iss for iss in ast_issues if iss not in scope_result.get('issues', [])])
+            scope_result['ast_valid'] = ast_valid
+
             analysis = None
             if include_analysis:
                 analysis = await self._analyze_scope_with_llm(scope_content, scope_type)
@@ -825,6 +834,7 @@ class V10ReadChunksUntilScopeTool:
                     'prefer_balanced_end': prefer_balanced_end,
                     'min_scanned_lines': min_scanned_lines,
                     'fallback_used': fallback_used,
+                    'ast_notes': ast_notes,
                 }
             )
         except Exception as e:
@@ -865,7 +875,40 @@ class V10ReadChunksUntilScopeTool:
 
         max_index = min(len(lines), start_line + max_chunks * 50)
         last_non_blank_line = scope_start
-        for i in range(start_line - 1, max_index):
+
+        # Backward header search for Python: always find nearest preceding def/class (with decorators)
+        scan_start_index = start_line - 1
+        if is_python:
+            header_idx = None
+            j = start_line - 1
+            header_re = re.compile(r"^\s*(def|async\s+def|class)\s+",
+                                   re.IGNORECASE)
+            while j - 1 >= 0:
+                prev = lines[j - 1]
+                if header_re.search(prev):
+                    header_idx = j - 1
+                    # include contiguous decorators above
+                    k = header_idx - 1
+                    while k >= 0 and re.match(r"^\s*@\w", lines[k]):
+                        header_idx = k
+                        k -= 1
+                    break
+                # stop if we reach a less-indented non-empty line that looks like a sibling header
+                # For robustness, do not stop early; only break at file start or after finding header
+                j -= 1
+            if header_idx is not None:
+                scope_start = header_idx + 1
+                started_on_start_pattern = True
+                start_indent = self._calculate_indent_level(lines[header_idx])
+                base_indent = start_indent
+                last_non_blank_line = scope_start
+                scan_start_index = header_idx
+            else:
+                # If no header found above, keep original start but treat as mid-scope (invalid if too short)
+                started_on_start_pattern = False
+
+        seen_body = False
+        for i in range(scan_start_index, max_index):
             line = lines[i]
             line_num = i + 1
 
@@ -881,25 +924,26 @@ class V10ReadChunksUntilScopeTool:
                 if is_python:
                     if line_num == scope_start or indent_level > start_indent:
                         last_non_blank_line = line_num
+                        if indent_level > start_indent:
+                            seen_body = True
                 else:
                     last_non_blank_line = line_num
 
-            # If we did not start on a start pattern, allow shifting the scope start to the first start pattern encountered
-            if not started_on_start_pattern:
-                for p in scope_patterns.get('start_patterns', []):
-                    if re.search(p, line):
-                        scope_start = line_num
-                        started_on_start_pattern = True
-                        base_indent = indent_level
-                        start_indent = indent_level
-                        last_non_blank_line = line_num
-                        # Do not end on the same line we just started
-                        matched = False
-                        break
-                else:
-                    matched = self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count)
+            # With Python header recentered above, follow normal end checks; for non-Python, keep pattern end logic
+            if is_python:
+                matched = False  # rely on indentation-based end below
             else:
                 matched = self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count)
+
+            # Python indentation-based end: when we see a non-comment, non-blank line whose
+            # indentation is less than or equal to the start indent (and not the start line),
+            # we consider the current scope closed just before this line.
+            if is_python and started_on_start_pattern:
+                stripped = line.strip()
+                if stripped and not stripped.startswith('#') and line_num != scope_start:
+                    # Only allow termination after body has been seen; prevents decorator/def header from closing immediately
+                    if seen_body and indent_level <= start_indent:
+                        matched = True
             # Do not terminate immediately on the starting line for Python 'def'/'class'
             if line_num == start_line and started_on_start_pattern and is_python:
                 matched = False
@@ -920,9 +964,11 @@ class V10ReadChunksUntilScopeTool:
                 # Therefore, we do not include the current line (belongs to the next construct).
                 # Close at the last non-blank line inside the scope.
                 if is_python:
-                    scope_end = max(scope_start, last_non_blank_line)
-                    if scope_end == line_num and last_non_blank_line == line_num:
-                        scope_end = max(scope_start, line_num - 1)
+                    # Use exclusive end bound (one past last non-blank in-body line)
+                    scope_end_candidate = max(scope_start, last_non_blank_line)
+                    if scope_end_candidate == line_num and last_non_blank_line == line_num:
+                        scope_end_candidate = max(scope_start, line_num - 1)
+                    scope_end = scope_end_candidate + 1
                     end_reason = 'indent_out'
                     end_pattern = None
                 else:
@@ -941,8 +987,8 @@ class V10ReadChunksUntilScopeTool:
 
             scope_end = line_num
 
-        # If we reached the scan limit/EOF without a clear end, mark as unterminated for Python
-        if end_reason is None and is_python and started_on_start_pattern:
+        # If we reached EOF or scan limit without a dedent and we saw body, mark as unterminated for Python
+        if end_reason is None and is_python and started_on_start_pattern and seen_body:
             # do not move scope_end further; it's already at last scanned
             if debug_trace is not None:
                 debug_trace.append({'note': 'eof_without_dedent'})
@@ -1035,6 +1081,34 @@ class V10ReadChunksUntilScopeTool:
         end = scope_result['end_line']
         scope_lines = lines[start:end]
         return ''.join(scope_lines)
+
+    def _validate_python_ast(self, file_text: str, snippet: str) -> (bool, List[str], List[str]):
+        """Validate Python AST for snippet (and optionally file). Returns (ast_valid, issues, notes)."""
+        issues: List[str] = []
+        notes: List[str] = []
+
+        # Quick tokenizer check for snippet
+        try:
+            _ = list(tokenize.generate_tokens(io.StringIO(snippet).readline))
+        except Exception as e:
+            issues.append('unterminated_string')
+            notes.append(f'tokenize_error: {e}')
+
+        # Try raw parse of snippet (notes only; do not wrap, do not add issues here)
+        ast_valid = True
+        try:
+            ast.parse(snippet)
+        except Exception as e:
+            ast_valid = False
+            notes.append(f'ast_invalid_snippet: {getattr(e, "msg", str(e))} @ line {getattr(e, "lineno", "?")}')
+
+        # Optional: file-level parse to surface file-wide issues (do not change ast_valid flag of snippet)
+        try:
+            ast.parse(file_text)
+        except SyntaxError as e:
+            notes.append(f'file_ast_invalid: {e.msg} @ line {e.lineno}')
+
+        return ast_valid, issues, notes
 
     async def _analyze_scope_with_llm(self, scope_content: str, scope_type: str) -> Dict[str, Any]:
         """Analyse le scope avec LLM."""
