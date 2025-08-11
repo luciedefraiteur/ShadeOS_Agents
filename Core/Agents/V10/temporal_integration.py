@@ -12,6 +12,7 @@ import time
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from datetime import datetime
+import uuid
 
 try:
     from Core.Config.feature_flags import is_temporal_engine_enabled
@@ -29,13 +30,67 @@ except ImportError:
 
 @dataclass
 class TemporalSession:
-    """Session temporelle pour un utilisateur."""
+    """Session temporelle interne pour un utilisateur (utilisée par l'intégration)."""
     user_id: str
     session_id: str
     created_at: datetime
     last_activity: datetime
     metadata: Dict[str, Any]
     temporal_engine: Optional[Any] = None
+
+
+# Classes attendues par les tests unitaires (API de façade minimale)
+@dataclass
+class V10Session:
+    """Dataclass simple pour représenter une session (API test)."""
+    user_id: str
+    session_id: str = None
+    created_at: datetime = None
+    last_activity: datetime = None
+    metadata: Dict[str, Any] = None
+
+    def __post_init__(self):
+        now = datetime.now()
+        if self.session_id is None:
+            # Use high-resolution time + UUID to avoid collisions in tests
+            self.session_id = f"v10_session_{self.user_id}_{int(time.time()*1000)}_{uuid.uuid4().hex[:8]}"
+        if self.created_at is None:
+            self.created_at = now
+        if self.last_activity is None:
+            self.last_activity = now
+        if self.metadata is None:
+            self.metadata = {}
+
+
+@dataclass
+class V10TemporalNode:
+    """Dataclass simple pour représenter un nœud temporel (API test)."""
+    content: str
+    metadata: Dict[str, Any]
+    node_id: str = None
+    created_at: datetime = None
+
+    def __post_init__(self):
+        if self.node_id is None:
+            self.node_id = f"v10_node_{int(time.time()*1000)}"
+        if self.created_at is None:
+            self.created_at = datetime.now()
+
+
+@dataclass
+class V10TemporalLink:
+    """Dataclass simple pour représenter un lien temporel (API test)."""
+    source_id: str
+    target_id: str
+    link_type: str
+    link_id: str = None
+    created_at: datetime = None
+
+    def __post_init__(self):
+        if self.link_id is None:
+            self.link_id = f"v10_link_{int(time.time()*1000)}"
+        if self.created_at is None:
+            self.created_at = datetime.now()
 
 
 class V10SessionManager:
@@ -93,10 +148,13 @@ class V10TemporalIntegration:
         """Initialise l'intégration temporelle."""
         self.temporal_engine = None
         self.session_manager = V10SessionManager()
+        self.temporal_engine_available = False
+        # Espace de simulation des nœuds (mode sans moteur)
+        self._sim_nodes: set[str] = set()
         
         # Activation contrôlée par feature flag
-        TEMPORAL_ENGINE_AVAILABLE = _TFME_IMPORTED and is_temporal_engine_enabled()
-        if TEMPORAL_ENGINE_AVAILABLE:
+        self.temporal_engine_available = _TFME_IMPORTED and is_temporal_engine_enabled()
+        if self.temporal_engine_available:
             try:
                 self.temporal_engine = TemporalEngine()
                 print("✅ TemporalFractalMemoryEngine intégré")
@@ -116,7 +174,7 @@ class V10TemporalIntegration:
             last_activity=datetime.now(),
             metadata={
                 "version": "V10",
-                "temporal_engine_available": TEMPORAL_ENGINE_AVAILABLE,
+                "temporal_engine_available": self.temporal_engine_available,
                 "features": ["multi_agent", "temporal_memory", "mcp_integration"]
             },
             temporal_engine=self.temporal_engine
@@ -125,20 +183,22 @@ class V10TemporalIntegration:
         await self.session_manager.register_session(session)
         return session
     
-    async def create_temporal_node(self, content: str, metadata: Dict[str, Any], session_id: str) -> Optional[str]:
+    async def create_temporal_node(self, content: str, metadata: Dict[str, Any], session_id: str, **kwargs) -> Optional[str]:
         """Crée un nœud temporel."""
+        # Vérifier la session même en mode simulation
+        session = await self.session_manager.get_session(session_id)
+        if not session:
+            print(f"⚠️ Session non trouvée: {session_id}")
+            return None
+
         if not self.temporal_engine:
-            # Mode simulation
-            node_id = f"sim_node_{int(time.time())}"
+            # Mode simulation: générer et stocker un ID local
+            node_id = f"sim_node_{int(time.time()*1000)}"
+            self._sim_nodes.add(node_id)
             print(f"📝 Nœud temporel simulé: {node_id} - {content}")
             return node_id
         
         try:
-            session = await self.session_manager.get_session(session_id)
-            if not session:
-                print(f"⚠️ Session non trouvée: {session_id}")
-                return None
-            
             node = await self.temporal_engine.create_temporal_node(
                 content=content,
                 metadata=metadata
@@ -154,9 +214,12 @@ class V10TemporalIntegration:
     async def create_temporal_link(self, source_id: str, target_id: str, link_type: str = "default", session_id: str = None) -> bool:
         """Crée un lien temporel entre deux nœuds."""
         if not self.temporal_engine:
-            # Mode simulation
-            print(f"🔗 Lien temporel simulé: {source_id} -> {target_id} ({link_type})")
-            return True
+            # Mode simulation avec validation basique d'existence
+            if source_id in self._sim_nodes and target_id in self._sim_nodes:
+                print(f"🔗 Lien temporel simulé: {source_id} -> {target_id} ({link_type})")
+                return True
+            print(f"❌ Lien temporel simulé invalide: {source_id} -> {target_id} ({link_type})")
+            return False
         
         try:
             await self.temporal_engine.create_temporal_link(
@@ -202,6 +265,14 @@ class V10TemporalIntegration:
         """Retourne les statistiques des sessions."""
         return {
             "active_sessions": self.session_manager.get_active_sessions_count(),
-            "temporal_engine_available": TEMPORAL_ENGINE_AVAILABLE,
+            "temporal_engine_available": self.temporal_engine_available,
             "session_timeout": self.session_manager.session_timeout
         }
+
+    async def update_session_activity(self, session_id: str) -> bool:
+        """Met à jour l'activité d'une session (API test)."""
+        session = await self.session_manager.get_session(session_id)
+        if not session:
+            return False
+        session.last_activity = datetime.now()
+        return True

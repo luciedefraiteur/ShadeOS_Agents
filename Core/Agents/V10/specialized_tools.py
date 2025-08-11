@@ -861,8 +861,10 @@ class V10ReadChunksUntilScopeTool:
         except Exception:
             pass
         base_indent = self._calculate_indent_level(lines[start_line - 1]) if 0 <= start_line - 1 < len(lines) else 0
+        start_indent = base_indent
 
         max_index = min(len(lines), start_line + max_chunks * 50)
+        last_non_blank_line = scope_start
         for i in range(start_line - 1, max_index):
             line = lines[i]
             line_num = i + 1
@@ -872,7 +874,35 @@ class V10ReadChunksUntilScopeTool:
             brace_count += line.count('{') - line.count('}')
             paren_count += line.count('(') - line.count(')')
 
-            matched = self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count)
+            # Only consider lines inside the current scope as candidates for last_non_blank_line
+            # For Python, a line is inside the scope if it is non-blank and its indentation is
+            # strictly greater than the start indent (body), or it's the start line itself.
+            if line.strip():
+                if is_python:
+                    if line_num == scope_start or indent_level > start_indent:
+                        last_non_blank_line = line_num
+                else:
+                    last_non_blank_line = line_num
+
+            # If we did not start on a start pattern, allow shifting the scope start to the first start pattern encountered
+            if not started_on_start_pattern:
+                for p in scope_patterns.get('start_patterns', []):
+                    if re.search(p, line):
+                        scope_start = line_num
+                        started_on_start_pattern = True
+                        base_indent = indent_level
+                        start_indent = indent_level
+                        last_non_blank_line = line_num
+                        # Do not end on the same line we just started
+                        matched = False
+                        break
+                else:
+                    matched = self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count)
+            else:
+                matched = self._is_scope_end(line, scope_patterns, indent_level, bracket_count, brace_count, paren_count)
+            # Do not terminate immediately on the starting line for Python 'def'/'class'
+            if line_num == start_line and started_on_start_pattern and is_python:
+                matched = False
             if is_python and prefer_balanced_end and not started_on_start_pattern:
                 if isinstance(matched, str) and re.search(r"^\s*(return|break|continue)\b", line):
                     matched = False
@@ -885,12 +915,41 @@ class V10ReadChunksUntilScopeTool:
                 matched = False
 
             if matched:
-                scope_end = line_num
-                end_reason = 'pattern' if isinstance(matched, str) else 'balanced_root_nonempty'
+                # Prefer indentation-based end for Python scopes: the scope ends when indentation returns
+                # to the start indent (or less) on a non-blank line, meaning the next top-level construct begins.
+                # Therefore, we do not include the current line (belongs to the next construct).
+                # Close at the last non-blank line inside the scope.
+                if is_python:
+                    scope_end = max(scope_start, last_non_blank_line)
+                    if scope_end == line_num and last_non_blank_line == line_num:
+                        scope_end = max(scope_start, line_num - 1)
+                    end_reason = 'indent_out'
+                    end_pattern = None
+                else:
+                    if isinstance(matched, str):
+                        scope_end = line_num
+                        end_reason = 'pattern'
+                        end_pattern = matched
+                    else:
+                        scope_end = max(scope_start, last_non_blank_line)
+                        if scope_end == line_num and last_non_blank_line == line_num:
+                            scope_end = max(scope_start, line_num - 1)
+                        end_reason = 'balanced_root_nonempty'
+                        end_pattern = None
                 end_pattern = matched if isinstance(matched, str) else None
                 break
 
             scope_end = line_num
+
+        # If we reached the scan limit/EOF without a clear end, mark as unterminated for Python
+        if end_reason is None and is_python and started_on_start_pattern:
+            # do not move scope_end further; it's already at last scanned
+            if debug_trace is not None:
+                debug_trace.append({'note': 'eof_without_dedent'})
+            # mark as invalid; caller can still use the partial
+            # we do not append below_min_scanned_lines here; it's a different issue
+            # issues list declared above
+            issues.append('unterminated_scope_eof')
 
         valid = True
         if end_reason == 'pattern' and is_python and prefer_balanced_end and not started_on_start_pattern:
@@ -900,7 +959,8 @@ class V10ReadChunksUntilScopeTool:
             valid = False
             issues.append('unbalanced_delimiters')
         result_len = (scope_end - scope_start + 1)
-        if not started_on_start_pattern and result_len < max(1, min_scanned_lines):
+        # En mode Python en démarrant au milieu d'un scope, on exige une fenêtre minimale inclusive
+        if not started_on_start_pattern and is_python and prefer_balanced_end and result_len <= max(1, min_scanned_lines):
             valid = False
             issues.append('below_min_scanned_lines')
 
@@ -1100,9 +1160,8 @@ class V10ScopeDetector:
                     r'^\s*private\s+\w+\s+\w+\s*\('
                 ],
                 'end_patterns': [
-                    r'^\s*return\s+',
-                    r'^\s*pass\s*$',
-                    r'^\s*raise\s+'
+                    # For Python, avoid premature termination on 'return' inside branches.
+                    # Prefer indentation-based end at next top-level non-empty.
                 ]
             },
             'class': {
@@ -1112,8 +1171,7 @@ class V10ScopeDetector:
                     r'^\s*private\s+class\s+\w+'
                 ],
                 'end_patterns': [
-                    r'^\s*pass\s*$',
-                    r'^\s*#\s*End\s+of\s+class'
+                    # Similarly, end via indentation-based heuristic
                 ]
             },
             'block': {

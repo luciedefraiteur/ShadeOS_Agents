@@ -23,7 +23,7 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 import json
 import fcntl
 import termios
@@ -44,6 +44,66 @@ def ensure_fifo(path: Path) -> None:
         os.mkfifo(path)
     except FileExistsError:
         pass
+
+
+def _read_cmdline(pid: int) -> List[str]:
+    """Read /proc/<pid>/cmdline and split into argv list. Returns [] on error."""
+    try:
+        with open(f"/proc/{pid}/cmdline", "rb") as f:
+            data = f.read()
+        if not data:
+            return []
+        parts = data.split(b"\0")
+        return [p.decode(errors="ignore") for p in parts if p]
+    except Exception:
+        return []
+
+
+def _same_user(pid: int) -> bool:
+    try:
+        st = os.stat(f"/proc/{pid}")
+        return st.st_uid == os.getuid()
+    except Exception:
+        return False
+
+
+def purge_duplicate_listeners(target_fifo: Path, tty: Optional[Path]) -> int:
+    """Kill other shadeos_term_listener.py processes reading the same FIFO for this user."""
+    killed = 0
+    target_str = str(target_fifo)
+    try:
+        for entry in os.scandir("/proc"):
+            if not entry.is_dir() or not entry.name.isdigit():
+                continue
+            pid = int(entry.name)
+            if pid == os.getpid():
+                continue
+            if not _same_user(pid):
+                continue
+            argv = _read_cmdline(pid)
+            if not argv:
+                continue
+            # Match script and fifo path
+            if "shadeos_term_listener.py" in " ".join(argv) and "--fifo" in argv:
+                try:
+                    fifo_index = argv.index("--fifo") + 1
+                    fifo_value = argv[fifo_index] if fifo_index < len(argv) else ""
+                except ValueError:
+                    fifo_value = ""
+                if fifo_value == target_str:
+                    try:
+                        os.kill(pid, 15)  # SIGTERM
+                        killed += 1
+                    except Exception:
+                        pass
+    except Exception:
+        return killed
+    # brief grace period
+    time.sleep(0.2)
+    if killed:
+        msg = f"[info] Purged {killed} duplicate listener(s) for FIFO {target_str}"
+        _write_to_tty(tty, msg)
+    return killed
 
 
 def _write_to_tty(tty: Optional[Path], text: str) -> None:
@@ -130,6 +190,14 @@ def main() -> int:
     args = parser.parse_args()
 
     fifo_path = Path(args.fifo)
+    # Purge duplicate listeners bound to the same FIFO (same user)
+    # Do this before opening/creating the FIFO to avoid racing multiple readers
+    tty_path = Path(args.tty).resolve() if args.tty else None
+    try:
+        purge_duplicate_listeners(fifo_path, tty_path)
+    except Exception:
+        # Non-fatal; continue listener startup
+        pass
     ensure_fifo(fifo_path)
 
     exec_cwd = Path(args.cwd).resolve() if args.cwd else None
@@ -138,7 +206,6 @@ def main() -> int:
         exec_cwd = None
 
     log_path = Path(args.log).resolve() if args.log else None
-    tty_path = Path(args.tty).resolve() if args.tty else None
 
     # Prepare environment (inherit + minimal helpful defaults)
     env = os.environ.copy()
