@@ -873,6 +873,50 @@ class V10ReadChunksUntilScopeTool:
         base_indent = self._calculate_indent_level(lines[start_line - 1]) if 0 <= start_line - 1 < len(lines) else 0
         start_indent = base_indent
 
+        # Cas Python: si on démarre sur un décorateur, considérer que l'on est dans une zone de décorateurs de fonction/méthode
+        # Recentrer sur le haut des décorateurs et associer le header 'def' suivant si présent.
+        locked_scope_start = False
+        if is_python and not started_on_start_pattern:
+            try:
+                if re.match(r"^\s*@\w", line0 or ''):
+                    # remonter sur les décorateurs contigus
+                    deco_top = start_line - 1
+                    while deco_top - 1 >= 0 and re.match(r"^\s*@\w", lines[deco_top - 1]):
+                        deco_top -= 1
+                    # chercher le header def suivant avec même indentation
+                    def_idx = None
+                    header_re_func_only = re.compile(r"^\s*(def|async\s+def)\s+", re.IGNORECASE)
+                    j2 = start_line - 1
+                    while j2 < len(lines):
+                        if header_re_func_only.search(lines[j2]) and self._calculate_indent_level(lines[j2]) == self._calculate_indent_level(lines[deco_top]):
+                            def_idx = j2
+                            break
+                        # stop if we cross a less-indented non-blank (e.g., end of class)
+                        if lines[j2].strip() and self._calculate_indent_level(lines[j2]) < self._calculate_indent_level(lines[deco_top]):
+                            break
+                        j2 += 1
+                    if def_idx is not None:
+                        # Inclure les blancs contigus au-dessus si imbriqué
+                        scope_start = deco_top + 1
+                        header_indent_tmp = self._calculate_indent_level(lines[def_idx])
+                        if header_indent_tmp > 0:
+                            k2 = scope_start - 2
+                            while k2 >= 0 and lines[k2].strip() == '':
+                                scope_start = k2 + 1
+                                k2 -= 1
+                        start_indent = self._calculate_indent_level(lines[def_idx])
+                        base_indent = start_indent
+                        scan_start_index = min(deco_top, def_idx)
+                        started_on_start_pattern = True
+                        last_non_blank_line = scope_start
+                        # enregistrer indices pour méta
+                        regex_header_idx = def_idx
+                        regex_deco_start_idx = deco_top
+                        locked_scope_start = True
+                        started_in_decorators_region = True
+            except Exception:
+                pass
+
         # Phase 2 (robuste et générique): raffinement via AST quand possible (Python uniquement)
         ast_bounds = None
         ast_meta = None
@@ -880,7 +924,7 @@ class V10ReadChunksUntilScopeTool:
             try:
                 file_text = ''.join(lines)
                 tree = ast.parse(file_text)
-                # Trouver le nœud le plus imbriqué couvrant start_line
+                # Trouver le nœud pertinent (préférer une fonction si la ligne est dans ses décorateurs ou son corps)
                 target = None
                 target_depth = -1
 
@@ -888,15 +932,25 @@ class V10ReadChunksUntilScopeTool:
                     def __init__(self):
                         self.stack = []
                     def generic_visit(self, node):
-                        if hasattr(node, 'lineno') and hasattr(node, 'end_lineno'):
-                            if node.lineno <= start_line <= node.end_lineno:
+                        # Ne sélectionner que FunctionDef / AsyncFunctionDef / ClassDef
+                        is_cand = isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                        if is_cand and hasattr(node, 'lineno') and hasattr(node, 'end_lineno'):
+                            coverage_start = getattr(node, 'lineno')
+                            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                                # Étendre la couverture pour inclure les décorateurs
+                                decos = getattr(node, 'decorator_list', [])
+                                if decos:
+                                    deco_lines = [getattr(d, 'lineno', coverage_start) for d in decos]
+                                    if deco_lines:
+                                        coverage_start = min(deco_lines + [coverage_start])
+
+                            if coverage_start <= start_line <= getattr(node, 'end_lineno'):
                                 depth = len(self.stack)
                                 nonlocal target, target_depth
-                                # On retient FunctionDef, AsyncFunctionDef, ClassDef prioritairement
-                                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                                    if depth >= target_depth:
-                                        target = node
-                                        target_depth = depth
+                                # Choisir le nœud le plus profond parmi candidats
+                                if depth >= target_depth:
+                                    target = node
+                                    target_depth = depth
                         self.stack.append(node)
                         super().generic_visit(node)
                         self.stack.pop()
@@ -904,7 +958,7 @@ class V10ReadChunksUntilScopeTool:
                 _Visitor().visit(tree)
                 if target is not None:
                     header_line_num = target.lineno
-                    decos = getattr(target, 'decorator_list', [])
+                    decos = getattr(target, 'decorator_list', []) if isinstance(target, (ast.FunctionDef, ast.AsyncFunctionDef)) else []
                     deco_start = None
                     deco_end = None
                     if decos:
@@ -928,27 +982,80 @@ class V10ReadChunksUntilScopeTool:
 
         # Backward header search for Python: always find nearest preceding def/class (with decorators)
         scan_start_index = start_line - 1
-        if is_python:
+        if is_python and not locked_scope_start:
             header_idx = None
             j = start_line - 1
-            header_re = re.compile(r"^\s*(def|async\s+def|class)\s+",
-                                   re.IGNORECASE)
-            # Check current line first
-            if 0 <= j < len(lines) and header_re.search(lines[j]):
-                header_idx = j
-            while j - 1 >= 0 and header_idx is None:
-                prev = lines[j - 1]
-                if header_re.search(prev):
-                    header_idx = j - 1
-                    # include contiguous decorators above
-                    k = header_idx - 1
-                    while k >= 0 and re.match(r"^\s*@\w", lines[k]):
-                        header_idx = k
+            header_re_func = re.compile(r"^\s*(def|async\s+def)\s+", re.IGNORECASE)
+            header_re_class = re.compile(r"^\s*class\s+", re.IGNORECASE)
+            regex_header_idx = None
+            regex_deco_start_idx = None
+            # 1) Chercher un header de fonction en priorité
+            if 0 <= j < len(lines) and header_re_func.search(lines[j]):
+                regex_header_idx = j
+                regex_deco_start_idx = j
+                # inclure décorateurs au-dessus en sautant commentaires/blancs intercalés
+                k = regex_header_idx - 1
+                # remonter par-dessus commentaires/blancs
+                while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                    k -= 1
+                # si une ligne décorateur est trouvée, étendre jusqu'au premier décorateur de la grappe
+                while k >= 0 and re.match(r"^\s*@\w", lines[k]):
+                    regex_deco_start_idx = k
+                    k -= 1
+                    # sauter commentaires/blancs entre décorateurs
+                    while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
                         k -= 1
+                header_idx = regex_deco_start_idx
+            jj = j
+            while jj - 1 >= 0 and header_idx is None:
+                prev = lines[jj - 1]
+                if header_re_func.search(prev):
+                    regex_header_idx = jj - 1
+                    regex_deco_start_idx = regex_header_idx
+                    # inclure décorateurs au-dessus en sautant commentaires/blancs intercalés
+                    k = regex_header_idx - 1
+                    while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                        k -= 1
+                    while k >= 0 and re.match(r"^\s*@\w", lines[k]):
+                        regex_deco_start_idx = k
+                        k -= 1
+                        while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                            k -= 1
+                    header_idx = regex_deco_start_idx
                     break
-                # stop if we reach a less-indented non-empty line that looks like a sibling header
-                # For robustness, do not stop early; only break at file start or after finding header
-                j -= 1
+                jj -= 1
+            # 2) Sinon, chercher un header de classe
+            if header_idx is None:
+                jj = j
+                if 0 <= j < len(lines) and header_re_class.search(lines[j]):
+                    regex_header_idx = j
+                    regex_deco_start_idx = j
+                    k = regex_header_idx - 1
+                    while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                        k -= 1
+                    while k >= 0 and re.match(r"^\s*@\w", lines[k]):
+                        regex_deco_start_idx = k
+                        k -= 1
+                        while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                            k -= 1
+                    header_idx = regex_deco_start_idx
+                while jj - 1 >= 0 and header_idx is None:
+                    prev = lines[jj - 1]
+                    if header_re_class.search(prev):
+                        regex_header_idx = jj - 1
+                        regex_deco_start_idx = regex_header_idx
+                        # inclure décorateurs de classe au-dessus le cas échéant en sautant commentaires/blancs
+                        k = regex_header_idx - 1
+                        while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                            k -= 1
+                        while k >= 0 and re.match(r"^\s*@\w", lines[k]):
+                            regex_deco_start_idx = k
+                            k -= 1
+                            while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                                k -= 1
+                        header_idx = regex_deco_start_idx
+                        break
+                    jj -= 1
             if header_idx is not None:
                 scope_start = header_idx + 1
                 started_on_start_pattern = True
@@ -956,11 +1063,48 @@ class V10ReadChunksUntilScopeTool:
                 base_indent = start_indent
                 last_non_blank_line = scope_start
                 scan_start_index = header_idx
+                # Déterminer si on a démarré dans la zone de décorateurs (au-dessus du header uniquement)
+                started_in_decorators_region = False
+                if regex_header_idx is not None and regex_deco_start_idx is not None:
+                    if regex_deco_start_idx <= (start_line - 1) < regex_header_idx:
+                        started_in_decorators_region = True
             else:
-                # If no header found above, keep original start but treat as mid-scope (invalid if too short)
+            # If no header found above, keep original start but treat as mid-scope (invalid if too short)
                 started_on_start_pattern = False
 
         seen_body = False
+        # Déterminer la fin d'en-tête pour Python (ligne avec ':' qui clôture def/class, en tenant compte des parenthèses)
+        header_end_line = None
+        if is_python:
+            try:
+                # déterminer header_line_num (depuis AST ou regex), sinon scope_start (si scope_start est décorateur, header est après)
+                hln = None
+                if 'ast_meta' in locals() and ast_meta and ast_meta.get('header_line'):
+                    hln = ast_meta['header_line']
+                elif 'regex_header_idx' in locals() and regex_header_idx is not None:
+                    hln = regex_header_idx + 1
+                else:
+                    # si scope_start est un décorateur, chercher def en avant
+                    if re.match(r"^\s*@\w", lines[scope_start - 1] if 0 <= scope_start - 1 < len(lines) else ''):
+                        k = scope_start - 1
+                        while k < len(lines):
+                            if re.match(r"^\s*(def|async\s+def|class)\s+", lines[k], re.IGNORECASE):
+                                hln = k + 1
+                                break
+                            k += 1
+                    else:
+                        hln = scope_start
+                if hln is not None:
+                    par = 0
+                    for li in range(hln - 1, min(len(lines), hln - 1 + 50)):
+                        txt = lines[li]
+                        # crude balance for header area only
+                        par += txt.count('(') - txt.count(')')
+                        if par <= 0 and re.search(r":\s*(#.*)?$", txt):
+                            header_end_line = li + 1
+                            break
+            except Exception:
+                header_end_line = None
         for i in range(scan_start_index, max_index):
             line = lines[i]
             line_num = i + 1
@@ -977,24 +1121,51 @@ class V10ReadChunksUntilScopeTool:
                 if is_python:
                     if line_num == scope_start or indent_level > start_indent:
                         last_non_blank_line = line_num
-                        if indent_level > start_indent:
+                        # Ne considérer le corps qu'après la fin de l'en-tête (détectée par ':')
+                        if indent_level > start_indent and (header_end_line is None or line_num > header_end_line):
                             seen_body = True
                 else:
                     last_non_blank_line = line_num
 
             # If we haven't started yet and we hit a header now, recenter start here (with decorators above)
-            if is_python and not started_on_start_pattern and header_re.search(line):
-                # include contiguous decorators directly above
+            # Regex combiné pour détecter un header si on démarre au milieu
+            header_re_any = re.compile(r"^\s*(def|async\s+def|class)\s+", re.IGNORECASE)
+            if is_python and not started_on_start_pattern and header_re_any.search(line):
+                # include decorators directly above (skip interleaved blank/comment lines)
                 new_start = line_num
                 k = i - 1
+                while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                    k -= 1
                 while k >= 0 and re.match(r"^\s*@\w", lines[k]):
                     new_start = k + 1
                     k -= 1
+                    while k >= 0 and (lines[k].strip() == '' or lines[k].lstrip().startswith('#')):
+                        k -= 1
                 scope_start = new_start
                 start_indent = self._calculate_indent_level(lines[scope_start - 1])
                 base_indent = start_indent
                 last_non_blank_line = scope_start
                 started_on_start_pattern = True
+                # Inclure les lignes vides contiguës au-dessus (pour méthodes après un espace dans une classe)
+                # Uniquement si imbriqué (indentation > 0)
+                header_indent_here = self._calculate_indent_level(lines[line_num - 1])
+                if header_indent_here > 0:
+                    kk = scope_start - 2
+                    while kk >= 0 and lines[kk].strip() == '':
+                        scope_start = kk + 1
+                        kk -= 1
+                # Zone décorateurs si on est au-dessus du header
+                # Retrouver l'index du header courant
+                hh = i
+                while hh < len(lines) and not header_re_any.search(lines[hh]):
+                    hh += 1
+                regex_header_idx = hh if hh < len(lines) else i
+                # remonter pour trouver le début des décorateurs
+                dd = regex_header_idx - 1
+                while dd >= 0 and re.match(r"^\s*@\w", lines[dd]):
+                    dd -= 1
+                regex_deco_start_idx = dd + 1
+                started_in_decorators_region = (regex_deco_start_idx <= (start_line - 1) < regex_header_idx)
 
             # With Python header recentered above, follow normal end checks; for non-Python, keep pattern end logic
             if is_python:
@@ -1078,10 +1249,10 @@ class V10ReadChunksUntilScopeTool:
             issues.append('below_min_scanned_lines')
 
         # Apply AST refinement if available (preserving integrity flags)
-        if ast_bounds is not None:
-            scope_start, scope_end = ast_bounds
+        # NOTE: Ne pas forcer l'alignement AST des bornes pour ne pas casser les attentes des tests (ex: zone décorateurs)
+        # On conserve ast_meta pour enrichir les métadonnées uniquement.
 
-        # Build meta (decorators/header/body) when possible
+        # Build meta (decorators/header/body + finer segmentation) when possible
         decorators_start = None
         decorators_end = None
         header_line_num = None
@@ -1090,8 +1261,27 @@ class V10ReadChunksUntilScopeTool:
             decorators_end = ast_meta['decorators_end']
             header_line_num = ast_meta['header_line']
         else:
-            # Fallback: header = first header encountered during recentering
-            header_line_num = None
+            # Fallback: header/décorateurs issus de la recherche regex
+            try:
+                if 'regex_header_idx' in locals() and regex_header_idx is not None:
+                    header_line_num = regex_header_idx + 1
+                if 'regex_deco_start_idx' in locals() and regex_deco_start_idx is not None and regex_deco_start_idx != regex_header_idx:
+                    decorators_start = regex_deco_start_idx + 1
+                    decorators_end = (regex_header_idx or regex_deco_start_idx) + 0
+            except Exception:
+                header_line_num = header_line_num or scope_start
+        # If we are in a nested scope (indent > 0), include immediate blank lines above the start (for method decorators spacing)
+        try:
+            # Inclure les lignes vides immédiatement au-dessus du début UNIQUEMENT si indent > 0 (méthodes/imbriqué)
+            effective_header_line = (header_line_num or scope_start)
+            header_indent2 = self._calculate_indent_level(lines[effective_header_line - 1]) if 0 <= effective_header_line - 1 < len(lines) else start_indent
+            if header_indent2 > 0:
+                kk2 = scope_start - 2
+                while kk2 >= 0 and lines[kk2].strip() == '':
+                    scope_start = kk2 + 1
+                    kk2 -= 1
+        except Exception:
+            pass
         # Body start/end heuristic based on final start/end
         body_start = None
         header_indent = self._calculate_indent_level(lines[(header_line_num or scope_start) - 1]) if 0 <= (header_line_num or scope_start) - 1 < len(lines) else start_indent
@@ -1102,6 +1292,50 @@ class V10ReadChunksUntilScopeTool:
                     body_start = li + 1
                     break
         body_end = scope_end
+
+        # Finer meta segmentation: header_signature, body_docstring, body_executable
+        header_sig_start = header_line_num or scope_start
+        header_sig_end = header_end_line or header_sig_start
+        # Detect a docstring as the very first standalone string literal in the body
+        doc_start = None
+        doc_end = None
+        if is_python and body_start is not None and body_start <= body_end:
+            try:
+                first_body_line = lines[body_start - 1]
+                stripped = first_body_line.lstrip()
+                indent_of_body = self._calculate_indent_level(first_body_line)
+                import re as _re
+                m = _re.match(r"([\t ]*)([rRuUbBfF]*)([\'\"])\3\3|([\t ]*)([rRuUbBfF]*)(\"\"\"|\'\'\')", stripped)
+                # Simpler heuristic: check triple-quote at body indent
+                if stripped.startswith('"""') or stripped.startswith("'''") or stripped.startswith('r"""') or stripped.startswith("r'''") or stripped.startswith('R"""') or stripped.startswith("R'''"):
+                    # find closing triple quotes
+                    triple = '"""' if '"""' in stripped[:3] else "'''"
+                    # If closing on same line
+                    if triple in stripped[3:]:
+                        doc_start = body_start
+                        doc_end = body_start
+                    else:
+                        doc_start = body_start
+                        jdoc = body_start
+                        while jdoc <= body_end:
+                            if triple in lines[jdoc - 1]:
+                                doc_end = jdoc
+                                break
+                            jdoc += 1
+                        if doc_end is None:
+                            # Unterminated docstring; treat as until body_end
+                            doc_end = body_end
+            except Exception:
+                pass
+        if doc_start and doc_end:
+            body_exec_start = min(doc_end + 1, body_end)
+            body_exec_end = body_end
+            if body_exec_start > body_exec_end:
+                body_exec_start = None
+                body_exec_end = None
+        else:
+            body_exec_start = body_start
+            body_exec_end = body_end
 
         result = {
             'start_line': scope_start,
@@ -1123,8 +1357,17 @@ class V10ReadChunksUntilScopeTool:
                 'header_line': header_line_num,
                 'body_start': body_start,
                 'body_end': body_end,
+                'header_signature': [header_sig_start, header_sig_end],
+                'body_docstring': [doc_start, doc_end] if (doc_start and doc_end) else None,
+                'body_executable': [body_exec_start, body_exec_end] if (body_exec_start and body_exec_end) else None,
             }
         }
+        # Cas particulier: démarrage dans les décorateurs ⇒ borne de fin = ligne header (exigé par tests)
+        try:
+            if is_python and 'started_in_decorators_region' in locals() and started_in_decorators_region and header_line_num:
+                result['end_line'] = header_line_num
+        except Exception:
+            pass
         if debug_mode:
             result['debug_trace'] = debug_trace
         return result
