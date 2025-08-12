@@ -873,6 +873,56 @@ class V10ReadChunksUntilScopeTool:
         base_indent = self._calculate_indent_level(lines[start_line - 1]) if 0 <= start_line - 1 < len(lines) else 0
         start_indent = base_indent
 
+        # Phase 2 (robuste et générique): raffinement via AST quand possible (Python uniquement)
+        ast_bounds = None
+        ast_meta = None
+        if is_python:
+            try:
+                file_text = ''.join(lines)
+                tree = ast.parse(file_text)
+                # Trouver le nœud le plus imbriqué couvrant start_line
+                target = None
+                target_depth = -1
+
+                class _Visitor(ast.NodeVisitor):
+                    def __init__(self):
+                        self.stack = []
+                    def generic_visit(self, node):
+                        if hasattr(node, 'lineno') and hasattr(node, 'end_lineno'):
+                            if node.lineno <= start_line <= node.end_lineno:
+                                depth = len(self.stack)
+                                nonlocal target, target_depth
+                                # On retient FunctionDef, AsyncFunctionDef, ClassDef prioritairement
+                                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                                    if depth >= target_depth:
+                                        target = node
+                                        target_depth = depth
+                        self.stack.append(node)
+                        super().generic_visit(node)
+                        self.stack.pop()
+
+                _Visitor().visit(tree)
+                if target is not None:
+                    header_line_num = target.lineno
+                    decos = getattr(target, 'decorator_list', [])
+                    deco_start = None
+                    deco_end = None
+                    if decos:
+                        deco_lines = [getattr(d, 'lineno', header_line_num) for d in decos]
+                        deco_start = min(deco_lines)
+                        deco_end = max(deco_lines)
+                    start_ast = min(deco_start, header_line_num) if deco_start else header_line_num
+                    end_ast = getattr(target, 'end_lineno', None) or header_line_num
+                    ast_bounds = (start_ast, end_ast)
+                    ast_meta = {
+                        'decorators_start': deco_start,
+                        'decorators_end': deco_end,
+                        'header_line': header_line_num,
+                    }
+            except Exception:
+                # AST indisponible ou fichier invalide: on retombe sur l'heuristique
+                pass
+
         max_index = min(len(lines), start_line + max_chunks * 50)
         last_non_blank_line = scope_start
 
@@ -883,7 +933,10 @@ class V10ReadChunksUntilScopeTool:
             j = start_line - 1
             header_re = re.compile(r"^\s*(def|async\s+def|class)\s+",
                                    re.IGNORECASE)
-            while j - 1 >= 0:
+            # Check current line first
+            if 0 <= j < len(lines) and header_re.search(lines[j]):
+                header_idx = j
+            while j - 1 >= 0 and header_idx is None:
                 prev = lines[j - 1]
                 if header_re.search(prev):
                     header_idx = j - 1
@@ -929,6 +982,20 @@ class V10ReadChunksUntilScopeTool:
                 else:
                     last_non_blank_line = line_num
 
+            # If we haven't started yet and we hit a header now, recenter start here (with decorators above)
+            if is_python and not started_on_start_pattern and header_re.search(line):
+                # include contiguous decorators directly above
+                new_start = line_num
+                k = i - 1
+                while k >= 0 and re.match(r"^\s*@\w", lines[k]):
+                    new_start = k + 1
+                    k -= 1
+                scope_start = new_start
+                start_indent = self._calculate_indent_level(lines[scope_start - 1])
+                base_indent = start_indent
+                last_non_blank_line = scope_start
+                started_on_start_pattern = True
+
             # With Python header recentered above, follow normal end checks; for non-Python, keep pattern end logic
             if is_python:
                 matched = False  # rely on indentation-based end below
@@ -964,11 +1031,11 @@ class V10ReadChunksUntilScopeTool:
                 # Therefore, we do not include the current line (belongs to the next construct).
                 # Close at the last non-blank line inside the scope.
                 if is_python:
-                    # Use exclusive end bound (one past last non-blank in-body line)
+                    # Use inclusive end bound at the last non-blank in-body line
                     scope_end_candidate = max(scope_start, last_non_blank_line)
                     if scope_end_candidate == line_num and last_non_blank_line == line_num:
                         scope_end_candidate = max(scope_start, line_num - 1)
-                    scope_end = scope_end_candidate + 1
+                    scope_end = scope_end_candidate
                     end_reason = 'indent_out'
                     end_pattern = None
                 else:
@@ -988,7 +1055,7 @@ class V10ReadChunksUntilScopeTool:
             scope_end = line_num
 
         # If we reached EOF or scan limit without a dedent and we saw body, mark as unterminated for Python
-        if end_reason is None and is_python and started_on_start_pattern and seen_body:
+        if end_reason is None and is_python and started_on_start_pattern:
             # do not move scope_end further; it's already at last scanned
             if debug_trace is not None:
                 debug_trace.append({'note': 'eof_without_dedent'})
@@ -1010,6 +1077,32 @@ class V10ReadChunksUntilScopeTool:
             valid = False
             issues.append('below_min_scanned_lines')
 
+        # Apply AST refinement if available (preserving integrity flags)
+        if ast_bounds is not None:
+            scope_start, scope_end = ast_bounds
+
+        # Build meta (decorators/header/body) when possible
+        decorators_start = None
+        decorators_end = None
+        header_line_num = None
+        if ast_meta:
+            decorators_start = ast_meta['decorators_start']
+            decorators_end = ast_meta['decorators_end']
+            header_line_num = ast_meta['header_line']
+        else:
+            # Fallback: header = first header encountered during recentering
+            header_line_num = None
+        # Body start/end heuristic based on final start/end
+        body_start = None
+        header_indent = self._calculate_indent_level(lines[(header_line_num or scope_start) - 1]) if 0 <= (header_line_num or scope_start) - 1 < len(lines) else start_indent
+        for li in range((header_line_num or scope_start), min(len(lines), scope_end)):
+            txt = lines[li]
+            if txt.strip() and not txt.lstrip().startswith('#'):
+                if self._calculate_indent_level(txt) > header_indent:
+                    body_start = li + 1
+                    break
+        body_end = scope_end
+
         result = {
             'start_line': scope_start,
             'end_line': scope_end,
@@ -1023,7 +1116,14 @@ class V10ReadChunksUntilScopeTool:
             'end_pattern': end_pattern,
             'started_on_start_pattern': started_on_start_pattern,
             'valid': valid,
-            'issues': issues
+            'issues': issues,
+            'meta': {
+                'decorators_start': decorators_start,
+                'decorators_end': decorators_end,
+                'header_line': header_line_num,
+                'body_start': body_start,
+                'body_end': body_end,
+            }
         }
         if debug_mode:
             result['debug_trace'] = debug_trace
