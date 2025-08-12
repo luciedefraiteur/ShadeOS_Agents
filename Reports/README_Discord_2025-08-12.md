@@ -1,10 +1,11 @@
+# ShadeOS_Agents — Présentation brève (Discord)
+
 # Prompt pour faire analyser le projet à Cursor CLI
 
 ```
-tiens en analysant tout les reports en commençant par le plus récent, et en jettant un oeil rapidement au code concerné qui t'interesse a la volée, pourrait tu mettre a jour le readme principal, aussi si tu veux relis tout les readme de Core et sous dossiers, et regarde rapidement le TemporalFractalMemoryEngine
+En analysant tous les reports du dossier Reports, en commençant par le plus récent, et en jetant rapidement un œil au code concerné qui t’intéresse à la volée, pourrais-tu prendre connaissance du projet et m’expliquer son fonctionnement ?
+Aussi, si tu veux, relis tous les README de Core et de ses sous-dossiers, et jette un coup d’œil rapide au TemporalFractalMemoryEngine.
 ```
-
-# ShadeOS_Agents — Présentation brève (Discord)
 
 ## TL;DR
 Système d’agents IA « conscients » propulsé par une mémoire fractale temporelle (TFME) et une architecture modulaire pro. Objectif: un assistant dev/ops vraiment utile, traçable et auto‑améliorable.

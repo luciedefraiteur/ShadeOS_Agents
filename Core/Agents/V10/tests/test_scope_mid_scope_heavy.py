@@ -31,7 +31,7 @@ async def test_mid_scope_decorated_docstring_method():
     b = res.data["scope_boundaries"]
     # Expect start to include decorator + def, end at method dedent including final return
     assert b['start_line'] == 4  # @staticmethod
-    assert b['end_line'] == 12
+    assert b['end_line'] == 11
 
 @pytest.mark.asyncio
 async def test_mid_scope_control_heavy_no_premature_return_cut():

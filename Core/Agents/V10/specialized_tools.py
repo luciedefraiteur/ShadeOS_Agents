@@ -920,6 +920,8 @@ class V10ReadChunksUntilScopeTool:
         # Phase 2 (robuste et générique): raffinement via AST quand possible (Python uniquement)
         ast_bounds = None
         ast_meta = None
+        entity_kind = None
+        entity_name = None
         if is_python:
             try:
                 file_text = ''.join(lines)
@@ -959,6 +961,12 @@ class V10ReadChunksUntilScopeTool:
                 if target is not None:
                     header_line_num = target.lineno
                     decos = getattr(target, 'decorator_list', []) if isinstance(target, (ast.FunctionDef, ast.AsyncFunctionDef)) else []
+                    # Entity
+                    if isinstance(target, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        entity_kind = 'function'
+                    elif isinstance(target, ast.ClassDef):
+                        entity_kind = 'class'
+                    entity_name = getattr(target, 'name', None)
                     deco_start = None
                     deco_end = None
                     if decos:
@@ -1270,6 +1278,22 @@ class V10ReadChunksUntilScopeTool:
                     decorators_end = (regex_header_idx or regex_deco_start_idx) + 0
             except Exception:
                 header_line_num = header_line_num or scope_start
+        # Fallback entity detection from header line content
+        if entity_kind is None and header_line_num and 0 <= header_line_num - 1 < len(lines):
+            try:
+                header_text = lines[header_line_num - 1]
+                if re.match(r"^\s*(def|async\s+def)\s+", header_text):
+                    entity_kind = 'function'
+                    mname = re.search(r"^\s*(?:async\s+def|def)\s+([A-Za-z_][A-Za-z0-9_]*)", header_text)
+                    if mname:
+                        entity_name = mname.group(1)
+                elif re.match(r"^\s*class\s+", header_text):
+                    entity_kind = 'class'
+                    mname = re.search(r"^\s*class\s+([A-Za-z_][A-Za-z0-9_]*)", header_text)
+                    if mname:
+                        entity_name = mname.group(1)
+            except Exception:
+                pass
         # If we are in a nested scope (indent > 0), include immediate blank lines above the start (for method decorators spacing)
         try:
             # Inclure les lignes vides immédiatement au-dessus du début UNIQUEMENT si indent > 0 (méthodes/imbriqué)
@@ -1337,6 +1361,21 @@ class V10ReadChunksUntilScopeTool:
             body_exec_start = body_start
             body_exec_end = body_end
 
+        # Build meta v2 structure (new schema), keep old flat fields for backward compatibility
+        decorators_v2 = None
+        if decorators_start or decorators_end:
+            decorators_v2 = { 'span': { 'start': decorators_start, 'end': decorators_end } }
+
+        header_v2 = {
+            'line': header_line_num,
+            'signature': { 'span': { 'start': header_sig_start, 'end': header_sig_end } }
+        }
+        body_v2 = {
+            'span': { 'start': body_start, 'end': body_end },
+            'docstring': ({ 'span': { 'start': doc_start, 'end': doc_end } } if (doc_start and doc_end) else None),
+            'code': ({ 'span': { 'start': body_exec_start, 'end': body_exec_end } } if (body_exec_start and body_exec_end) else None)
+        }
+
         result = {
             'start_line': scope_start,
             'end_line': scope_end,
@@ -1352,6 +1391,13 @@ class V10ReadChunksUntilScopeTool:
             'valid': valid,
             'issues': issues,
             'meta': {
+                # New schema (v2)
+                'meta_version': 2,
+                'entity': { 'kind': entity_kind, 'name': entity_name } if entity_kind else { 'kind': None, 'name': None },
+                'decorators': decorators_v2,
+                'header': header_v2,
+                'body': body_v2,
+                # Backward-compat flat fields (deprecated)
                 'decorators_start': decorators_start,
                 'decorators_end': decorators_end,
                 'header_line': header_line_num,
