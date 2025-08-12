@@ -5,6 +5,7 @@
 # - Makes changes persistent in /etc/fstab
 # - Tunes swappiness and vfs_cache_pressure
 # - Optionally configures ZRAM (compressed swap in RAM)
+# - Adds preflight inspection mode
 #
 # USAGE EXAMPLES
 #   sudo bash Scripts/swap_setup.sh --size 16G                       # create/resize /swapfile to 16G
@@ -24,6 +25,7 @@ VFS_PRESSURE="50"
 ZRAM_MODE="disable"        # enable|disable
 ZRAM_PERCENT="50"          # % of RAM for zram if enabled
 DRY_RUN="false"
+PREFLIGHT_ONLY="false"
 
 log() { echo "[swap-setup] $*"; }
 warn() { echo "[swap-setup][WARN] $*"; }
@@ -46,10 +48,10 @@ need_root() {
 
 # ---- Arguments validation helpers ----
 require_abs_path() {
-  [[ "$1" =~ ^/[^[:space:]]+$ ]] || { err "Invalid --path '$1' (must be absolute, no spaces)"; exit 2; }
+  [[ "$1" =~ ^/[[:alnum:]._/-]+$ ]] || { err "Invalid --path '$1' (must be absolute, safe chars only)"; exit 2; }
 }
 require_size() {
-  [[ "$1" =~ ^[0-9]+[KMGTP]?$ ]] || { err "Invalid size '$1'"; exit 2; }
+  [[ "$1" =~ ^[0-9]+[KMGT]?$ ]] || { err "Invalid size '$1'"; exit 2; }
 }
 require_percent() {
   [[ "$1" =~ ^[0-9]{1,3}$ ]] && (( 1 <= $1 && $1 <= 200 )) || { err "Invalid percent '$1' (1-200)"; exit 2; }
@@ -114,15 +116,21 @@ backup_file() {
 update_fstab() {
   local path="$1" opts="$2"
   backup_file /etc/fstab
-  # Rewrite atomically using awk: update matching line or append if missing
-  run "awk -v p='$path' -v o='$opts' 'BEGIN{updated=0} $1==p && $3==\"swap\" {print p\" none swap \"o\" 0 0\"; updated=1; next} {print} END{ if(!updated){ print p\" none swap \"o\" 0 0\" } }' /etc/fstab > /etc/fstab.new && mv /etc/fstab.new /etc/fstab"
+  # Rewrite atomically using awk: update existing matching line or append if missing
+  run "awk -v p='$path' -v o='$opts' '
+    BEGIN{updated=0}
+    # Match either a canonical swap line (fs_vfstype == swap) or a line whose options include swap
+    (\$1==p) && ( (\$3==\"swap\") || (\$4 ~ /(^|,)swap(,|$)/) ) { print p\" none swap \"o\" 0 0\"; updated=1; next }
+    { print }
+    END { if(!updated){ print p\" none swap \"o\" 0 0\" } }
+  ' /etc/fstab > /etc/fstab.new && mv /etc/fstab.new /etc/fstab"
 }
 
 configure_sysctl() {
   local f="/etc/sysctl.d/99-swap-tuning.conf"
   log "Configuring sysctl: swappiness=$SWAPPINESS vfs_cache_pressure=$VFS_PRESSURE"
   backup_file "$f" || true
-  run "bash -lc 'printf "vm.swappiness=%s\nvm.vfs_cache_pressure=%s\n" "$SWAPPINESS" "$VFS_PRESSURE" > "$f"'"
+  run "printf '%s\n%s\n' 'vm.swappiness=$SWAPPINESS' 'vm.vfs_cache_pressure=$VFS_PRESSURE' > '/etc/sysctl.d/99-swap-tuning.conf'"
   run "sysctl --system >/dev/null"
 }
 
@@ -140,20 +148,32 @@ setup_zram() {
     log "ZRAM: disabled (use --zram enable to turn on)"
     return
   fi
+  # Prefer Ubuntu/Debian zram-tools if present
+  if systemctl list-unit-files | grep -q '^zramswap.service'; then
+    local cfg="/etc/default/zramswap"
+    log "Configuring zram-tools (zramswap.service) with PERCENT=${ZRAM_PERCENT}"
+    backup_file "$cfg" || true
+    # Ensure config file exists
+    run "touch '$cfg'"
+    # Set or update PERCENT and ALGO=zstd
+    run "grep -q '^PERCENT=' '$cfg' && sed -i -E 's/^PERCENT=.*/PERCENT=${ZRAM_PERCENT}/' '$cfg' || printf '%s\n' 'PERCENT=${ZRAM_PERCENT}' >> '$cfg'"
+    run "grep -q '^ALGO=' '$cfg' && sed -i -E 's/^ALGO=.*/ALGO=zstd/' '$cfg' || printf '%s\n' 'ALGO=zstd' >> '$cfg'"
+    # Ensure high priority (optional; keep default if present)
+    run "grep -q '^PRIORITY=' '$cfg' || printf '%s\n' 'PRIORITY=100' >> '$cfg'"
+    run "systemctl enable --now zramswap.service"
+    run "systemctl restart zramswap.service || true"
+    return
+  fi
+  # Fallback: systemd zram-generator
   if [[ -d /etc/systemd ]]; then
     local cfg="/etc/systemd/zram-generator.conf"
     log "Configuring systemd zram-generator (size=ram/${ZRAM_PERCENT}, algo=zstd)"
     backup_file "$cfg" || true
-    run "bash -lc 'cat > "$cfg" <<EOC
-[zram0]
-zram-size = ram/${ZRAM_PERCENT}
-compression-algorithm = zstd
-EOC'"
+    run "printf '%s\n%s\n%s\n' '[zram0]' 'zram-size = ram/${ZRAM_PERCENT}' 'compression-algorithm = zstd' > '$cfg'"
     run "systemctl daemon-reload"
-    # Prefer enabling the generated swap unit; fall back to legacy service name
     run "systemctl enable --now dev-zram0.swap || systemctl restart systemd-zram-setup@zram0.service || true"
   else
-    warn "systemd not found; skipping zram-generator setup"
+    warn "systemd not found; skipping zram setup"
   fi
 }
 
@@ -163,6 +183,8 @@ create_swapfile_ext() {
   # Ensure parent dir exists
   run "install -d -m 755 '$(dirname "$path")'"
   if is_swap_active_for_file "$path"; then run "swapoff '$path'"; fi
+  # Ensure there is sufficient free space before allocating
+  check_space "$size_str" "$path"
   if [[ ! -f "$path" ]]; then
     run "fallocate -l '$size_str' '$path'"
   else
@@ -214,6 +236,44 @@ resize_or_create_swapfile() {
   fi
 }
 
+# Inspect current swap state and report before taking actions
+inspect_swap_state() {
+  SWAP_EXISTS=false
+  SWAP_ACTIVE=false
+  SWAP_IN_FSTAB=false
+  SWAP_SIZE_BYTES=0
+
+  # Existence and type checks
+  if [[ -e "$SWAP_PATH" ]]; then
+    if [[ -d "$SWAP_PATH" ]]; then err "Path '$SWAP_PATH' is a directory"; exit 2; fi
+    if [[ -b "$SWAP_PATH" || -c "$SWAP_PATH" ]]; then err "Path '$SWAP_PATH' is a device node"; exit 2; fi
+    if [[ -f "$SWAP_PATH" || -L "$SWAP_PATH" ]]; then
+      SWAP_EXISTS=true
+      SWAP_SIZE_BYTES=$(stat -c %s "$SWAP_PATH" 2>/dev/null || echo 0)
+    fi
+  fi
+
+  # Active?
+  if swapon --show=NAME --noheadings | grep -qx "$SWAP_PATH"; then
+    SWAP_ACTIVE=true
+  fi
+
+  # Present in fstab?
+  if awk -v p="$SWAP_PATH" '($1==p) && ((($2=="none") && ($3=="swap")) || ($4 ~ /(^|,)swap(,|$)/)) {found=1} END{exit !found}' /etc/fstab; then
+    SWAP_IN_FSTAB=true
+  fi
+
+  # List other active swap devices
+  mapfile -t ACTIVE_LIST < <(swapon --show=NAME --noheadings || true)
+
+  log "Preflight: path=$SWAP_PATH exists=$SWAP_EXISTS active=$SWAP_ACTIVE size=${SWAP_SIZE_BYTES}B in_fstab=$SWAP_IN_FSTAB"
+  if ((${#ACTIVE_LIST[@]})); then
+    log "Active swap devices: ${ACTIVE_LIST[*]}"
+  else
+    log "Active swap devices: (none)"
+  fi
+}
+
 main() {
   need_root
   # Parse args
@@ -226,10 +286,11 @@ main() {
       --vfs-pressure) VFS_PRESSURE="$2"; shift 2;;
       --zram) ZRAM_MODE="$2"; shift 2;;
       --zram-percent) ZRAM_PERCENT="$2"; shift 2;;
+      --preflight-only) PREFLIGHT_ONLY="true"; shift 1;;
       --dry-run) DRY_RUN="true"; shift 1;;
       -h|--help)
         cat <<USAGE
-Usage: sudo $0 [--path /swapfile] [--size 16G | --increment 8G] [--swappiness 20] [--vfs-pressure 50] [--zram enable|disable] [--zram-percent 50] [--dry-run]
+Usage: sudo $0 [--path /swapfile] [--size 16G | --increment 8G] [--swappiness 20] [--vfs-pressure 50] [--zram enable|disable] [--zram-percent 50] [--preflight-only] [--dry-run]
 USAGE
         exit 0;;
       *) err "Unknown arg: $1"; exit 2;;
@@ -240,6 +301,18 @@ USAGE
     err "You must provide --size or --increment"
     exit 2
   fi
+
+  # Validate args
+  require_abs_path "$SWAP_PATH"
+  [[ -n "$SIZE_ABS" ]] && require_size "$SIZE_ABS"
+  [[ -n "$SIZE_INC" ]] && require_size "$SIZE_INC"
+  require_int "$SWAPPINESS" swappiness
+  require_int "$VFS_PRESSURE" vfs_cache_pressure
+  require_percent "$ZRAM_PERCENT"
+
+  # Preflight inspection before deciding sizes/actions
+  inspect_swap_state
+  [[ "$PREFLIGHT_ONLY" == "true" ]] && { log "Preflight only → exiting."; exit 0; }
 
   # Determine target absolute size
   local final_size_str=""
@@ -266,12 +339,12 @@ USAGE
 
   log "Planned swapfile: $SWAP_PATH size=$final_size_str (dry-run=$DRY_RUN)"
 
-  # SSD-friendly fstab opts (avoid always-on discard; keep priority only)
+  # Create/resize swap file first
+  resize_or_create_swapfile "$SWAP_PATH" "$final_size_str"
+
+  # Persist in fstab after successful creation
   local fstab_opts="pri=10"
   update_fstab "$SWAP_PATH" "$fstab_opts"
-
-  # Create/resize swap file
-  resize_or_create_swapfile "$SWAP_PATH" "$final_size_str"
 
   # Tune sysctl and enable TRIM
   configure_sysctl
