@@ -1,3 +1,9 @@
+# Prompt pour faire analyser le projet à Cursor CLI
+
+```
+tiens en analysant tout les reports en commençant par le plus récent, et en jettant un oeil rapidement au code concerné qui t'interesse a la volée, pourrait tu mettre a jour le readme principal, aussi si tu veux relis tout les readme de Core et sous dossiers, et regarde rapidement le TemporalFractalMemoryEngine
+```
+
 # ShadeOS_Agents — Présentation brève (Discord)
 
 ## TL;DR
