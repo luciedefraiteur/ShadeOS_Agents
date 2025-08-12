@@ -99,20 +99,52 @@ async def run_case(idx: int, total: int, case: Dict[str, Any]) -> int:
     print(f"Result: OK")
     print(f"Scope: {b['start_line']}..{b['end_line']}  | valid={b.get('valid', True)}  | end_reason={b.get('end_reason')}  | type={b.get('scope_type')}")
     # Meta block
-    ds = meta.get('decorators_start')
-    de = meta.get('decorators_end')
-    hl = meta.get('header_line')
-    bs = meta.get('body_start')
-    be = meta.get('body_end')
-    if ds and de:
-        print(f"Meta.decorators: {ds}..{de} | anchors: {abs_path}:{ds} {abs_path}:{de}")
+    mv = meta.get('meta_version')
+    if mv == 2:
+        entity = meta.get('entity') or {}
+        if entity:
+            print(f"Meta.entity: kind={entity.get('kind')} name={entity.get('name')}")
+        dec = (meta.get('decorators') or {}).get('span') or {}
+        if dec.get('start') and dec.get('end'):
+            print(f"Meta.decorators: {dec.get('start')}..{dec.get('end')} | anchors: {abs_path}:{dec.get('start')} {abs_path}:{dec.get('end')}")
+        else:
+            print("Meta.decorators: -")
+        hdr = meta.get('header') or {}
+        hl = hdr.get('line')
+        print(f"Meta.header.line: {hl if hl else '-'}", (f"| anchor: {abs_path}:{hl}" if hl else ''))
+        sig = (hdr.get('signature') or {}).get('span') or {}
+        print(f"Meta.header.signature: {(sig.get('start') if sig else '-') }..{(sig.get('end') if sig else '-')}")
+        body = meta.get('body') or {}
+        bspan = (body.get('span') or {})
+        print(f"Meta.body: {(bspan.get('start') if bspan else '-') }..{(bspan.get('end') if bspan else '-')}")
+        bdoc = (body.get('docstring') or {})
+        bdocspan = bdoc.get('span') if bdoc else None
+        if isinstance(bdocspan, dict):
+            print(f"Meta.body.docstring: {bdocspan.get('start')}..{bdocspan.get('end')}")
+        else:
+            print("Meta.body.docstring: -")
+        bcode = (body.get('code') or {})
+        bcodespan = bcode.get('span') if bcode else None
+        if isinstance(bcodespan, dict):
+            print(f"Meta.body.code: {bcodespan.get('start')}..{bcodespan.get('end')}")
+        else:
+            print("Meta.body.code: -")
     else:
-        print("Meta.decorators: -")
-    print(f"Meta.header_line: {hl if hl else '-'}", (f"| anchor: {abs_path}:{hl}" if hl else ''))
-    if bs and be:
-        print(f"Meta.body: {bs}..{be} | anchors: {abs_path}:{bs} {abs_path}:{be}")
-    else:
-        print("Meta.body: -")
+        # Legacy fallback
+        ds = meta.get('decorators_start')
+        de = meta.get('decorators_end')
+        hl = meta.get('header_line')
+        bs = meta.get('body_start')
+        be = meta.get('body_end')
+        if ds and de:
+            print(f"Meta.decorators: {ds}..{de} | anchors: {abs_path}:{ds} {abs_path}:{de}")
+        else:
+            print("Meta.decorators: -")
+        print(f"Meta.header_line: {hl if hl else '-'}", (f"| anchor: {abs_path}:{hl}" if hl else ''))
+        if bs and be:
+            print(f"Meta.body: {bs}..{be} | anchors: {abs_path}:{bs} {abs_path}:{be}")
+        else:
+            print("Meta.body: -")
 
     print(f"Issues: {issues if issues else '[]'}")
     print(f"AST notes: {ast_notes if ast_notes else '[]'}")

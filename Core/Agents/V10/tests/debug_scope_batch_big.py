@@ -96,22 +96,47 @@ async def run_case(idx: int, total: int, line: int, name: str, note: str) -> int
     print(f"Result: OK")
     print(f"Scope: {b['start_line']}..{b['end_line']}  | valid={b.get('valid', True)}  | end_reason={b.get('end_reason')}  | type={b.get('scope_type')}")
 
-    ds = meta.get('decorators_start'); de = meta.get('decorators_end')
-    hl = meta.get('header_line')
-    hs = meta.get('header_signature')
-    bd = meta.get('body_docstring')
-    bex = meta.get('body_executable')
-    bs = meta.get('body_start'); be = meta.get('body_end')
-
-    if ds and de:
-        print(f"Meta.decorators: {ds}..{de} | anchors: {abs_path}:{ds} {abs_path}:{de}")
+    mv = meta.get('meta_version')
+    if mv == 2:
+        entity = meta.get('entity') or {}
+        if entity:
+            print(f"Meta.entity: kind={entity.get('kind')} name={entity.get('name')}")
+        dec = (meta.get('decorators') or {}).get('span') or {}
+        if dec.get('start') and dec.get('end'):
+            print(f"Meta.decorators: {dec.get('start')}..{dec.get('end')} | anchors: {abs_path}:{dec.get('start')} {abs_path}:{dec.get('end')}")
+        else:
+            print("Meta.decorators: -")
+        hdr = meta.get('header') or {}
+        hl = hdr.get('line')
+        print(f"Meta.header.line: {hl if hl else '-'}", (f"| anchor: {abs_path}:{hl}" if hl else ''))
+        sig = (hdr.get('signature') or {}).get('span') or {}
+        print(fmt_range('Meta.header.signature', [sig.get('start'), sig.get('end')] if sig else None))
+        body = meta.get('body') or {}
+        bspan = (body.get('span') or {})
+        print(fmt_range('Meta.body', [bspan.get('start'), bspan.get('end')] if bspan else None))
+        bdoc = (body.get('docstring') or {})
+        bdocspan = bdoc.get('span') if bdoc else None
+        print(fmt_range('Meta.body.docstring', [bdocspan.get('start'), bdocspan.get('end')] if isinstance(bdocspan, dict) else None))
+        bcode = (body.get('code') or {})
+        bcodespan = bcode.get('span') if bcode else None
+        print(fmt_range('Meta.body.code', [bcodespan.get('start'), bcodespan.get('end')] if isinstance(bcodespan, dict) else None))
     else:
-        print("Meta.decorators: -")
-    print(f"Meta.header_line: {hl if hl else '-'}", (f"| anchor: {abs_path}:{hl}" if hl else ''))
-    print(fmt_range('Meta.header_signature', hs))
-    print(fmt_range('Meta.body_docstring', bd))
-    print(fmt_range('Meta.body_executable', bex))
-    print(f"Meta.body: {bs if bs else '-'}..{be if be else '-'}")
+        # Legacy
+        ds = meta.get('decorators_start'); de = meta.get('decorators_end')
+        hl = meta.get('header_line')
+        hs = meta.get('header_signature')
+        bd = meta.get('body_docstring')
+        bex = meta.get('body_executable')
+        bs = meta.get('body_start'); be = meta.get('body_end')
+        if ds and de:
+            print(f"Meta.decorators: {ds}..{de} | anchors: {abs_path}:{ds} {abs_path}:{de}")
+        else:
+            print("Meta.decorators: -")
+        print(f"Meta.header_line: {hl if hl else '-'}", (f"| anchor: {abs_path}:{hl}" if hl else ''))
+        print(fmt_range('Meta.header_signature', hs))
+        print(fmt_range('Meta.body_docstring', bd))
+        print(fmt_range('Meta.body_executable', bex))
+        print(f"Meta.body: {bs if bs else '-'}..{be if be else '-'}")
 
     print(f"Issues: {issues if issues else '[]'}")
     print(f"AST notes: {ast_notes if ast_notes else '[]'}")
