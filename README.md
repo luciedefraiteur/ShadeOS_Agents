@@ -19,7 +19,7 @@ Substrat mémoire/conscience à dimension temporelle universelle
 - **Couches temporelles**: WorkspaceTemporalLayer, ToolTemporalLayer, Git/Template
 - **Systèmes**: QueryEnrichmentSystem, AutoImprovementEngine, FractalSearchEngine
 - **Backends**: Neo4j (optionnel), FileSystem par défaut
-  - Voir `TemporalFractalMemoryEngine/README.md`
+  - Détails et API: voir `TemporalFractalMemoryEngine/README.md`
 
 ### ℹ️ Note de migration — MemoryEngine ➜ TemporalFractalMemoryEngine
 - L’ancien « MemoryEngine » (V1) est en cours de remplacement par **TemporalFractalMemoryEngine** (V2).
@@ -83,6 +83,29 @@ assistant = V9_AutoFeedingThreadAgent()
 
 ## 📈 **Évolutions Récentes**
 
+### 🚀 2025‑08‑12 — Scope Detector Meta v2, Debug Runners, Batch Terminal
+- **Meta v2 (scope Python)**: `meta` structuré et stable
+  - `entity { kind, name }`, `decorators.span`, `header.line`, `header.signature.span`, `body.span`, `body.docstring.span`, `body.code.span`
+  - Rétro‑compat préservée (legacy fields encore présents)
+- **Debug runners à jour (Meta v2 en premier)**:
+  - Small batch: `python Core/Agents/V10/tests/debug_scope_batch.py`
+  - Big batch: `python Core/Agents/V10/tests/debug_scope_batch_big.py`
+  - Runner simple: `python Core/Agents/V10/tests/debug_scope_runner.py`
+  - Astuce: évitez de piper la sortie du big batch (risque `BrokenPipe`), ou augmentez le buffer
+- **Détections améliorées**:
+  - Alignement début de scope conscient des décorateurs (tolère commentaires/lignes vides)
+  - Détection des signatures multi‑lignes (`meta.header_signature`)
+  - Séparation docstring et exposition `meta.body_executable`
+- **État des tests**:
+  - Scope tool (mid‑scope heavy, advanced): verts en local
+  - Big fixture batch (18 requêtes): ALL GREEN
+- **Refactor V10 Specialized Tools (à venir, sans rupture)**:
+  - Scission de `Core/Agents/V10/specialized_tools.py` en modules:
+    - `tools/io_lines.py` (IO lignes), `tools/analysis.py` (index/summaries)
+    - `tools/scope_detection/python_scope.py`, `tools/scope_detection/reader.py`
+    - `tools/registry.py` (API publique)
+  - `specialized_tools.py` ré‑exportera pour préserver les imports existants
+
 ### 🔥 What's new (2025‑08‑09/10)
 - V10 Specialized Tools: `read_chunks_until_scope`
   - Mode debug (`debug:true`): trace par ligne, `end_reason`, `end_pattern`, `scanned_lines`
@@ -134,6 +157,18 @@ python shadeos_cli.py exec-tool \
   --params-json '{"file_path":"Core/Agents/V10/specialized_tools.py","start_line":860,"include_analysis":false,"debug":true}'
 ```
 
+### Debug Runners (scope Python)
+```bash
+# Petit lot
+python Core/Agents/V10/tests/debug_scope_batch.py
+
+# Gros lot (18 requêtes, évitez le piping)
+python Core/Agents/V10/tests/debug_scope_batch_big.py
+
+# Runner unitaire sur un fichier/ligne
+python Core/Agents/V10/tests/debug_scope_runner.py --file Core/Agents/V10/specialized_tools.py --line 860
+```
+
 ### Tests (rapides, mock par défaut)
 ```bash
 # E2E (mock) avec timeout court
@@ -156,11 +191,20 @@ python shadeos_term_exec.py --cmd 'python run_tests.py --e2e --timeout 20 --log 
 ```
 - Auto‑découverte: l’injecteur lit `~/.shadeos_listener.json` (FIFO, TTY, CWD). Le listener restaure le prompt après chaque commande et peut mirrorer la sortie dans un log.
 
+Références terminal:
+- `Reports/Terminal/terminal_batch_usage_2025-08-12_121644.md`
+- `Reports/Terminal/terminal_injection_usage_2025-08-11_120219.md`
+
 ## 🧬 V10 Specialized Tools (aperçu)
 - `read_chunks_until_scope` (gros fichiers, debug, honnêteté):
   - `debug:true` → trace par ligne (`indent/brackets/braces/parens`), `end_reason`, `end_pattern`, `scanned_lines`
   - mid-scope heuristics (Python): `prefer_balanced_end` + `min_scanned_lines`; flags `valid`/`issues`
   - fallback LLM court-budget (optionnel) quand heuristiques incertaines
+
+Sortie `meta` (v2) actuellement exposée:
+- `entity`, `decorators.span`, `header.line`, `header.signature.span`, `body.span`, `body.docstring.span`, `body.code.span`
+
+À venir: chaîne d’ascendance (parents/ancêtres de scope) dans `meta` et runners.
 
 ## 🔐 LLM & Clés API
 - Clés stockées dans `~/.shadeos_env`
