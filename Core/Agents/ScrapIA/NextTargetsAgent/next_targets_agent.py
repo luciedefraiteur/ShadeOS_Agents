@@ -7,8 +7,10 @@ from typing import Dict, List, Any, Optional
 # Minimal import path, adjust if running standalone
 try:
     from Core.Providers.LLMProviders.provider_factory import ProviderFactory
+    from Core.Config.secure_env_manager import load_project_environment
 except Exception:
     from ...Providers.LLMProviders.provider_factory import ProviderFactory  # type: ignore
+    from ...Config.secure_env_manager import load_project_environment  # type: ignore
 
 
 def _read_tail_lines(path: Path, max_lines: int = 500) -> List[str]:
@@ -31,6 +33,12 @@ def plan_next_targets(
 
     Returns a dict with greenhouse_boards, ddg_queries, non_gh_targets, rationale, confidence.
     """
+    # Load env (ensures GEMINI/OPENAI keys from ~/.shadeos_env are available)
+    try:
+        load_project_environment()
+    except Exception:
+        pass
+
     # Prepare compact context
     summaries_tail = _read_tail_lines(summaries_path, 200)
     handles_tail = _read_tail_lines(handles_path, 200)
