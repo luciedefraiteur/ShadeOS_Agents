@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 # Minimal import path, adjust if running standalone
 try:
@@ -24,6 +24,7 @@ def plan_next_targets(
     provider: str = "gemini",
     model: str = "gemini-1.5-pro",
     max_items: int = 12,
+    save_prompt_to: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Use an LLM provider to propose next targets (GH boards, DDG queries, non-GH targets).
 
@@ -43,6 +44,14 @@ def plan_next_targets(
         f"Max {max_items} cibles au total, pas de doublons, favorise la diversité des providers.\n"
         "FORMAT UNIQUEMENT JSON, PAS DE TEXTE AUTOUR.\n"
     )
+
+    # Optional: persist the exact prompt for debugging/observability
+    try:
+        if save_prompt_to:
+            save_prompt_to.parent.mkdir(parents=True, exist_ok=True)
+            save_prompt_to.write_text(prompt, encoding="utf-8")
+    except Exception:
+        pass
 
     # Build provider
     prov = ProviderFactory.create_provider(provider, model=model)
