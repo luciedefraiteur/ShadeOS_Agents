@@ -25,6 +25,7 @@ def plan_next_targets(
     model: str = "gemini-1.5-pro",
     max_items: int = 12,
     save_prompt_to: Optional[Path] = None,
+    save_raw_to: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Use an LLM provider to propose next targets (GH boards, DDG queries, non-GH targets).
 
@@ -77,6 +78,14 @@ def plan_next_targets(
 
     content = anyio.run(_call)
 
+    # Persist raw content for observability/debugging
+    try:
+        if save_raw_to:
+            save_raw_to.parent.mkdir(parents=True, exist_ok=True)
+            save_raw_to.write_text(str(content), encoding="utf-8")
+    except Exception:
+        pass
+
     try:
         data = json.loads(content)
         # Basic shape check
@@ -91,11 +100,12 @@ def plan_next_targets(
         if isinstance(data["non_gh_targets"], list):
             data["non_gh_targets"] = data["non_gh_targets"][:max_items]
         return data
-    except Exception:
+    except Exception as e:
         return {
             "greenhouse_boards": [],
             "ddg_queries": [],
             "non_gh_targets": [],
-            "rationale": "parse_error",
+            "rationale": f"parse_error: {e}",
             "confidence": 0.0,
+            "raw_path": str(save_raw_to) if save_raw_to else None,
         }
