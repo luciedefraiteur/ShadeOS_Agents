@@ -65,6 +65,7 @@ def main() -> int:
         "--print-ready",
         "--post-ctrl-c",
         "--inject-enter",
+        "--post-sigint",
         "--state-file", str(STATE_PATH),
     ]
     if tty.startswith("/dev/pts/"):

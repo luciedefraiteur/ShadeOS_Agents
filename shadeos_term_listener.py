@@ -23,11 +23,12 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Iterable
 import json
 import fcntl
 import termios
 import time
+import signal
 
 DONE_MARK = "__DONE__"
 
@@ -122,7 +123,63 @@ def _write_to_tty(tty: Optional[Path], text: str) -> None:
         print(text)
 
 
-def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optional[Path], tty: Optional[Path], post_ctrl_c: bool, inject_enter: bool) -> int:
+def _iter_pids_on_tty(tty: Path) -> Iterable[int]:
+    """Yield PIDs that have the given TTY open on fd 0/1/2 (same user only)."""
+    tty_str = str(tty)
+    try:
+        for entry in os.scandir("/proc"):
+            if not entry.is_dir() or not entry.name.isdigit():
+                continue
+            pid = int(entry.name)
+            if not _same_user(pid):
+                continue
+            # Check a few fds for the TTY
+            found = False
+            for fd in (0, 1, 2):
+                link = f"/proc/{pid}/fd/{fd}"
+                try:
+                    target = os.readlink(link)
+                    if target == tty_str:
+                        found = True
+                        break
+                except Exception:
+                    continue
+            if found:
+                yield pid
+    except Exception:
+        return
+
+
+def _read_comm(pid: int) -> str:
+    try:
+        with open(f"/proc/{pid}/comm", "rt") as f:
+            return f.read().strip()
+    except Exception:
+        return ""
+
+
+def _find_shell_pids(tty: Optional[Path]) -> List[int]:
+    """Return likely shell PIDs attached to the given TTY (bash/zsh/fish)."""
+    if not tty:
+        return []
+    shells = {"bash", "zsh", "fish", "sh"}
+    candidates: List[int] = []
+    for pid in _iter_pids_on_tty(tty):
+        comm = _read_comm(pid).lower()
+        if comm in shells:
+            candidates.append(pid)
+    return candidates
+
+
+def _send_sigint_to_shell(tty: Optional[Path]) -> None:
+    for pid in _find_shell_pids(tty):
+        try:
+            os.kill(pid, signal.SIGINT)
+        except Exception:
+            pass
+
+
+def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optional[Path], tty: Optional[Path], post_ctrl_c: bool, inject_enter: bool, post_sigint: bool) -> int:
     if echo:
         _write_to_tty(tty, f"$ {cmd}")
     try:
@@ -171,6 +228,8 @@ def run_command(cmd: str, cwd: Optional[Path], env: dict, echo: bool, log: Optio
                 os.close(fd)
         except Exception:
             pass
+    if post_sigint:
+        _send_sigint_to_shell(tty)
     return rc
 
 
@@ -186,6 +245,7 @@ def main() -> int:
     parser.add_argument("--post-ctrl-c", action="store_true", help="Send Ctrl-C to TTY after each command to restore prompt")
     parser.add_argument("--inject-enter", action="store_true", help="Try ioctl(TIOCSTI) to push Enter into shell input (if allowed)")
     parser.add_argument("--state-file", help="Write listener state (pid, fifo, tty, cwd, log) to this JSON file")
+    parser.add_argument("--post-sigint", action="store_true", help="Send a real SIGINT to the shell on the target TTY after each command (restores prompt even in daemon mode)")
 
     args = parser.parse_args()
 
@@ -265,7 +325,7 @@ def main() -> int:
                     cmd = line.rstrip("\r\n")
                     if not cmd:
                         continue
-                    run_command(cmd, exec_cwd, env, args.echo, log_path, tty_path, args.post_ctrl_c, args.inject_enter)
+                    run_command(cmd, exec_cwd, env, args.echo, log_path, tty_path, args.post_ctrl_c, args.inject_enter, args.post_sigint)
                 # Writer closed; loop to reopen
     except KeyboardInterrupt:
         _write_to_tty(tty_path, "[info] Listener stopped (Ctrl-C)")
