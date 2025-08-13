@@ -94,8 +94,22 @@ def plan_next_targets(
     except Exception:
         pass
 
+    # Some LLMs wrap JSON inside Markdown code fences (```json ... ```)
+    def _extract_json_payload(text: str) -> str:
+        import re
+        # ```json ... ```
+        m = re.search(r"```json\s*([\s\S]*?)```", text, re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+        # ``` ... ``` without language
+        m = re.search(r"```\s*([\s\S]*?)```", text)
+        if m:
+            return m.group(1).strip()
+        return text
+
     try:
-        data = json.loads(content)
+        payload = _extract_json_payload(str(content))
+        data = json.loads(payload)
         # Basic shape check
         data.setdefault("greenhouse_boards", [])
         data.setdefault("ddg_queries", [])
