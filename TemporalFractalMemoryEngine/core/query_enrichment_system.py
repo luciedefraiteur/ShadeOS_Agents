@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional, Union
 from enum import Enum
 from dataclasses import dataclass
 
-from Core.Providers.LLMProviders import LLMProvider
+from LR_Providers.LLMProviders import LLMProvider
 
 
 class EnrichmentPower(Enum):

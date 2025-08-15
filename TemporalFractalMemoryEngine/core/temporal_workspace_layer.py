@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional, Union
 from pathlib import Path
 from datetime import datetime
 
-from Core.Providers.LLMProviders import LLMProvider
+from LR_Providers.LLMProviders import LLMProvider
 from .temporal_components import WorkspaceTemporalLayer as BaseWorkspaceTemporalLayer
 # Import lazy pour éviter l'import circulaire
 MemoryEngine = None
