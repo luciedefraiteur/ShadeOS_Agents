@@ -58,12 +58,16 @@ class ExecutionResult:
     metadata: Dict[str, Any]
 
 
+from .tool_agent import V10ToolAgent
+
+
 class V10DevAgent:
     """Agent spécialisé dans le raisonnement métier et la logique de développement."""
     
-    def __init__(self, temporal_integration: V10TemporalIntegration, llm_provider: Any = None):
+    def __init__(self, temporal_integration: V10TemporalIntegration, tool_agent: V10ToolAgent, llm_provider: Any = None):
         """Initialise l'agent développeur."""
         self.temporal_integration = temporal_integration
+        self.tool_agent = tool_agent
         self.context_manager = V10ContextManager()
         self.planning_engine = V10PlanningEngine()
         self.session_id = None
@@ -234,10 +238,6 @@ CONTEXTE: {context}
         )
         
         try:
-            # Import dynamique pour éviter les dépendances circulaires
-            from .tool_agent import V10ToolAgent
-            tool_agent = V10ToolAgent(self.temporal_integration)
-            
             for i, step in enumerate(plan.steps):
                 try:
                     # Enregistrement de l'étape
@@ -252,7 +252,7 @@ CONTEXTE: {context}
                     )
                     
                     # Exécution de l'étape
-                    result = await tool_agent.execute_tool(
+                    result = await self.tool_agent.execute_tool(
                         step.get('tool_name'),
                         step.get('parameters', {}),
                         self.session_id

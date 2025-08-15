@@ -34,8 +34,8 @@ class V10Assistant:
     def __init__(self):
         """Initialise l'Assistant V10."""
         self.temporal_integration = V10TemporalIntegration()
-        self.dev_agent = V10DevAgent(self.temporal_integration)
         self.tool_agent = V10ToolAgent(self.temporal_integration)
+        self.dev_agent = V10DevAgent(self.temporal_integration, self.tool_agent)
         self.session_id = None
         self.user_id = None
     

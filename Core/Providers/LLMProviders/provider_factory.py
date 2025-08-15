@@ -33,12 +33,18 @@ class ProviderFactory:
             # Ancien provider subprocess (pour compatibilité)
             return LocalProvider(kwargs)
         elif provider_type == "gemini":
-            # Charge paresseuse pour éviter dépendances manquantes
-            from .providers_optional.gemini_provider import GeminiProvider
-            return GeminiProvider(kwargs)
+            try:
+                # Charge paresseuse pour éviter dépendances manquantes
+                from .providers_optional.gemini_provider import GeminiProvider
+                return GeminiProvider(kwargs)
+            except ImportError:
+                raise ValueError("Le package 'google-generativeai' est requis pour le provider Gemini. Installez-le avec 'pip install google-generativeai'.")
         elif provider_type == "anthropic":
-            from .providers_optional.anthropic_provider import AnthropicProvider
-            return AnthropicProvider(kwargs)
+            try:
+                from .providers_optional.anthropic_provider import AnthropicProvider
+                return AnthropicProvider(kwargs)
+            except ImportError:
+                raise ValueError("Le package 'anthropic' est requis pour le provider Anthropic. Installez-le avec 'pip install anthropic'.")
         else:
             raise ValueError(f"Provider inconnu: {provider_type}. Types supportés: openai, local, gemini, anthropic")
     
